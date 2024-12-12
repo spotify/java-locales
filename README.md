@@ -4,7 +4,7 @@ Library that centralizes and standardizes the use of Unicode locales in Java com
 
 ## Support
 
-Create a [new issue](https://$REPOURL/issues/new)
+Create a [new issue](https://github.com/spotify/java-locales/issues/new)
 
 ## Contributing
 
@@ -17,7 +17,7 @@ in all interactions with the community.
 * @ericfjosne <efjosne@spotify.com>
 * @jsahleen <jsahleen@spotify.com>
 
-A full list of [contributors](https://$REPOURL/graphs/contributors?type=a) can be found on GHC
+A full list of [contributors](https://github.com/spotify/java-locales/graphs/contributors?type=a) can be found on GHC
 
 Follow [@SpotifyEng](https://x.com/spotifyeng) on X for updates.
 
