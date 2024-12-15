@@ -9,7 +9,7 @@ Create a [new issue](https://github.com/spotify/java-locales/issues/new)
 ## Contributing
 
 We feel that a welcoming community is important and we ask that you follow Spotify's
-[Open Source Code of Conduct](https://github.com/spotify/code-of-conduct/blob/main/code-of-conduct.md)
+[Open Source Code of Conduct](https://github.com/spotify/code-of-conduct/blob/master/code-of-conduct.md)
 in all interactions with the community.
 
 ## Authors
@@ -64,9 +64,9 @@ It also offers utility classes to deal with specific problems:
 
 - [AcceptLanguageUtils](./locales-utils/src/main/java/com/spotify/i18n/locales/utils/acceptlanguage/AcceptLanguageUtils.java):
   Parse and/or normalize raw Accept-Language header values
-- [LanguageTagUtils](./locales-utils/src/main/java/com/spotify/i18n/locales/utils/acceptlanguage/LanguageTagUtils.java):
+- [LanguageTagUtils](./locales-utils/src/main/java/com/spotify/i18n/locales/utils/languagetag/LanguageTagUtils.java):
   Parse and/or normalize raw language tags
-- [LocalesHierarchyUtils](./locales-utils/src/main/java/com/spotify/i18n/locales/utils/acceptlanguage/LocalesHierarchyUtils.java):
+- [LocalesHierarchyUtils](./locales-utils/src/main/java/com/spotify/i18n/locales/utils/hierarchy/LocalesHierarchyUtils.java):
   Navigate the locales tree hierarchy, as per [CLDR](https://cldr.unicode.org/).
 
 ## Project Direction
