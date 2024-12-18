@@ -68,7 +68,7 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git@github.com:spotify/java-locales.git</connection>
+    <connection>scm:git:https@github.com:spotify/java-locales.git</connection>
     <developerConnection>scm:git:git@github.com:spotify/java-locales.git</developerConnection>
     <tag>HEAD</tag>
     <url>http://github.com/spotify/java-locales</url>
