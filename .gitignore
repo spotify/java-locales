@@ -4,5 +4,10 @@
 .*
 !.git*
 
+target/
 */target/
-examples/*/target/
+*/*/target/
+
+# Release related
+pom.xml.releaseBackup
+release.properties
