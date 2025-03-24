@@ -64,7 +64,7 @@ public abstract class LocalesMatcherBaseImpl implements LocalesMatcher {
   private static final LikelySubtags LIKELY_SUBTAGS_INSTANCE = LikelySubtags.INSTANCE;
 
   // LikelySubtags method arguments, all assigned to their default as per icu implementation
-  private static final boolean LIKELY_SUBTAGS_CAN_RETURNS_INPUT = false;
+  private static final boolean LIKELY_SUBTAGS_RETURNS_INPUT_IF_UNMATCH = false;
 
   public abstract Set<ULocale> supportedLocales();
 
@@ -111,7 +111,8 @@ public abstract class LocalesMatcherBaseImpl implements LocalesMatcher {
   }
 
   private static LSR getMaximizedLanguageScriptRegion(final ULocale locale) {
-    return LIKELY_SUBTAGS_INSTANCE.makeMaximizedLsrFrom(locale, LIKELY_SUBTAGS_CAN_RETURNS_INPUT);
+    return LIKELY_SUBTAGS_INSTANCE.makeMaximizedLsrFrom(
+        locale, LIKELY_SUBTAGS_RETURNS_INPUT_IF_UNMATCH);
   }
 
   /**
