@@ -100,10 +100,10 @@ public abstract class LocalesMatcherBaseImpl implements LocalesMatcher {
   }
 
   private static int getDistanceBetweenInputAndSupported(
-      final LSR maxParsed, final LSR... maxSupported) {
+      final LSR maxParsed, final LSR maxSupported) {
     return LOCALE_DISTANCE_INSTANCE.getBestIndexAndDistance(
         maxParsed,
-        maxSupported,
+        new LSR[] {maxSupported},
         LOCALE_DISTANCE_SUPPORTED_LSRS_LENGTH,
         LOCALE_DISTANCE_SHIFTED,
         LOCALE_DISTANCE_FAVOR_SUBTAG,
