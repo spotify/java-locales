@@ -22,6 +22,7 @@ package com.spotify.i18n.locales.utils.hierarchy;
 
 import com.google.common.base.Preconditions;
 import com.ibm.icu.util.ULocale;
+import com.ibm.icu.util.ULocale.Builder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -103,6 +104,9 @@ public class LocalesHierarchyUtils {
     ULocale highestAncestor = locale;
     while (true) {
       Optional<ULocale> currentOpt = getParentLocale(highestAncestor);
+      if (currentOpt.isEmpty()) {
+        return highestAncestor;
+      }
       if (currentOpt.get().equals(ULocale.ROOT)) {
         return highestAncestor;
       }
@@ -195,16 +199,23 @@ public class LocalesHierarchyUtils {
         // If they are a match, we can safely return the fallback.
         return Optional.of(locale.getFallback());
       } else {
-        // When they are not a match, we call the same method by force-feeding the script identifier
-        // to the given locale. Ex: for zh-TW, we will be calling this same method, with the
-        // overridden zh-Hant-TW locale.
-        return getParentLocale(
-            new ULocale.Builder()
+        final ULocale localeWithScriptOverride =
+            new Builder()
                 // Build with the base language tag
                 .setLanguageTag(locale.toLanguageTag())
                 // Override the script only
                 .setScript(localeScript)
-                .build());
+                .build();
+        if (isSameLocale(locale, localeWithScriptOverride)) {
+          // This is most likely a locale that is not available in CLDR, with a wrong combination
+          // of language code and script code.
+          return Optional.empty();
+        } else {
+          // When they are not a match, we call the same method by force-feeding the script
+          // identifier to the given locale. Ex: for zh-TW, we will be calling this same method,
+          // with the overridden zh-Hant-TW locale.
+          return getParentLocale(localeWithScriptOverride);
+        }
       }
     }
   }

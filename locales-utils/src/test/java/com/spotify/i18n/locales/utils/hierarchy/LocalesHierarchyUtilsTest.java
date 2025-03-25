@@ -109,6 +109,17 @@ class LocalesHierarchyUtilsTest {
 
   @ParameterizedTest
   @MethodSource
+  void emptyParentLocaleForUnsupportedCombinationsOfLanguageScriptCodes(String languageTag) {
+    assertTrue(
+        LocalesHierarchyUtils.getParentLocale(ULocale.forLanguageTag(languageTag)).isEmpty());
+  }
+
+  static Stream<Arguments> emptyParentLocaleForUnsupportedCombinationsOfLanguageScriptCodes() {
+    return List.of("es-Arab", "fr-Hant", "zh-Japn").stream().map(Arguments::of);
+  }
+
+  @ParameterizedTest
+  @MethodSource
   void isChildLocale(String childLanguageTag, String parentLanguageTag) {
     assertTrue(
         LocalesHierarchyUtils.isDescendantLocale(
@@ -165,20 +176,20 @@ class LocalesHierarchyUtilsTest {
   }
 
   static Stream<Arguments> getAncestorsLocales() {
-    return Map.of(
-            "", List.of(),
-            "en-150", List.of("en-001", "en", ""),
-            "en-GB", List.of("en-001", "en", ""),
-            "en-US", List.of("en", ""),
-            "fr", List.of(""),
-            "wo-Arab", List.of(""),
-            "zh-Hans", List.of("zh", ""),
-            "zh-Hant", List.of(""),
-            "ht", List.of("fr-HT", "fr", ""),
-            "zh-Hant-MO", List.of("zh-Hant-HK", "zh-Hant", ""))
-        .entrySet()
-        .stream()
-        .map(e -> Arguments.arguments(e.getKey(), e.getValue()));
+    return Stream.of(
+        Arguments.of("", List.of()),
+        Arguments.of("en-150", List.of("en-001", "en", "")),
+        Arguments.of("en-GB", List.of("en-001", "en", "")),
+        Arguments.of("en-US", List.of("en", "")),
+        Arguments.of("fr", List.of("")),
+        Arguments.of("wo-Arab", List.of("")),
+        Arguments.of("zh-Hans", List.of("zh", "")),
+        Arguments.of("zh-Hant", List.of("")),
+        Arguments.of("ht", List.of("fr-HT", "fr", "")),
+        Arguments.of("zh-Hant-MO", List.of("zh-Hant-HK", "zh-Hant", "")),
+        Arguments.of("zh-MO", List.of("zh-Hant-HK", "zh-Hant", "")),
+        Arguments.of("sr-RS", List.of("sr", "")),
+        Arguments.of("sr-Latn-RS", List.of("sr-Latn", "")));
   }
 
   @ParameterizedTest
@@ -190,19 +201,19 @@ class LocalesHierarchyUtilsTest {
   }
 
   static Stream<Arguments> getHighestAncestorLocale() {
-    return Map.of(
-            "en-150", "en",
-            "en-GB", "en",
-            "en-US", "en",
-            "fr", "fr",
-            "wo-Arab", "wo-Arab",
-            "zh-Hans-CN", "zh",
-            "zh-Hant", "zh-Hant",
-            "ht", "fr",
-            "zh-Hant-MO", "zh-Hant")
-        .entrySet()
-        .stream()
-        .map(e -> Arguments.arguments(e.getKey(), e.getValue()));
+    return Stream.of(
+        Arguments.of("en-150", "en"),
+        Arguments.of("en-GB", "en"),
+        Arguments.of("en-US", "en"),
+        Arguments.of("fr", "fr"),
+        Arguments.of("wo-Arab", "wo-Arab"),
+        Arguments.of("zh-Hans-CN", "zh"),
+        Arguments.of("zh-Hant", "zh-Hant"),
+        Arguments.of("ht", "fr"),
+        Arguments.of("zh-Hant-MO", "zh-Hant"),
+        Arguments.of("sr-Latn", "sr-Latn"),
+        Arguments.of("zh-MO", "zh-Hant"),
+        Arguments.of("es-Arab-MA", "es-Arab"));
   }
 
   @Test
