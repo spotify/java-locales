@@ -91,20 +91,20 @@ class LocalesHierarchyUtilsTest {
   }
 
   static Stream<Arguments> getParentLocale() {
-    return Map.of(
-            "en-150", "en-001",
-            "en-GB", "en-001",
-            "en-US", "en",
-            "fr", "",
-            "ja-JP", "ja",
-            "wo-Arab", "",
-            "zh-Hans", "zh",
-            "zh-Hant", "",
-            "ht", "fr-HT",
-            "zh-Hant-MO", "zh-Hant-HK")
-        .entrySet()
-        .stream()
-        .map(e -> Arguments.arguments(e.getKey(), e.getValue()));
+    return Stream.of(
+        Arguments.of("en-150", "en-001"),
+        Arguments.of("en-GB", "en-001"),
+        Arguments.of("en-US", "en"),
+        Arguments.of("fr", ""),
+        Arguments.of("ja-JP", "ja"),
+        Arguments.of("wo-Arab", ""),
+        Arguments.of("zh-CN", "zh"),
+        Arguments.of("zh-TW", "zh-Hant"),
+        Arguments.of("zh-MO", "zh-Hant-HK"),
+        Arguments.of("zh-Hans", "zh"),
+        Arguments.of("zh-Hant", ""),
+        Arguments.of("ht", "fr-HT"),
+        Arguments.of("zh-Hant-MO", "zh-Hant-HK"));
   }
 
   @ParameterizedTest
