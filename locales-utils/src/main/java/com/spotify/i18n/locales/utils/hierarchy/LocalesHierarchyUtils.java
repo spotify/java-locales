@@ -22,6 +22,7 @@ package com.spotify.i18n.locales.utils.hierarchy;
 
 import com.google.common.base.Preconditions;
 import com.ibm.icu.util.ULocale;
+import com.ibm.icu.util.ULocale.Builder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -103,6 +104,9 @@ public class LocalesHierarchyUtils {
     ULocale highestAncestor = locale;
     while (true) {
       Optional<ULocale> currentOpt = getParentLocale(highestAncestor);
+      if (currentOpt.isEmpty()) {
+        return highestAncestor;
+      }
       if (currentOpt.get().equals(ULocale.ROOT)) {
         return highestAncestor;
       }
@@ -165,7 +169,55 @@ public class LocalesHierarchyUtils {
    */
   public static Optional<ULocale> getParentLocale(final ULocale locale) {
     Preconditions.checkNotNull(locale);
-    return Optional.ofNullable(CHILD_TO_PARENT_MAP.getOrDefault(locale, locale.getFallback()));
+    if (CHILD_TO_PARENT_MAP.containsKey(locale)) {
+      return Optional.of(CHILD_TO_PARENT_MAP.get(locale));
+    } else {
+      return getParentLocaleBasedOnFallback(locale);
+    }
+  }
+
+  /**
+   * Returns the parent {@link ULocale} according to CLDR, for a given locale, based on its
+   * fallback. We need this to handle cases like zh-TW, for which the parent locale should be
+   * zh-Hant and not zh. By default, the fallback logic removes the last identifier from the tag.
+   *
+   * @param locale A locale for which no explicit parent mapping is defined in CLDR
+   * @return The parent locale, according to CLDR
+   */
+  private static Optional<ULocale> getParentLocaleBasedOnFallback(final ULocale locale) {
+    if (isSameLocale(locale, ULocale.ROOT)) {
+      return Optional.empty();
+    } else if (isSameLocale(locale.getFallback(), ULocale.ROOT)) {
+      return Optional.of(ULocale.ROOT);
+    } else {
+      // We retrieve the script from the given locale
+      final String localeScript = ULocale.addLikelySubtags(locale).getScript();
+      // We retrieve the script from the fallback locale
+      final String parentLocaleScript = ULocale.addLikelySubtags(locale.getFallback()).getScript();
+
+      if (localeScript.equals(parentLocaleScript)) {
+        // If they are a match, we can safely return the fallback.
+        return Optional.of(locale.getFallback());
+      } else {
+        final ULocale localeWithScriptOverride =
+            new Builder()
+                // Build with the base language tag
+                .setLanguageTag(locale.toLanguageTag())
+                // Override the script only
+                .setScript(localeScript)
+                .build();
+        if (isSameLocale(locale, localeWithScriptOverride)) {
+          // This is most likely a locale that is not available in CLDR, with a wrong combination
+          // of language code and script code.
+          return Optional.empty();
+        } else {
+          // When they are not a match, we call the same method by force-feeding the script
+          // identifier to the given locale. Ex: for zh-TW, we will be calling this same method,
+          // with the overridden zh-Hant-TW locale.
+          return getParentLocale(localeWithScriptOverride);
+        }
+      }
+    }
   }
 
   /**
