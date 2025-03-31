@@ -70,9 +70,13 @@ public abstract class LocalesMatcherBaseImpl implements LocalesMatcher {
 
   @Override
   public LocalesMatcherResult match(final String languageTag) {
-    return LocalesMatcherResult.builder()
-        .matchingScore(convertDistanceToScore(getBestDistance(languageTag)))
-        .build();
+    if (supportedLocales().isEmpty()) {
+      return LocalesMatcherResult.builder().matchingScore(0).build();
+    } else {
+      return LocalesMatcherResult.builder()
+          .matchingScore(convertDistanceToScore(getBestDistance(languageTag)))
+          .build();
+    }
   }
 
   private int convertDistanceToScore(final int distance) {

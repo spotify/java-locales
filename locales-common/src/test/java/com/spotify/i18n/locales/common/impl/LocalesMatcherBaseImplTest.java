@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.LocalesMatcher;
 import com.spotify.i18n.locales.common.model.LocalesMatcherResult;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,6 +54,15 @@ class LocalesMatcherBaseImplTest {
             () -> LocalesMatcherBaseImpl.builder().supportedLocales(Set.of(ULocale.ROOT)).build());
 
     assertEquals(thrown.getMessage(), "The supported locales cannot contain the root.");
+  }
+
+  @ParameterizedTest
+  @MethodSource(value = "whenMatching_returnsExpectedResult")
+  void whenMatchingAgainstEmptySetOfSupportedLocales_returnsExpectedResult(String languageTag) {
+    final LocalesMatcher matcher =
+        LocalesMatcherBaseImpl.builder().supportedLocales(Collections.emptySet()).build();
+
+    assertEquals(0, matcher.match(languageTag).matchingScore());
   }
 
   @ParameterizedTest

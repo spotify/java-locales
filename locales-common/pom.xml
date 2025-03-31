@@ -20,6 +20,10 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.spotify.i18n</groupId>
       <artifactId>locales-utils</artifactId>
     </dependency>
