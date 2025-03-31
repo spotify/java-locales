@@ -23,14 +23,10 @@ package com.spotify.i18n.locales.common.model;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import com.ibm.icu.util.ULocale;
-import com.spotify.i18n.locales.common.impl.LocalesMatcherBaseImpl.Builder;
+import com.spotify.i18n.locales.common.LocalesMatcher;
 
 /**
- * A model class that represents a resolved locale. It contains the resolved supported locale for
- * translations, along with the resolved locale for formatting.
- *
- * <p>By "supported locale", we mean that this is a locale that identifies a language for which we
- * can supply translations.
+ * A model class that represents a {@link LocalesMatcher} result.
  *
  * <p>This class is not intended for public subclassing. New object instances must be created using
  * the builder pattern, starting with the {@link #builder()} method.
