@@ -22,7 +22,7 @@ package com.spotify.i18n.locales.common;
 
 import com.google.common.base.Preconditions;
 import com.ibm.icu.util.ULocale;
-import com.spotify.i18n.locales.common.impl.LocalesMatcherBaseImpl;
+import com.spotify.i18n.locales.common.impl.LocaleAffinityCalculatorBaseImpl;
 import com.spotify.i18n.locales.utils.acceptlanguage.AcceptLanguageUtils;
 import com.spotify.i18n.locales.utils.languagetag.LanguageTagUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -32,68 +32,70 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * A factory for creating instances of {@link LocalesMatcher}.
+ * A factory for creating instances of {@link LocaleAffinityCalculator}.
  *
  * @author Eric Fjøsne
  */
-public class LocalesMatcherFactory {
+public class LocaleAffinityCalculatorFactory {
 
-  public static LocalesMatcherFactory getDefaultInstance() {
-    return new LocalesMatcherFactory();
+  public static LocaleAffinityCalculatorFactory getDefaultInstance() {
+    return new LocaleAffinityCalculatorFactory();
   }
 
-  private LocalesMatcherFactory() {}
+  private LocaleAffinityCalculatorFactory() {}
 
   /**
-   * Returns a preconfigured, ready-to-use instance of {@link LocalesMatcher}, using all valid
-   * locales present in the Accept-Language as target supported locales.
+   * Returns a preconfigured, ready-to-use instance of {@link LocaleAffinityCalculator}, using all
+   * valid locales present in the Accept-Language as target supported locales.
    *
    * <p>Malformed or null Accept-Language values will be ignored.
    *
    * <p>Invalid or improperly formatted contained language tags will be ignored.
    *
    * @param acceptLanguage The Accept-Language value
-   * @return Pre-configured matcher
-   * @see LocalesMatcher
+   * @return Pre-configured locale affinity calculator
+   * @see LocaleAffinityCalculator
    * @see <a
    *     href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language">Accept-Language
    *     headers documentation</a>
    */
-  public LocalesMatcher buildLocalesMatcherForAcceptLanguage(
+  public LocaleAffinityCalculator buildLocaleAffinityCalculatorForAcceptLanguage(
       @Nullable final String acceptLanguage) {
-    return buildLocalesMatcherForLanguageTags(
+    return buildLocaleAffinityCalculatorForLanguageTags(
         AcceptLanguageUtils.parse(acceptLanguage).stream()
             .map(LanguageRange::getRange)
             .collect(Collectors.toSet()));
   }
 
   /**
-   * Returns a preconfigured, ready-to-use instance of {@link LocalesMatcher}, using the supplied
-   * language tags as supported locales.
+   * Returns a preconfigured, ready-to-use instance of {@link LocaleAffinityCalculator}, using the
+   * supplied language tags as supported locales.
    *
    * <p>Invalid or improperly formatted language tags will be ignored.
    *
-   * @return Pre-configured matcher
+   * @return Pre-configured locale affinity calculator
    * @see ULocale
    */
-  public LocalesMatcher buildLocalesMatcherForLocales(final Set<ULocale> locales) {
+  public LocaleAffinityCalculator buildLocaleAffinityCalculatorForLocales(
+      final Set<ULocale> locales) {
     Preconditions.checkNotNull(locales);
-    return LocalesMatcherBaseImpl.builder().supportedLocales(locales).build();
+    return LocaleAffinityCalculatorBaseImpl.builder().supportedLocales(locales).build();
   }
 
   /**
-   * Returns a preconfigured, ready-to-use instance of {@link LocalesMatcher}, using the supplied
-   * language tags as supported locales.
+   * Returns a preconfigured, ready-to-use instance of {@link LocaleAffinityCalculator}, using the
+   * supplied language tags as supported locales.
    *
    * <p>Invalid or improperly formatted language tags will be ignored.
    *
-   * @return Pre-configured matcher
-   * @see LocalesMatcher
+   * @return Pre-configured locale affinity calculator
+   * @see LocaleAffinityCalculator
    * @see <a href="https://en.wikipedia.org/wiki/IETF_language_tag">IETF BCP 47 language tag</a>
    */
-  public LocalesMatcher buildLocalesMatcherForLanguageTags(final Set<String> languageTags) {
+  public LocaleAffinityCalculator buildLocaleAffinityCalculatorForLanguageTags(
+      final Set<String> languageTags) {
     Preconditions.checkNotNull(languageTags);
-    return buildLocalesMatcherForLocales(
+    return buildLocaleAffinityCalculatorForLocales(
         languageTags.stream()
             .map(LanguageTagUtils::parse)
             .flatMap(Optional::stream)

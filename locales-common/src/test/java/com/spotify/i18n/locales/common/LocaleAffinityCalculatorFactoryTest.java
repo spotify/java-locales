@@ -27,7 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.ibm.icu.util.ULocale;
-import com.spotify.i18n.locales.common.impl.LocalesMatcherBaseImpl;
+import com.spotify.i18n.locales.common.impl.LocaleAffinityCalculatorBaseImpl;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,25 +38,27 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-class LocalesMatcherFactoryTest {
+class LocaleAffinityCalculatorFactoryTest {
 
   @ParameterizedTest
   @MethodSource
-  public void whenBuildingInstanceForAcceptLanguage_returnsExpectedMatcher(
+  public void whenBuildingInstanceForAcceptLanguage_returnsExpectedCalculator(
       final String acceptLanguage, final Set<String> expectedLanguageTagsForBuilder) {
-    try (MockedStatic<LocalesMatcherBaseImpl> matcherStaticMock =
-        Mockito.mockStatic(LocalesMatcherBaseImpl.class)) {
-      final LocalesMatcherBaseImpl.Builder mockedBuilder = mock();
-      final LocalesMatcher mockedMatcher = mock();
-      matcherStaticMock.when(() -> LocalesMatcherBaseImpl.builder()).thenReturn(mockedBuilder);
+    try (MockedStatic<LocaleAffinityCalculatorBaseImpl> calculatorStaticMock =
+        Mockito.mockStatic(LocaleAffinityCalculatorBaseImpl.class)) {
+      final LocaleAffinityCalculatorBaseImpl.Builder mockedBuilder = mock();
+      final LocaleAffinityCalculator mockedCalculator = mock();
+      calculatorStaticMock
+          .when(() -> LocaleAffinityCalculatorBaseImpl.builder())
+          .thenReturn(mockedBuilder);
       when(mockedBuilder.supportedLocales(any())).thenReturn(mockedBuilder);
-      when(mockedBuilder.build()).thenReturn(mockedMatcher);
+      when(mockedBuilder.build()).thenReturn(mockedCalculator);
 
-      final LocalesMatcher built =
-          LocalesMatcherFactory.getDefaultInstance()
-              .buildLocalesMatcherForAcceptLanguage(acceptLanguage);
+      final LocaleAffinityCalculator built =
+          LocaleAffinityCalculatorFactory.getDefaultInstance()
+              .buildLocaleAffinityCalculatorForAcceptLanguage(acceptLanguage);
 
-      assertEquals(mockedMatcher, built);
+      assertEquals(mockedCalculator, built);
       verify(mockedBuilder)
           .supportedLocales(
               expectedLanguageTagsForBuilder.stream()
@@ -65,7 +67,8 @@ class LocalesMatcherFactoryTest {
     }
   }
 
-  public static Stream<Arguments> whenBuildingInstanceForAcceptLanguage_returnsExpectedMatcher() {
+  public static Stream<Arguments>
+      whenBuildingInstanceForAcceptLanguage_returnsExpectedCalculator() {
     return Stream.of(
         Arguments.of(null, Collections.emptySet()),
         Arguments.of("", Collections.emptySet()),
@@ -77,21 +80,23 @@ class LocalesMatcherFactoryTest {
 
   @ParameterizedTest
   @MethodSource
-  public void whenBuildingInstanceForLanguageTagsSet_returnsExpectedMatcher(
+  public void whenBuildingInstanceForLanguageTagsSet_returnsExpectedCalculator(
       final Set<String> languageTags, final Set<String> expectedLanguageTagsForBuilder) {
-    try (MockedStatic<LocalesMatcherBaseImpl> matcherStaticMock =
-        Mockito.mockStatic(LocalesMatcherBaseImpl.class)) {
-      final LocalesMatcherBaseImpl.Builder mockedBuilder = mock();
-      final LocalesMatcher mockedMatcher = mock();
-      matcherStaticMock.when(() -> LocalesMatcherBaseImpl.builder()).thenReturn(mockedBuilder);
+    try (MockedStatic<LocaleAffinityCalculatorBaseImpl> calculatorStaticMock =
+        Mockito.mockStatic(LocaleAffinityCalculatorBaseImpl.class)) {
+      final LocaleAffinityCalculatorBaseImpl.Builder mockedBuilder = mock();
+      final LocaleAffinityCalculator mockedCalculator = mock();
+      calculatorStaticMock
+          .when(() -> LocaleAffinityCalculatorBaseImpl.builder())
+          .thenReturn(mockedBuilder);
       when(mockedBuilder.supportedLocales(any())).thenReturn(mockedBuilder);
-      when(mockedBuilder.build()).thenReturn(mockedMatcher);
+      when(mockedBuilder.build()).thenReturn(mockedCalculator);
 
-      final LocalesMatcher built =
-          LocalesMatcherFactory.getDefaultInstance()
-              .buildLocalesMatcherForLanguageTags(languageTags);
+      final LocaleAffinityCalculator built =
+          LocaleAffinityCalculatorFactory.getDefaultInstance()
+              .buildLocaleAffinityCalculatorForLanguageTags(languageTags);
 
-      assertEquals(mockedMatcher, built);
+      assertEquals(mockedCalculator, built);
       verify(mockedBuilder)
           .supportedLocales(
               expectedLanguageTagsForBuilder.stream()
@@ -100,7 +105,7 @@ class LocalesMatcherFactoryTest {
     }
   }
 
-  public static Stream<Arguments> whenBuildingInstanceForLanguageTagsSet_returnsExpectedMatcher() {
+  public static Stream<Arguments> whenBuildingInstanceForLanguageTagsSet_returnsExpectedCalculator() {
     return Stream.of(
         Arguments.of(Collections.emptySet(), Collections.emptySet()),
         Arguments.of(
@@ -112,24 +117,27 @@ class LocalesMatcherFactoryTest {
 
   @ParameterizedTest
   @MethodSource
-  public void whenBuildingInstanceForLocalesSet_returnsExpectedMatcher(final Set<ULocale> locales) {
-    try (MockedStatic<LocalesMatcherBaseImpl> matcherStaticMock =
-        Mockito.mockStatic(LocalesMatcherBaseImpl.class)) {
-      final LocalesMatcherBaseImpl.Builder mockedBuilder = mock();
-      final LocalesMatcher mockedMatcher = mock();
-      matcherStaticMock.when(() -> LocalesMatcherBaseImpl.builder()).thenReturn(mockedBuilder);
+  public void whenBuildingInstanceForLocalesSet_returnsExpectedCalculator(final Set<ULocale> locales) {
+    try (MockedStatic<LocaleAffinityCalculatorBaseImpl> calculatorStaticMock =
+        Mockito.mockStatic(LocaleAffinityCalculatorBaseImpl.class)) {
+      final LocaleAffinityCalculatorBaseImpl.Builder mockedBuilder = mock();
+      final LocaleAffinityCalculator mockedCalculator = mock();
+      calculatorStaticMock
+          .when(() -> LocaleAffinityCalculatorBaseImpl.builder())
+          .thenReturn(mockedBuilder);
       when(mockedBuilder.supportedLocales(any())).thenReturn(mockedBuilder);
-      when(mockedBuilder.build()).thenReturn(mockedMatcher);
+      when(mockedBuilder.build()).thenReturn(mockedCalculator);
 
-      final LocalesMatcher built =
-          LocalesMatcherFactory.getDefaultInstance().buildLocalesMatcherForLocales(locales);
+      final LocaleAffinityCalculator built =
+          LocaleAffinityCalculatorFactory.getDefaultInstance()
+              .buildLocaleAffinityCalculatorForLocales(locales);
 
-      assertEquals(mockedMatcher, built);
+      assertEquals(mockedCalculator, built);
       verify(mockedBuilder).supportedLocales(locales);
     }
   }
 
-  public static Stream<Arguments> whenBuildingInstanceForLocalesSet_returnsExpectedMatcher() {
+  public static Stream<Arguments> whenBuildingInstanceForLocalesSet_returnsExpectedCalculator() {
     return Stream.of(
         Arguments.of(Collections.emptySet(), Collections.emptySet()),
         Arguments.of(Set.of(ULocale.ROOT, ULocale.FRENCH, ULocale.JAPANESE)));
