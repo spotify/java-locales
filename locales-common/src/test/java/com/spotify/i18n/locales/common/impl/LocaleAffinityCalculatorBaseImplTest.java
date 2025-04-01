@@ -25,8 +25,9 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.ibm.icu.util.ULocale;
-import com.spotify.i18n.locales.common.LocalesMatcher;
-import com.spotify.i18n.locales.common.model.LocalesMatcherResult;
+import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
+import com.spotify.i18n.locales.common.model.LocaleAffinityResult;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,12 +36,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class LocalesMatcherBaseImplTest {
+class LocaleAffinityCalculatorBaseImplTest {
 
   @Test
   void whenBuildingWithMissingRequiredProperties_buildFails() {
     final IllegalStateException thrown =
-        assertThrows(IllegalStateException.class, () -> LocalesMatcherBaseImpl.builder().build());
+        assertThrows(
+            IllegalStateException.class, () -> LocaleAffinityCalculatorBaseImpl.builder().build());
 
     assertEquals(thrown.getMessage(), "Missing required properties: supportedLocales");
   }
@@ -50,16 +52,28 @@ class LocalesMatcherBaseImplTest {
     final IllegalStateException thrown =
         assertThrows(
             IllegalStateException.class,
-            () -> LocalesMatcherBaseImpl.builder().supportedLocales(Set.of(ULocale.ROOT)).build());
+            () ->
+                LocaleAffinityCalculatorBaseImpl.builder()
+                    .supportedLocales(Set.of(ULocale.ROOT))
+                    .build());
 
     assertEquals(thrown.getMessage(), "The supported locales cannot contain the root.");
   }
 
   @ParameterizedTest
+  @MethodSource(value = "whenMatching_returnsExpectedResult")
+  void whenMatchingAgainstEmptySetOfSupportedLocales_returnsExpectedResult(String languageTag) {
+    final LocaleAffinityCalculator matcher =
+        LocaleAffinityCalculatorBaseImpl.builder().supportedLocales(Collections.emptySet()).build();
+
+    assertEquals(0, matcher.calculate(languageTag).affinityScore());
+  }
+
+  @ParameterizedTest
   @MethodSource
   void whenMatching_returnsExpectedResult(final String languageTag, final int expectedScore) {
-    final LocalesMatcher matcher =
-        LocalesMatcherBaseImpl.builder()
+    final LocaleAffinityCalculator matcher =
+        LocaleAffinityCalculatorBaseImpl.builder()
             .supportedLocales(
                 Set.of("ar", "bs", "es", "fr", "ja", "pt", "sr-Latn", "zh-Hant").stream()
                     .map(ULocale::forLanguageTag)
@@ -67,8 +81,8 @@ class LocalesMatcherBaseImplTest {
             .build();
 
     assertThat(
-        matcher.match(languageTag),
-        is(LocalesMatcherResult.builder().matchingScore(expectedScore).build()));
+        matcher.calculate(languageTag),
+        is(LocaleAffinityResult.builder().affinityScore(expectedScore).build()));
   }
 
   public static Stream<Arguments> whenMatching_returnsExpectedResult() {

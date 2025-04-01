@@ -20,21 +20,21 @@
 
 package com.spotify.i18n.locales.common;
 
-import com.spotify.i18n.locales.common.model.LocalesMatcherResult;
+import com.spotify.i18n.locales.common.model.LocaleAffinityResult;
 
 /**
- * Represents an engine that performs match operations on a given input. All implementations of this
- * interface must return a non-null {@link LocalesMatcherResult}, even when the given input is null
- * or empty.
+ * Represents an engine that calculates a locale affinity score based a given input. All
+ * implementations of this interface must return a non-null {@link LocaleAffinityResult}, even when
+ * the given input is null or empty.
  *
  * @author Eric Fjøsne
  */
-public interface LocalesMatcher {
+public interface LocaleAffinityCalculator {
 
   /**
-   * Returns the {@link LocalesMatcherResult} for the given input
+   * Returns the calculated {@link LocaleAffinityResult} for the given input
    *
-   * @return the locales matcher result
+   * @return the locale affinity result
    */
-  LocalesMatcherResult match(final String input);
+  LocaleAffinityResult calculate(final String input);
 }
