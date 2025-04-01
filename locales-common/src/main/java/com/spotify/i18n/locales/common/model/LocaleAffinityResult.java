@@ -22,58 +22,61 @@ package com.spotify.i18n.locales.common.model;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
-import com.ibm.icu.util.ULocale;
-import com.spotify.i18n.locales.common.LocalesMatcher;
+import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
 
 /**
- * A model class that represents a {@link LocalesMatcher} result.
+ * A model class that represents a {@link LocaleAffinityCalculator} result.
  *
  * <p>This class is not intended for public subclassing. New object instances must be created using
  * the builder pattern, starting with the {@link #builder()} method.
  *
- * @see ULocale
  * @author Eric Fjøsne
  */
 @AutoValue
-public abstract class LocalesMatcherResult {
+public abstract class LocaleAffinityResult {
 
   private static final int MAX_SCORE = 100;
   private static final int MIN_SCORE = 0;
 
-  public abstract int matchingScore();
+  /**
+   * Returns the calculated affinity score
+   *
+   * @return affinity score, with value within the range 0 to 100.
+   */
+  public abstract int affinityScore();
 
   /**
    * Returns a {@link Builder} instance that will allow you to manually create a {@link
-   * LocalesMatcherResult} instance.
+   * LocaleAffinityResult} instance.
    *
    * @return The builder
    */
   public static Builder builder() {
-    return new AutoValue_LocalesMatcherResult.Builder();
+    return new AutoValue_LocaleAffinityResult.Builder();
   }
 
   @AutoValue.Builder
   public abstract static class Builder {
     Builder() {} // package private constructor
 
-    public abstract Builder matchingScore(int matchingScore);
+    public abstract Builder affinityScore(int affinityScore);
 
-    abstract LocalesMatcherResult autoBuild(); // not public
+    abstract LocaleAffinityResult autoBuild(); // not public
 
     /**
-     * Builds a {@link LocalesMatcherResult} out of this builder.
+     * Builds a {@link LocaleAffinityResult} out of this builder.
      *
      * <p>This is safe to be called several times on the same builder.
      *
      * @throws IllegalStateException if any of the builder property does not match the requirements.
      */
-    public final LocalesMatcherResult build() {
-      LocalesMatcherResult result = autoBuild();
-      int score = result.matchingScore();
+    public final LocaleAffinityResult build() {
+      LocaleAffinityResult result = autoBuild();
+      int score = result.affinityScore();
       Preconditions.checkState(
           score >= MIN_SCORE && score <= MAX_SCORE,
           String.format(
-              "The matching score must be between %d and %d. Provided: %d.",
+              "The affinity score must be between %d and %d. Provided: %d.",
               MIN_SCORE, MAX_SCORE, score));
       return result;
     }

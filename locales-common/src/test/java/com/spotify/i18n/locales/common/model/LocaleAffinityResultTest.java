@@ -26,14 +26,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class LocalesMatcherResultTest {
+class LocaleAffinityResultTest {
 
   @Test
   void whenBuildingWithMissingRequiredProperties_buildFails() {
     IllegalStateException thrown =
-        assertThrows(IllegalStateException.class, () -> LocalesMatcherResult.builder().build());
+        assertThrows(IllegalStateException.class, () -> LocaleAffinityResult.builder().build());
 
-    assertEquals("Missing required properties: matchingScore", thrown.getMessage());
+    assertEquals("Missing required properties: affinityScore", thrown.getMessage());
   }
 
   @ParameterizedTest
@@ -42,10 +42,10 @@ class LocalesMatcherResultTest {
     IllegalStateException thrown =
         assertThrows(
             IllegalStateException.class,
-            () -> LocalesMatcherResult.builder().matchingScore(invalidScore).build());
+            () -> LocaleAffinityResult.builder().affinityScore(invalidScore).build());
 
     assertEquals(
-        String.format("The matching score must be between 0 and 100. Provided: %d.", invalidScore),
+        String.format("The affinity score must be between 0 and 100. Provided: %d.", invalidScore),
         thrown.getMessage());
   }
 
@@ -54,6 +54,6 @@ class LocalesMatcherResultTest {
   void whenProvidedScoreIsValid_succeeds(int validScore) {
     assertEquals(
         validScore,
-        LocalesMatcherResult.builder().matchingScore(validScore).build().matchingScore());
+        LocaleAffinityResult.builder().affinityScore(validScore).build().affinityScore());
   }
 }
