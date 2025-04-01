@@ -20,17 +20,9 @@
 
 package com.spotify.i18n.locales.common.model;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import org.junit.jupiter.api.Test;
-
-class LocaleAffinityResultTest {
-
-  @Test
-  void whenBuildingWithMissingRequiredProperties_buildFails() {
-    IllegalStateException thrown =
-        assertThrows(IllegalStateException.class, () -> LocaleAffinityResult.builder().build());
-
-    assertEquals("Missing required properties: affinity", thrown.getMessage());
-  }
+public enum LocaleAffinity {
+  NONE,
+  LOW,
+  HIGH,
+  SAME_OR_INTERCHANGEABLE
 }

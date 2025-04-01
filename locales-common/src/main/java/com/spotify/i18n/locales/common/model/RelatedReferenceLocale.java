@@ -1,3 +1,23 @@
+/*-
+ * -\-\-
+ * locales-common
+ * --
+ * Copyright (C) 2016 - 2025 Spotify AB
+ * --
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * -/-/-
+ */
+
 package com.spotify.i18n.locales.common.model;
 
 import com.google.auto.value.AutoValue;
@@ -8,7 +28,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @AutoValue
-public abstract class ReferenceLocale implements Comparable<ReferenceLocale> {
+public abstract class RelatedReferenceLocale {
 
   public static final ULocale EN_US_POSIX = ULocale.forLanguageTag("en-US-POSIX");
 
@@ -26,53 +46,39 @@ public abstract class ReferenceLocale implements Comparable<ReferenceLocale> {
     return REFERENCE_LOCALES;
   }
 
-  private static final int MAX_SCORE = 100;
-  private static final int MIN_SCORE = 0;
-
   public abstract ULocale referenceLocale();
 
-  public abstract int affinityScore();
-
-  @Override
-  public int compareTo(ReferenceLocale o) {
-    return referenceLocale().compareTo(o.referenceLocale());
-  }
+  public abstract LocaleAffinity affinity();
 
   /**
-   * Returns a {@link ReferenceLocale.Builder} instance that will allow you to manually create a
-   * {@link ReferenceLocale} instance.
+   * Returns a {@link RelatedReferenceLocale.Builder} instance that will allow you to manually
+   * create a {@link RelatedReferenceLocale} instance.
    *
    * @return The builder
    */
-  public static ReferenceLocale.Builder builder() {
-    return new AutoValue_ReferenceLocale.Builder();
+  public static RelatedReferenceLocale.Builder builder() {
+    return new AutoValue_RelatedReferenceLocale.Builder();
   }
 
   @AutoValue.Builder
   public abstract static class Builder {
     Builder() {} // package private constructor
 
-    public abstract Builder affinityScore(final int affinityScore);
+    public abstract Builder affinity(final LocaleAffinity affinity);
 
     public abstract Builder referenceLocale(final ULocale referenceLocale);
 
-    abstract ReferenceLocale autoBuild(); // not public
+    abstract RelatedReferenceLocale autoBuild(); // not public
 
     /**
-     * Builds a {@link ReferenceLocale} out of this builder.
+     * Builds a {@link RelatedReferenceLocale} out of this builder.
      *
      * <p>This is safe to be called several times on the same builder.
      *
      * @throws IllegalStateException if any of the builder property does not match the requirements.
      */
-    public final ReferenceLocale build() {
-      final ReferenceLocale mrl = autoBuild();
-      final int score = mrl.affinityScore();
-      Preconditions.checkState(
-          score >= MIN_SCORE && score <= MAX_SCORE,
-          String.format(
-              "The affinity score must be between %d and %d. Provided: %d.",
-              MIN_SCORE, MAX_SCORE, score));
+    public final RelatedReferenceLocale build() {
+      final RelatedReferenceLocale mrl = autoBuild();
 
       Preconditions.checkState(
           REFERENCE_LOCALES.contains(mrl.referenceLocale()),

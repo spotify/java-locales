@@ -20,12 +20,16 @@
 
 package com.spotify.i18n.locales.common.impl;
 
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.LOW;
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.NONE;
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.SAME_OR_INTERCHANGEABLE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
+import com.spotify.i18n.locales.common.model.LocaleAffinity;
 import com.spotify.i18n.locales.common.model.LocaleAffinityResult;
 import java.util.Collections;
 import java.util.Set;
@@ -66,12 +70,13 @@ class LocaleAffinityCalculatorBaseImplTest {
     final LocaleAffinityCalculator matcher =
         LocaleAffinityCalculatorBaseImpl.builder().supportedLocales(Collections.emptySet()).build();
 
-    assertEquals(0, matcher.calculate(languageTag).affinityScore());
+    assertEquals(NONE, matcher.calculate(languageTag).affinity());
   }
 
   @ParameterizedTest
   @MethodSource
-  void whenMatching_returnsExpectedResult(final String languageTag, final int expectedScore) {
+  void whenMatching_returnsExpectedResult(
+      final String languageTag, final LocaleAffinity expectedAffinity) {
     final LocaleAffinityCalculator matcher =
         LocaleAffinityCalculatorBaseImpl.builder()
             .supportedLocales(
@@ -82,61 +87,62 @@ class LocaleAffinityCalculatorBaseImplTest {
 
     assertThat(
         matcher.calculate(languageTag),
-        is(LocaleAffinityResult.builder().affinityScore(expectedScore).build()));
+        is(LocaleAffinityResult.builder().affinity(expectedAffinity).build()));
   }
 
   public static Stream<Arguments> whenMatching_returnsExpectedResult() {
     return Stream.of(
         // Edge cases
-        Arguments.of(" Invalid language tag ", 0),
-        Arguments.of(null, 0),
+        Arguments.of(" Invalid language tag ", NONE),
+        Arguments.of(null, NONE),
 
         // Catalan should be matched, since we support Spanish
-        Arguments.of("ca", 28),
-        Arguments.of("ca-ES", 28), // Higher score for Spain than other countries
-        Arguments.of("ca-AD", 14),
+        Arguments.of("ca", LOW),
+        Arguments.of("ca-ES", LOW),
+        Arguments.of("ca-AD", LOW),
 
         // No english should be matched
-        Arguments.of("en", 0),
-        Arguments.of("en-GB", 0),
-        Arguments.of("en-US", 0),
+        Arguments.of("en", NONE),
+        Arguments.of("en-GB", NONE),
+        Arguments.of("en-US", NONE),
 
         // Spanish in Europe should be ranked higher
-        Arguments.of("es-419", 82),
-        Arguments.of("es-GB", 85),
-        Arguments.of("es-US", 82),
+        Arguments.of("es-419", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("es-GB", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("es-US", SAME_OR_INTERCHANGEABLE),
 
         // Basque should be matched, since we support Spanish
-        Arguments.of("eu", 28),
+        Arguments.of("eu", LOW),
 
         // French
-        Arguments.of("fr", 100),
-        Arguments.of("fr-BE", 85),
-        Arguments.of("fr-CA", 85),
-        Arguments.of("fr-FR", 99),
+        Arguments.of("fr", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("fr-BE", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("fr-CA", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("fr-FR", SAME_OR_INTERCHANGEABLE),
 
         // Galician should be matched, since we support Spanish
-        Arguments.of("gl", 28),
+        Arguments.of("gl", LOW),
 
         // Hindi shouldn't be matched
-        Arguments.of("hi", 0),
+        Arguments.of("hi", NONE),
 
         // Croatian should be nicely matched with Bosnian
-        Arguments.of("hr-HR", 71),
+        Arguments.of("hr-HR", SAME_OR_INTERCHANGEABLE),
 
         // Serbian Cyrillic should be matched, although only Latin script is supported
-        Arguments.of("sr", 82),
-        Arguments.of("sr-Latn", 100),
+        Arguments.of("sr", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("sr-Latn", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("sr-Cyrl-ME", SAME_OR_INTERCHANGEABLE),
 
         // Portuguese
-        Arguments.of("pt", 100),
-        Arguments.of("pt-BR", 99),
-        Arguments.of("pt-SE", 82),
-        Arguments.of("pt-US", 85),
+        Arguments.of("pt", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("pt-BR", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("pt-SE", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("pt-US", SAME_OR_INTERCHANGEABLE),
 
         // Only Traditional Chinese should be matched, not Simplified
-        Arguments.of("zh-CN", 0),
-        Arguments.of("zh-TW", 98),
-        Arguments.of("zh-HK", 82));
+        Arguments.of("zh-CN", NONE),
+        Arguments.of("zh-TW", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("zh-HK", SAME_OR_INTERCHANGEABLE));
   }
 }

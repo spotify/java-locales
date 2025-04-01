@@ -18,19 +18,17 @@
  * -/-/-
  */
 
-package com.spotify.i18n.locales.common.model;
+package com.spotify.i18n.locales.common;
 
-import static org.junit.jupiter.api.Assertions.*;
+import com.ibm.icu.util.ULocale;
+import com.spotify.i18n.locales.common.model.RelatedReferenceLocale;
+import edu.umd.cs.findbugs.annotations.Nullable;
+import java.util.List;
+import java.util.Optional;
 
-import org.junit.jupiter.api.Test;
+public interface RelatedReferenceLocalesCalculator {
 
-class LocaleAffinityResultTest {
+  List<RelatedReferenceLocale> getRelatedReferenceLocales(@Nullable final String input);
 
-  @Test
-  void whenBuildingWithMissingRequiredProperties_buildFails() {
-    IllegalStateException thrown =
-        assertThrows(IllegalStateException.class, () -> LocaleAffinityResult.builder().build());
-
-    assertEquals("Missing required properties: affinity", thrown.getMessage());
-  }
+  Optional<ULocale> getBestMatchingReferenceLocale(@Nullable final String input);
 }

@@ -38,7 +38,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-class LocaleAffinityCalculatorFactoryTest {
+class LocaleAffinityHelpersFactoryTest {
 
   @ParameterizedTest
   @MethodSource
@@ -55,8 +55,8 @@ class LocaleAffinityCalculatorFactoryTest {
       when(mockedBuilder.build()).thenReturn(mockedCalculator);
 
       final LocaleAffinityCalculator built =
-          LocaleAffinityCalculatorFactory.getDefaultInstance()
-              .buildLocaleAffinityCalculatorForAcceptLanguage(acceptLanguage);
+          LocaleAffinityHelpersFactory.getDefaultInstance()
+              .buildCalculatorForAcceptLanguage(acceptLanguage);
 
       assertEquals(mockedCalculator, built);
       verify(mockedBuilder)
@@ -93,8 +93,8 @@ class LocaleAffinityCalculatorFactoryTest {
       when(mockedBuilder.build()).thenReturn(mockedCalculator);
 
       final LocaleAffinityCalculator built =
-          LocaleAffinityCalculatorFactory.getDefaultInstance()
-              .buildLocaleAffinityCalculatorForLanguageTags(languageTags);
+          LocaleAffinityHelpersFactory.getDefaultInstance()
+              .buildCalculatorForLanguageTags(languageTags);
 
       assertEquals(mockedCalculator, built);
       verify(mockedBuilder)
@@ -131,8 +131,7 @@ class LocaleAffinityCalculatorFactoryTest {
       when(mockedBuilder.build()).thenReturn(mockedCalculator);
 
       final LocaleAffinityCalculator built =
-          LocaleAffinityCalculatorFactory.getDefaultInstance()
-              .buildLocaleAffinityCalculatorForLocales(locales);
+          LocaleAffinityHelpersFactory.getDefaultInstance().buildCalculatorForLocales(locales);
 
       assertEquals(mockedCalculator, built);
       verify(mockedBuilder).supportedLocales(locales);

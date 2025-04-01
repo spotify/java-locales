@@ -29,6 +29,7 @@ import com.ibm.icu.util.LocaleMatcher.Direction;
 import com.ibm.icu.util.LocaleMatcher.FavorSubtag;
 import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
+import com.spotify.i18n.locales.common.model.LocaleAffinity;
 import com.spotify.i18n.locales.common.model.LocaleAffinityResult;
 import com.spotify.i18n.locales.utils.languagetag.LanguageTagUtils;
 import java.util.Set;
@@ -44,9 +45,6 @@ import java.util.Set;
  */
 @AutoValue
 public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinityCalculator {
-
-  // Chosen max distance threshold. Anything beyond will be scored 0.
-  private static final double MAX_DISTANCE_THRESHOLD = 224.0;
 
   // LocaleDistance.INSTANCE is commented as VisibleForTesting, so not ideal ... but this is the
   // only way to make use of this class, which contains all we need here.
@@ -66,24 +64,28 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
   // LikelySubtags method arguments, all assigned to their default as per icu implementation
   private static final boolean LIKELY_SUBTAGS_RETURNS_INPUT_IF_UNMATCH = false;
 
+  // Distance threshold: Anything above this value will be scored 0.
+  private static final double DISTANCE_THRESHOLD = 224.0;
+
+  // Score to affinity thresholds
+  private static final int SCORE_THRESHOLD_SAME_OR_INTERCHANGEABLE = 65;
+  private static final int SCORE_THRESHOLD_HIGH = 30;
+  private static final int SCORE_THRESHOLD_LOW = 0;
+
   public abstract Set<ULocale> supportedLocales();
 
   @Override
   public LocaleAffinityResult calculate(final String languageTag) {
-    if (supportedLocales().isEmpty()) {
-      return LocaleAffinityResult.builder().affinityScore(0).build();
-    } else {
-      return LocaleAffinityResult.builder()
-          .affinityScore(convertDistanceToAffinityScore(getBestDistance(languageTag)))
-          .build();
-    }
+    return LocaleAffinityResult.builder().affinity(getAffinity(languageTag)).build();
   }
 
-  private int convertDistanceToAffinityScore(final int distance) {
-    if (distance > MAX_DISTANCE_THRESHOLD) {
-      return 0;
+  private LocaleAffinity getAffinity(final String languageTag) {
+    if (supportedLocales().isEmpty()) {
+      return LocaleAffinity.NONE;
     } else {
-      return (int) ((MAX_DISTANCE_THRESHOLD - distance) / MAX_DISTANCE_THRESHOLD * 100.0);
+      int bestDistance = getBestDistance(languageTag);
+      int correspondingScore = convertDistanceToAffinityScore(bestDistance);
+      return convertScoreToLocaleAffinity(correspondingScore);
     }
   }
 
@@ -103,8 +105,27 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
         .orElse(Integer.MAX_VALUE);
   }
 
-  private static int getDistanceBetweenInputAndSupported(
-      final LSR maxParsed, final LSR maxSupported) {
+  private int convertDistanceToAffinityScore(final int distance) {
+    if (distance > DISTANCE_THRESHOLD) {
+      return 0;
+    } else {
+      return (int) ((DISTANCE_THRESHOLD - distance) / DISTANCE_THRESHOLD * 100.0);
+    }
+  }
+
+  private LocaleAffinity convertScoreToLocaleAffinity(final int score) {
+    if (score > SCORE_THRESHOLD_SAME_OR_INTERCHANGEABLE) {
+      return LocaleAffinity.SAME_OR_INTERCHANGEABLE;
+    } else if (score > SCORE_THRESHOLD_HIGH) {
+      return LocaleAffinity.HIGH;
+    } else if (score > SCORE_THRESHOLD_LOW) {
+      return LocaleAffinity.LOW;
+    } else {
+      return LocaleAffinity.NONE;
+    }
+  }
+
+  private int getDistanceBetweenInputAndSupported(final LSR maxParsed, final LSR maxSupported) {
     return LOCALE_DISTANCE_INSTANCE.getBestIndexAndDistance(
         maxParsed,
         new LSR[] {maxSupported},
