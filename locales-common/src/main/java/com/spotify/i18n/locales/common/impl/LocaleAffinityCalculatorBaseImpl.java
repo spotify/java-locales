@@ -35,7 +35,7 @@ import java.util.Set;
 
 /**
  * Base implementation of {@link LocaleAffinityCalculator} that calculates a locale affinity score
- * based a given input value (language tag) against a set of supported locales.
+ * based on a given input value (language tag) against a set of supported locales.
  *
  * <p>This class is not intended for public subclassing. New object instances must be created using
  * the builder pattern, starting with the {@link #builder()} method.
@@ -74,12 +74,12 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
       return LocaleAffinityResult.builder().affinityScore(0).build();
     } else {
       return LocaleAffinityResult.builder()
-          .affinityScore(convertDistanceAffinityToScore(getBestDistance(languageTag)))
+          .affinityScore(convertDistanceToAffinityScore(getBestDistance(languageTag)))
           .build();
     }
   }
 
-  private int convertDistanceAffinityToScore(final int distance) {
+  private int convertDistanceToAffinityScore(final int distance) {
     if (distance > MAX_DISTANCE_THRESHOLD) {
       return 0;
     } else {
