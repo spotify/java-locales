@@ -23,6 +23,7 @@ package com.spotify.i18n.locales.common;
 import com.google.common.base.Preconditions;
 import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.impl.LocaleAffinityCalculatorBaseImpl;
+import com.spotify.i18n.locales.common.impl.RelatedReferenceLocalesCalculatorBaseImpl;
 import com.spotify.i18n.locales.utils.acceptlanguage.AcceptLanguageUtils;
 import com.spotify.i18n.locales.utils.languagetag.LanguageTagUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -36,13 +37,13 @@ import java.util.stream.Collectors;
  *
  * @author Eric Fjøsne
  */
-public class LocaleAffinityCalculatorFactory {
+public class LocaleAffinityHelpersFactory {
 
-  public static LocaleAffinityCalculatorFactory getDefaultInstance() {
-    return new LocaleAffinityCalculatorFactory();
+  public static LocaleAffinityHelpersFactory getDefaultInstance() {
+    return new LocaleAffinityHelpersFactory();
   }
 
-  private LocaleAffinityCalculatorFactory() {}
+  private LocaleAffinityHelpersFactory() {}
 
   /**
    * Returns a preconfigured, ready-to-use instance of {@link LocaleAffinityCalculator}, using all
@@ -59,9 +60,9 @@ public class LocaleAffinityCalculatorFactory {
    *     href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language">Accept-Language
    *     headers documentation</a>
    */
-  public LocaleAffinityCalculator buildLocaleAffinityCalculatorForAcceptLanguage(
+  public LocaleAffinityCalculator buildCalculatorForAcceptLanguage(
       @Nullable final String acceptLanguage) {
-    return buildLocaleAffinityCalculatorForLanguageTags(
+    return buildCalculatorForLanguageTags(
         AcceptLanguageUtils.parse(acceptLanguage).stream()
             .map(LanguageRange::getRange)
             .collect(Collectors.toSet()));
@@ -76,8 +77,7 @@ public class LocaleAffinityCalculatorFactory {
    * @return Pre-configured locale affinity calculator
    * @see ULocale
    */
-  public LocaleAffinityCalculator buildLocaleAffinityCalculatorForLocales(
-      final Set<ULocale> locales) {
+  public LocaleAffinityCalculator buildCalculatorForLocales(final Set<ULocale> locales) {
     Preconditions.checkNotNull(locales);
     return LocaleAffinityCalculatorBaseImpl.builder().supportedLocales(locales).build();
   }
@@ -92,13 +92,22 @@ public class LocaleAffinityCalculatorFactory {
    * @see LocaleAffinityCalculator
    * @see <a href="https://en.wikipedia.org/wiki/IETF_language_tag">IETF BCP 47 language tag</a>
    */
-  public LocaleAffinityCalculator buildLocaleAffinityCalculatorForLanguageTags(
-      final Set<String> languageTags) {
+  public LocaleAffinityCalculator buildCalculatorForLanguageTags(final Set<String> languageTags) {
     Preconditions.checkNotNull(languageTags);
-    return buildLocaleAffinityCalculatorForLocales(
+    return buildCalculatorForLocales(
         languageTags.stream()
             .map(LanguageTagUtils::parse)
             .flatMap(Optional::stream)
             .collect(Collectors.toSet()));
+  }
+
+  /**
+   * Returns a preconfigured, ready-to-use instance of {@link RelatedReferenceLocalesCalculator}.
+   *
+   * @return Pre-configured calculator
+   * @see RelatedReferenceLocalesCalculator
+   */
+  public RelatedReferenceLocalesCalculator buildRelatedReferenceLocalesCalculator() {
+    return RelatedReferenceLocalesCalculatorBaseImpl.builder().build();
   }
 }

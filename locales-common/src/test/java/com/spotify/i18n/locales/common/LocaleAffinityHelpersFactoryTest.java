@@ -32,13 +32,14 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-class LocaleAffinityCalculatorFactoryTest {
+class LocaleAffinityHelpersFactoryTest {
 
   @ParameterizedTest
   @MethodSource
@@ -55,8 +56,8 @@ class LocaleAffinityCalculatorFactoryTest {
       when(mockedBuilder.build()).thenReturn(mockedCalculator);
 
       final LocaleAffinityCalculator built =
-          LocaleAffinityCalculatorFactory.getDefaultInstance()
-              .buildLocaleAffinityCalculatorForAcceptLanguage(acceptLanguage);
+          LocaleAffinityHelpersFactory.getDefaultInstance()
+              .buildCalculatorForAcceptLanguage(acceptLanguage);
 
       assertEquals(mockedCalculator, built);
       verify(mockedBuilder)
@@ -93,8 +94,8 @@ class LocaleAffinityCalculatorFactoryTest {
       when(mockedBuilder.build()).thenReturn(mockedCalculator);
 
       final LocaleAffinityCalculator built =
-          LocaleAffinityCalculatorFactory.getDefaultInstance()
-              .buildLocaleAffinityCalculatorForLanguageTags(languageTags);
+          LocaleAffinityHelpersFactory.getDefaultInstance()
+              .buildCalculatorForLanguageTags(languageTags);
 
       assertEquals(mockedCalculator, built);
       verify(mockedBuilder)
@@ -131,8 +132,7 @@ class LocaleAffinityCalculatorFactoryTest {
       when(mockedBuilder.build()).thenReturn(mockedCalculator);
 
       final LocaleAffinityCalculator built =
-          LocaleAffinityCalculatorFactory.getDefaultInstance()
-              .buildLocaleAffinityCalculatorForLocales(locales);
+          LocaleAffinityHelpersFactory.getDefaultInstance().buildCalculatorForLocales(locales);
 
       assertEquals(mockedCalculator, built);
       verify(mockedBuilder).supportedLocales(locales);
@@ -143,5 +143,12 @@ class LocaleAffinityCalculatorFactoryTest {
     return Stream.of(
         Arguments.of(Collections.emptySet(), Collections.emptySet()),
         Arguments.of(Set.of(ULocale.ROOT, ULocale.FRENCH, ULocale.JAPANESE)));
+  }
+
+  @Test
+  void whenBuildingRelatedReferenceLocalesCalculator_returnsExpectedCalculator() {
+    assertTrue(
+        LocaleAffinityHelpersFactory.getDefaultInstance().buildRelatedReferenceLocalesCalculator()
+            instanceof RelatedReferenceLocalesCalculator);
   }
 }

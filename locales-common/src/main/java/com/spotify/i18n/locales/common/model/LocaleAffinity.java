@@ -20,17 +20,28 @@
 
 package com.spotify.i18n.locales.common.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+/**
+ * An enum that represents the affinity between 2 locales.
+ *
+ * @author Eric Fjøsne
+ */
+public enum LocaleAffinity {
 
-import org.junit.jupiter.api.Test;
+  /** Locales are totally unrelated */
+  NONE,
 
-class LocaleAffinityResultTest {
+  /**
+   * Locales are somewhat related, meaning they either have low similarities from a linguistic
+   * perspective or co-exist in given geopolitical or cultural contexts.
+   */
+  LOW,
 
-  @Test
-  void whenBuildingWithMissingRequiredProperties_buildFails() {
-    IllegalStateException thrown =
-        assertThrows(IllegalStateException.class, () -> LocaleAffinityResult.builder().build());
+  /** Locales are quite related, meaning they have similarities from a linguistic perspective. */
+  HIGH,
 
-    assertEquals("Missing required properties: affinity", thrown.getMessage());
-  }
+  /**
+   * Locales either identify the same language, or languages that are similar to a point where a
+   * person should understand both if they understand one of them.
+   */
+  SAME_OR_INTERCHANGEABLE
 }

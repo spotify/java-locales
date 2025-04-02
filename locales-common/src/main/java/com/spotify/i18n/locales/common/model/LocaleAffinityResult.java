@@ -21,7 +21,6 @@
 package com.spotify.i18n.locales.common.model;
 
 import com.google.auto.value.AutoValue;
-import com.google.common.base.Preconditions;
 import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
 
 /**
@@ -35,15 +34,12 @@ import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
 @AutoValue
 public abstract class LocaleAffinityResult {
 
-  private static final int MAX_SCORE = 100;
-  private static final int MIN_SCORE = 0;
-
   /**
-   * Returns the calculated affinity score
+   * Returns the calculated affinity
    *
-   * @return affinity score, with value within the range 0 to 100.
+   * @return affinity
    */
-  public abstract int affinityScore();
+  public abstract LocaleAffinity affinity();
 
   /**
    * Returns a {@link Builder} instance that will allow you to manually create a {@link
@@ -59,26 +55,13 @@ public abstract class LocaleAffinityResult {
   public abstract static class Builder {
     Builder() {} // package private constructor
 
-    public abstract Builder affinityScore(int affinityScore);
-
-    abstract LocaleAffinityResult autoBuild(); // not public
+    public abstract Builder affinity(LocaleAffinity affinity);
 
     /**
      * Builds a {@link LocaleAffinityResult} out of this builder.
      *
      * <p>This is safe to be called several times on the same builder.
-     *
-     * @throws IllegalStateException if any of the builder property does not match the requirements.
      */
-    public final LocaleAffinityResult build() {
-      LocaleAffinityResult result = autoBuild();
-      int score = result.affinityScore();
-      Preconditions.checkState(
-          score >= MIN_SCORE && score <= MAX_SCORE,
-          String.format(
-              "The affinity score must be between %d and %d. Provided: %d.",
-              MIN_SCORE, MAX_SCORE, score));
-      return result;
-    }
+    public abstract LocaleAffinityResult build();
   }
 }
