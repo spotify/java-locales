@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -142,5 +143,12 @@ class LocaleAffinityHelpersFactoryTest {
     return Stream.of(
         Arguments.of(Collections.emptySet(), Collections.emptySet()),
         Arguments.of(Set.of(ULocale.ROOT, ULocale.FRENCH, ULocale.JAPANESE)));
+  }
+
+  @Test
+  void whenBuildingRelatedReferenceLocalesCalculator_returnsExpectedCalculator() {
+    assertTrue(
+        LocaleAffinityHelpersFactory.getDefaultInstance().buildRelatedReferenceLocalesCalculator()
+            instanceof RelatedReferenceLocalesCalculator);
   }
 }

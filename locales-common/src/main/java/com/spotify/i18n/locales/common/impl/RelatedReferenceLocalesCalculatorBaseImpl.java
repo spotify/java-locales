@@ -35,6 +35,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Base implementation of an engine that enables reference locales based operations, most notably to
+ * join datasets, based on an origin source supported locale, and a target locale to match.
+ *
+ * <p>Read more about when to use this implementation in {@link RelatedReferenceLocalesCalculator}.
+ *
+ * @author Eric Fjøsne
+ */
 @AutoValue
 public abstract class RelatedReferenceLocalesCalculatorBaseImpl
     implements RelatedReferenceLocalesCalculator {
@@ -46,17 +54,23 @@ public abstract class RelatedReferenceLocalesCalculatorBaseImpl
           .setNoDefaultLocale()
           .build();
 
+  /**
+   * For a given supported locale, returns the list of related reference locales, along with their
+   * calculated affinities with the supported locale.
+   *
+   * @param languageTag supported locale identifier
+   * @return List of related reference locales, along with the calculated affinity
+   */
   @Override
-  public List<RelatedReferenceLocale> getRelatedReferenceLocales(
+  public List<RelatedReferenceLocale> getRelatedReferenceLocalesForSupportedLocale(
       @Nullable final String languageTag) {
     return LanguageTagUtils.parse(languageTag)
-        .map(parsedLocale -> getCorrespondingReferenceLocales(parsedLocale))
+        .map(supportedLocale -> getRelatedReferenceLocales(supportedLocale))
         .orElse(Collections.emptyList());
   }
 
-  private List<RelatedReferenceLocale> getCorrespondingReferenceLocales(
-      final ULocale parsedLocale) {
-    final LocaleAffinityCalculator affinityCalculator = buildAffinityCalculator(parsedLocale);
+  private List<RelatedReferenceLocale> getRelatedReferenceLocales(final ULocale supportedLocale) {
+    final LocaleAffinityCalculator affinityCalculator = buildAffinityCalculator(supportedLocale);
     return RelatedReferenceLocale.availableReferenceLocales().stream()
         .map(
             refLocale ->
@@ -66,32 +80,47 @@ public abstract class RelatedReferenceLocalesCalculatorBaseImpl
                     .build())
         // We only retain reference locales with some affinity
         .filter(refLocale -> refLocale.affinity() != LocaleAffinity.NONE)
-        // Sorting by descending affinity
+        // Sorting by descending affinity, thus ensuring the highest affinity entries come first
         .sorted((rl1, rl2) -> rl2.affinity().compareTo(rl1.affinity()))
         .collect(Collectors.toList());
   }
 
-  private LocaleAffinityCalculator buildAffinityCalculator(final ULocale parsedLocale) {
+  private LocaleAffinityCalculator buildAffinityCalculator(final ULocale supportedLocale) {
     return LocaleAffinityCalculatorBaseImpl.builder()
-        .supportedLocales(Set.of(parsedLocale))
+        .supportedLocales(Set.of(supportedLocale))
         .build();
   }
 
+  /**
+   * For a given target locale, returns the best matching reference locale.
+   *
+   * @param languageTag target locale identifier
+   * @return the optional best matching reference locale
+   */
   @Override
-  public Optional<ULocale> getBestMatchingReferenceLocale(@Nullable final String languageTag) {
+  public Optional<ULocale> getBestMatchingReferenceLocaleForTargetLocale(
+      @Nullable final String languageTag) {
     return LanguageTagUtils.parse(languageTag).map(REFERENCE_LOCALE_MATCHER::getBestMatch);
   }
 
+  /**
+   * Returns a {@link Builder} instance that will allow you to manually create a {@link
+   * RelatedReferenceLocalesCalculatorBaseImpl} instance.
+   *
+   * @return The builder
+   */
   public static Builder builder() {
     return new AutoValue_RelatedReferenceLocalesCalculatorBaseImpl.Builder();
   }
 
+  /** A builder for a {@link RelatedReferenceLocalesCalculatorBaseImpl}. */
   @AutoValue.Builder
   public abstract static class Builder {
     Builder() {}
 
     abstract RelatedReferenceLocalesCalculatorBaseImpl autoBuild();
 
+    /** Builds a {@link RelatedReferenceLocalesCalculator} out of this builder. */
     public final RelatedReferenceLocalesCalculator build() {
       return autoBuild();
     }

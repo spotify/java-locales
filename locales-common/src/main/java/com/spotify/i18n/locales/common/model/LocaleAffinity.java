@@ -20,9 +20,28 @@
 
 package com.spotify.i18n.locales.common.model;
 
+/**
+ * An enum that represents the affinity between 2 locales.
+ *
+ * @author Eric Fjøsne
+ */
 public enum LocaleAffinity {
+
+  /** Locales are totally unrelated */
   NONE,
+
+  /**
+   * Locales are somewhat related, meaning they either have low similarities from a linguistic
+   * perspective or co-exist in given geopolitical or cultural contexts.
+   */
   LOW,
+
+  /** Locales are quite related, meaning they have similarities from a linguistic perspective. */
   HIGH,
+
+  /**
+   * Locales either identify the same language, or languages that are similar to a point where a
+   * person should understand both if they understand one of them.
+   */
   SAME_OR_INTERCHANGEABLE
 }

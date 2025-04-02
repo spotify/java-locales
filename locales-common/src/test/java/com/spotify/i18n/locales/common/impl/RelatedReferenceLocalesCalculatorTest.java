@@ -56,10 +56,13 @@ class RelatedReferenceLocalesCalculatorTest {
   public void validateReferenceLocaleAffinityScoreRanges(final ULocale input) {
     RelatedReferenceLocalesCalculator oneWayAffinity =
         RelatedReferenceLocalesCalculatorBaseImpl.builder().build();
-    assertTrue(oneWayAffinity.getBestMatchingReferenceLocale(input.toLanguageTag()).isPresent());
+    assertTrue(
+        oneWayAffinity
+            .getBestMatchingReferenceLocaleForTargetLocale(input.toLanguageTag())
+            .isPresent());
 
     List<RelatedReferenceLocale> relatedReferenceLocales =
-        oneWayAffinity.getRelatedReferenceLocales(input.toLanguageTag());
+        oneWayAffinity.getRelatedReferenceLocalesForSupportedLocale(input.toLanguageTag());
 
     ULocale inputLS =
         new Builder()
@@ -115,31 +118,31 @@ class RelatedReferenceLocalesCalculatorTest {
     String reference = referenceLS.toLanguageTag();
 
     switch (input) {
-      // Bosnian and Croatian
+        // Bosnian and Croatian
       case "bs-Latn":
         return reference.equals("hr-Latn");
-      // Croatian and Bosnian
+        // Croatian and Bosnian
       case "hr-Latn":
         return reference.equals("bs-Latn");
-      // German and Luxembourgish or Swiss German
+        // German and Luxembourgish or Swiss German
       case "de-Latn":
         return reference.equals("lb-Latn") || reference.equals("gsw-Latn");
-      // Luxembourgish and German
+        // Luxembourgish and German
       case "lb-Latn":
         return reference.equals("de-Latn");
-      // Swiss German and German
+        // Swiss German and German
       case "gsw-Latn":
         return reference.equals("de-Latn");
-      // Bokmål and Norwegian
+        // Bokmål and Norwegian
       case "nb-Latn":
         return reference.equals("no-Latn");
-      // Norwegian and Bokmål
+        // Norwegian and Bokmål
       case "no-Latn":
         return reference.equals("nb-Latn");
-      // Serbian (Latin script) and Serbian (Cyrillic script)
+        // Serbian (Latin script) and Serbian (Cyrillic script)
       case "sr-Latn":
         return reference.equals("sr-Cyrl");
-      // Serbian (Cyrillic script) and Serbian (Latin script)
+        // Serbian (Cyrillic script) and Serbian (Latin script)
       case "sr-Cyrl":
         return reference.equals("sr-Latn");
       default:
@@ -154,7 +157,7 @@ class RelatedReferenceLocalesCalculatorTest {
     RelatedReferenceLocalesCalculator joiner =
         RelatedReferenceLocalesCalculatorBaseImpl.builder().build();
     List<RelatedReferenceLocale> relatedReferenceLocaleForAffinities =
-        joiner.getRelatedReferenceLocales(input);
+        joiner.getRelatedReferenceLocalesForSupportedLocale(input);
 
     assertTrue(
         relatedReferenceLocaleForAffinities.stream()
@@ -179,16 +182,16 @@ class RelatedReferenceLocalesCalculatorTest {
 
   @ParameterizedTest
   @MethodSource
-  public void getBestMatchingReferenceLocale_returnsExpected(
+  public void getBestMatchingReferenceLocaleForTargetLocale_returnsExpected(
       final String input, final String expectedLanguageTag) {
     RelatedReferenceLocalesCalculator joiner =
         RelatedReferenceLocalesCalculatorBaseImpl.builder().build();
     assertThat(
-        joiner.getBestMatchingReferenceLocale(input),
+        joiner.getBestMatchingReferenceLocaleForTargetLocale(input),
         is(Optional.of(ULocale.forLanguageTag(expectedLanguageTag))));
   }
 
-  public static Stream<Arguments> getBestMatchingReferenceLocale_returnsExpected() {
+  public static Stream<Arguments> getBestMatchingReferenceLocaleForTargetLocale_returnsExpected() {
     return Stream.of(
         Arguments.of("ZH_us", "zh-TW"),
         Arguments.of("zh-Hant", "zh-TW"),

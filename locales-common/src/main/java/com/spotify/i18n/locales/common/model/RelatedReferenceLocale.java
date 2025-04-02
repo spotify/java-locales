@@ -27,6 +27,14 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * A model class that represents a {@link RelatedReferenceLocale}.
+ *
+ * <p>This class is not intended for public subclassing. New object instances must be created using
+ * the builder pattern, starting with the {@link #builder()} method.
+ *
+ * @author Eric Fjøsne
+ */
 @AutoValue
 public abstract class RelatedReferenceLocale {
 
@@ -34,29 +42,32 @@ public abstract class RelatedReferenceLocale {
 
   /**
    * Set containing all reference locales, which are all CLDR available {@link ULocale} without
-   * duplicate entries.
+   * duplicate entries, and without en-us-POSIX.
    */
   private static final Set<ULocale> REFERENCE_LOCALES =
       Arrays.stream(ULocale.getAvailableLocales())
           .filter(l -> !l.equals(EN_US_POSIX))
           .map(ULocale::minimizeSubtags)
-          .collect(Collectors.toSet());
+          .collect(Collectors.toUnmodifiableSet());
 
+  /** Returns all available reference locales */
   public static Set<ULocale> availableReferenceLocales() {
     return REFERENCE_LOCALES;
   }
 
+  /** Returns the reference locale */
   public abstract ULocale referenceLocale();
 
+  /** Returns the calculated affinity for the reference locale */
   public abstract LocaleAffinity affinity();
 
   /**
-   * Returns a {@link RelatedReferenceLocale.Builder} instance that will allow you to manually
-   * create a {@link RelatedReferenceLocale} instance.
+   * Returns a {@link Builder} instance that will allow you to manually create a {@link
+   * RelatedReferenceLocale} instance.
    *
    * @return The builder
    */
-  public static RelatedReferenceLocale.Builder builder() {
+  public static Builder builder() {
     return new AutoValue_RelatedReferenceLocale.Builder();
   }
 
