@@ -37,7 +37,8 @@ import java.util.stream.Collectors;
 
 /**
  * Base implementation of an engine that enables reference locales based operations, most notably to
- * join datasets, based on an origin source supported locale, and a target locale to match.
+ * join datasets by enabling match operations between an origin source supported locale, and a
+ * target locale.
  *
  * <p>Read more about when to use this implementation in {@link RelatedReferenceLocalesCalculator}.
  *
@@ -55,11 +56,11 @@ public abstract class RelatedReferenceLocalesCalculatorBaseImpl
           .build();
 
   /**
-   * For a given supported locale, returns the list of related reference locales, along with their
-   * calculated affinities with the supported locale.
+   * Returns the list of related reference locales, along with their calculated affinity with the
+   * supported locale, for a given language tag.
    *
-   * @param languageTag supported locale identifier
-   * @return List of related reference locales, along with the calculated affinity
+   * @param languageTag language tag
+   * @return List of related reference locales, along with their calculated affinity
    */
   @Override
   public List<RelatedReferenceLocale> getRelatedReferenceLocales(
@@ -80,8 +81,6 @@ public abstract class RelatedReferenceLocalesCalculatorBaseImpl
                     .build())
         // We only retain reference locales with some affinity
         .filter(refLocale -> refLocale.affinity() != LocaleAffinity.NONE)
-        // Sorting by descending affinity, thus ensuring the highest affinity entries come first
-        .sorted((rl1, rl2) -> rl2.affinity().compareTo(rl1.affinity()))
         .collect(Collectors.toList());
   }
 
@@ -92,14 +91,13 @@ public abstract class RelatedReferenceLocalesCalculatorBaseImpl
   }
 
   /**
-   * For a given target locale, returns the best matching reference locale.
+   * Returns the best matching reference locale for a given language tag.
    *
-   * @param languageTag target locale identifier
+   * @param languageTag language tag
    * @return the optional best matching reference locale
    */
   @Override
-  public Optional<ULocale> getBestMatchingReferenceLocale(
-      @Nullable final String languageTag) {
+  public Optional<ULocale> getBestMatchingReferenceLocale(@Nullable final String languageTag) {
     return LanguageTagUtils.parse(languageTag).map(REFERENCE_LOCALE_MATCHER::getBestMatch);
   }
 

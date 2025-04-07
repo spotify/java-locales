@@ -21,20 +21,21 @@
 package com.spotify.i18n.locales.common;
 
 import com.spotify.i18n.locales.common.model.LocaleAffinityResult;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
- * Represents an engine that calculates a locale affinity score based a given input. All
+ * Represents an engine that calculates a locale affinity score based on a given language tag. All
  * implementations of this interface must return a non-null {@link LocaleAffinityResult}, even when
- * the given input is null or empty.
+ * the given language is null or empty.
  *
  * @author Eric Fjøsne
  */
 public interface LocaleAffinityCalculator {
 
   /**
-   * Returns the calculated {@link LocaleAffinityResult} for the given input
+   * Returns the calculated {@link LocaleAffinityResult} for the given language tag
    *
    * @return the locale affinity result
    */
-  LocaleAffinityResult calculate(final String input);
+  LocaleAffinityResult calculate(@Nullable final String languageTag);
 }

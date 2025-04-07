@@ -46,10 +46,10 @@ public class LocaleAffinityHelpersFactory {
   private LocaleAffinityHelpersFactory() {}
 
   /**
-   * Returns a preconfigured, ready-to-use instance of {@link LocaleAffinityCalculator}, using all
-   * valid locales present in the Accept-Language as target supported locales.
+   * Returns a pre-configured, ready-to-use instance of {@link LocaleAffinityCalculator}, using all
+   * valid locales present in the Accept-Language as supported locales.
    *
-   * <p>Malformed or null Accept-Language values will be ignored.
+   * <p>Malformed, empty or null Accept-Language values will be ignored.
    *
    * <p>Invalid or improperly formatted contained language tags will be ignored.
    *
@@ -69,12 +69,11 @@ public class LocaleAffinityHelpersFactory {
   }
 
   /**
-   * Returns a preconfigured, ready-to-use instance of {@link LocaleAffinityCalculator}, using the
-   * supplied language tags as supported locales.
-   *
-   * <p>Invalid or improperly formatted language tags will be ignored.
+   * Returns a pre-configured, ready-to-use instance of {@link LocaleAffinityCalculator}, using the
+   * supplied locales as supported locales.
    *
    * @return Pre-configured locale affinity calculator
+   * @see LocaleAffinityCalculator
    * @see ULocale
    */
   public LocaleAffinityCalculator buildCalculatorForLocales(final Set<ULocale> locales) {
@@ -83,7 +82,7 @@ public class LocaleAffinityHelpersFactory {
   }
 
   /**
-   * Returns a preconfigured, ready-to-use instance of {@link LocaleAffinityCalculator}, using the
+   * Returns a pre-configured, ready-to-use instance of {@link LocaleAffinityCalculator}, using the
    * supplied language tags as supported locales.
    *
    * <p>Invalid or improperly formatted language tags will be ignored.
@@ -102,7 +101,7 @@ public class LocaleAffinityHelpersFactory {
   }
 
   /**
-   * Returns a preconfigured, ready-to-use instance of {@link RelatedReferenceLocalesCalculator}.
+   * Returns a pre-configured, ready-to-use instance of {@link RelatedReferenceLocalesCalculator}.
    *
    * @return Pre-configured calculator
    * @see RelatedReferenceLocalesCalculator

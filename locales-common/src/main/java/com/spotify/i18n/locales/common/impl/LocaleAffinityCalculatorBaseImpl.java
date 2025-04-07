@@ -32,6 +32,7 @@ import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
 import com.spotify.i18n.locales.common.model.LocaleAffinity;
 import com.spotify.i18n.locales.common.model.LocaleAffinityResult;
 import com.spotify.i18n.locales.utils.languagetag.LanguageTagUtils;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Set;
 
 /**
@@ -75,11 +76,11 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
   public abstract Set<ULocale> supportedLocales();
 
   @Override
-  public LocaleAffinityResult calculate(final String languageTag) {
+  public LocaleAffinityResult calculate(@Nullable final String languageTag) {
     return LocaleAffinityResult.builder().affinity(getAffinity(languageTag)).build();
   }
 
-  private LocaleAffinity getAffinity(final String languageTag) {
+  private LocaleAffinity getAffinity(@Nullable final String languageTag) {
     if (supportedLocales().isEmpty()) {
       return LocaleAffinity.NONE;
     } else {
@@ -89,7 +90,7 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
     }
   }
 
-  private int getBestDistance(final String languageTag) {
+  private int getBestDistance(@Nullable final String languageTag) {
     return LanguageTagUtils.parse(languageTag)
         .map(LocaleAffinityCalculatorBaseImpl::getMaximizedLanguageScriptRegion)
         .map(
@@ -155,16 +156,17 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
   public abstract static class Builder {
     Builder() {} // package private constructor
 
-    public abstract Builder supportedLocales(final Set<ULocale> baseLocales);
+    public abstract Builder supportedLocales(final Set<ULocale> supportedLocales);
 
     abstract LocaleAffinityCalculatorBaseImpl autoBuild();
 
     /** Builds a {@link LocaleAffinityCalculator} out of this builder. */
     public final LocaleAffinityCalculator build() {
       final LocaleAffinityCalculatorBaseImpl built = autoBuild();
-      for (ULocale baseLocale : built.supportedLocales()) {
+      for (ULocale supportedLocale : built.supportedLocales()) {
         Preconditions.checkState(
-            !baseLocale.equals(ULocale.ROOT), "The supported locales cannot contain the root.");
+            !supportedLocale.equals(ULocale.ROOT),
+            "The supported locales cannot contain the root.");
       }
       return built;
     }
