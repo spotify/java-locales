@@ -58,11 +58,11 @@ class RelatedReferenceLocalesCalculatorTest {
         RelatedReferenceLocalesCalculatorBaseImpl.builder().build();
     assertTrue(
         oneWayAffinity
-            .getBestMatchingReferenceLocaleForTargetLocale(input.toLanguageTag())
+            .getBestMatchingReferenceLocale(input.toLanguageTag())
             .isPresent());
 
     List<RelatedReferenceLocale> relatedReferenceLocales =
-        oneWayAffinity.getRelatedReferenceLocalesForSupportedLocale(input.toLanguageTag());
+        oneWayAffinity.getRelatedReferenceLocales(input.toLanguageTag());
 
     ULocale inputLS =
         new Builder()
@@ -157,7 +157,7 @@ class RelatedReferenceLocalesCalculatorTest {
     RelatedReferenceLocalesCalculator joiner =
         RelatedReferenceLocalesCalculatorBaseImpl.builder().build();
     List<RelatedReferenceLocale> relatedReferenceLocaleForAffinities =
-        joiner.getRelatedReferenceLocalesForSupportedLocale(input);
+        joiner.getRelatedReferenceLocales(input);
 
     assertTrue(
         relatedReferenceLocaleForAffinities.stream()
@@ -182,16 +182,16 @@ class RelatedReferenceLocalesCalculatorTest {
 
   @ParameterizedTest
   @MethodSource
-  public void getBestMatchingReferenceLocaleForTargetLocale_returnsExpected(
+  public void getBestMatchingReferenceLocale_returnsExpected(
       final String input, final String expectedLanguageTag) {
     RelatedReferenceLocalesCalculator joiner =
         RelatedReferenceLocalesCalculatorBaseImpl.builder().build();
     assertThat(
-        joiner.getBestMatchingReferenceLocaleForTargetLocale(input),
+        joiner.getBestMatchingReferenceLocale(input),
         is(Optional.of(ULocale.forLanguageTag(expectedLanguageTag))));
   }
 
-  public static Stream<Arguments> getBestMatchingReferenceLocaleForTargetLocale_returnsExpected() {
+  public static Stream<Arguments> getBestMatchingReferenceLocale_returnsExpected() {
     return Stream.of(
         Arguments.of("ZH_us", "zh-TW"),
         Arguments.of("zh-Hant", "zh-TW"),

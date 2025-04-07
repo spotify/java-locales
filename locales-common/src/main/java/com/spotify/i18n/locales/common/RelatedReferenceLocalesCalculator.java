@@ -48,15 +48,13 @@ import java.util.Optional;
  *
  * <ul>
  *   <li>Calculate all related reference locales for a given supported locale (ex: supported user
- *       language). This is done using the {@link
- *       #getRelatedReferenceLocalesForSupportedLocale(String)} method.
+ *       language). This is done using the {@link #getRelatedReferenceLocales(String)} method.
  *   <li>Calculate the best matching reference locale for a given target locale (ex: target content
- *       language). This is done using the {@link
- *       #getBestMatchingReferenceLocaleForTargetLocale(String)}
+ *       language). This is done using the {@link #getBestMatchingReferenceLocale(String)}
  *   <li>Join datasets based on calculated reference locale only ({@link
  *       RelatedReferenceLocale#referenceLocale()} and output of {@link
- *       #getBestMatchingReferenceLocaleForTargetLocale(String)}), and filter based on the
- *       calculated {@link RelatedReferenceLocale#affinity()}.
+ *       #getBestMatchingReferenceLocale(String)}), and filter based on the calculated {@link
+ *       RelatedReferenceLocale#affinity()}.
  * </ul>
  *
  * @author Eric Fjøsne
@@ -70,8 +68,7 @@ public interface RelatedReferenceLocalesCalculator {
    * @param languageTag supported locale identifier
    * @return List of related reference locales, along with the calculated affinity
    */
-  List<RelatedReferenceLocale> getRelatedReferenceLocalesForSupportedLocale(
-      @Nullable final String languageTag);
+  List<RelatedReferenceLocale> getRelatedReferenceLocales(@Nullable final String languageTag);
 
   /**
    * For a given target locale, returns the best matching reference locale.
@@ -79,6 +76,5 @@ public interface RelatedReferenceLocalesCalculator {
    * @param languageTag target locale identifier
    * @return the optional best matching reference locale
    */
-  Optional<ULocale> getBestMatchingReferenceLocaleForTargetLocale(
-      @Nullable final String languageTag);
+  Optional<ULocale> getBestMatchingReferenceLocale(@Nullable final String languageTag);
 }

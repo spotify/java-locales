@@ -62,7 +62,7 @@ public abstract class RelatedReferenceLocalesCalculatorBaseImpl
    * @return List of related reference locales, along with the calculated affinity
    */
   @Override
-  public List<RelatedReferenceLocale> getRelatedReferenceLocalesForSupportedLocale(
+  public List<RelatedReferenceLocale> getRelatedReferenceLocales(
       @Nullable final String languageTag) {
     return LanguageTagUtils.parse(languageTag)
         .map(supportedLocale -> getRelatedReferenceLocales(supportedLocale))
@@ -98,7 +98,7 @@ public abstract class RelatedReferenceLocalesCalculatorBaseImpl
    * @return the optional best matching reference locale
    */
   @Override
-  public Optional<ULocale> getBestMatchingReferenceLocaleForTargetLocale(
+  public Optional<ULocale> getBestMatchingReferenceLocale(
       @Nullable final String languageTag) {
     return LanguageTagUtils.parse(languageTag).map(REFERENCE_LOCALE_MATCHER::getBestMatch);
   }
