@@ -145,4 +145,17 @@ class LocaleAffinityCalculatorBaseImplTest {
         Arguments.of("zh-TW", SAME_OR_INTERCHANGEABLE),
         Arguments.of("zh-HK", SAME_OR_INTERCHANGEABLE));
   }
+
+  @Test
+  void whenMatchingSwedishAgainstBokmaalNorwegianAndDanish_returnsNoAffinity() {
+    final LocaleAffinityCalculator matcher =
+        LocaleAffinityCalculatorBaseImpl.builder()
+            .supportedLocales(
+                Set.of("da", "nb", "no").stream()
+                    .map(ULocale::forLanguageTag)
+                    .collect(Collectors.toSet()))
+            .build();
+
+    assertThat(matcher.calculate("sv"), is(LocaleAffinityResult.builder().affinity(NONE).build()));
+  }
 }
