@@ -60,9 +60,9 @@ public class LocaleAffinityHelpersFactory {
    *     href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language">Accept-Language
    *     headers documentation</a>
    */
-  public LocaleAffinityCalculator buildCalculatorForAcceptLanguage(
+  public LocaleAffinityCalculator buildAffinityWithAcceptLanguageCalculator(
       @Nullable final String acceptLanguage) {
-    return buildCalculatorForLanguageTags(
+    return buildAffinityWithLanguageTagsCalculator(
         AcceptLanguageUtils.parse(acceptLanguage).stream()
             .map(LanguageRange::getRange)
             .collect(Collectors.toSet()));
@@ -76,9 +76,9 @@ public class LocaleAffinityHelpersFactory {
    * @see LocaleAffinityCalculator
    * @see ULocale
    */
-  public LocaleAffinityCalculator buildCalculatorForLocales(final Set<ULocale> locales) {
+  public LocaleAffinityCalculator buildAffinityWithLocalesCalculator(final Set<ULocale> locales) {
     Preconditions.checkNotNull(locales);
-    return LocaleAffinityCalculatorBaseImpl.builder().supportedLocales(locales).build();
+    return LocaleAffinityCalculatorBaseImpl.builder().withLocales(locales).build();
   }
 
   /**
@@ -91,9 +91,10 @@ public class LocaleAffinityHelpersFactory {
    * @see LocaleAffinityCalculator
    * @see <a href="https://en.wikipedia.org/wiki/IETF_language_tag">IETF BCP 47 language tag</a>
    */
-  public LocaleAffinityCalculator buildCalculatorForLanguageTags(final Set<String> languageTags) {
+  public LocaleAffinityCalculator buildAffinityWithLanguageTagsCalculator(
+      final Set<String> languageTags) {
     Preconditions.checkNotNull(languageTags);
-    return buildCalculatorForLocales(
+    return buildAffinityWithLocalesCalculator(
         languageTags.stream()
             .map(LanguageTagUtils::parse)
             .flatMap(Optional::stream)

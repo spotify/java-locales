@@ -86,7 +86,7 @@ public abstract class RelatedReferenceLocalesCalculatorBaseImpl
 
   private LocaleAffinityCalculator buildAffinityCalculator(final ULocale supportedLocale) {
     return LocaleAffinityCalculatorBaseImpl.builder()
-        .supportedLocales(Set.of(supportedLocale))
+        .withLocales(Set.of(supportedLocale))
         .build();
   }
 

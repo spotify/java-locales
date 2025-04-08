@@ -52,13 +52,13 @@ class LocaleAffinityCalculatorBaseImplTest {
   }
 
   @Test
-  void whenBuildingWithRootAsPartOfSupportedLocales_buildFails() {
+  void whenBuildingWithRootAsPartOfWithLocales_buildFails() {
     final IllegalStateException thrown =
         assertThrows(
             IllegalStateException.class,
             () ->
                 LocaleAffinityCalculatorBaseImpl.builder()
-                    .supportedLocales(Set.of(ULocale.ROOT))
+                    .withLocales(Set.of(ULocale.ROOT))
                     .build());
 
     assertEquals(thrown.getMessage(), "The supported locales cannot contain the root.");
@@ -66,9 +66,9 @@ class LocaleAffinityCalculatorBaseImplTest {
 
   @ParameterizedTest
   @MethodSource(value = "whenMatching_returnsExpectedResult")
-  void whenMatchingAgainstEmptySetOfSupportedLocales_returnsExpectedResult(String languageTag) {
+  void whenMatchingAgainstEmptySetOfWithLocales_returnsExpectedResult(String languageTag) {
     final LocaleAffinityCalculator matcher =
-        LocaleAffinityCalculatorBaseImpl.builder().supportedLocales(Collections.emptySet()).build();
+        LocaleAffinityCalculatorBaseImpl.builder().withLocales(Collections.emptySet()).build();
 
     assertEquals(NONE, matcher.calculate(languageTag).affinity());
   }
@@ -79,7 +79,7 @@ class LocaleAffinityCalculatorBaseImplTest {
       final String languageTag, final LocaleAffinity expectedAffinity) {
     final LocaleAffinityCalculator matcher =
         LocaleAffinityCalculatorBaseImpl.builder()
-            .supportedLocales(
+            .withLocales(
                 Set.of("ar", "bs", "es", "fr", "ja", "pt", "sr-Latn", "zh-Hant").stream()
                     .map(ULocale::forLanguageTag)
                     .collect(Collectors.toSet()))
@@ -150,7 +150,7 @@ class LocaleAffinityCalculatorBaseImplTest {
   void whenMatchingSwedishAgainstBokmaalNorwegianAndDanish_returnsNoAffinity() {
     final LocaleAffinityCalculator matcher =
         LocaleAffinityCalculatorBaseImpl.builder()
-            .supportedLocales(
+            .withLocales(
                 Set.of("da", "nb", "no").stream()
                     .map(ULocale::forLanguageTag)
                     .collect(Collectors.toSet()))

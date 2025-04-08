@@ -36,8 +36,8 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Set;
 
 /**
- * Base implementation of {@link LocaleAffinityCalculator} that calculates a locale affinity score
- * based on a given input value (language tag) against a set of supported locales.
+ * Base implementation of {@link LocaleAffinityCalculator} that calculates a locale affinity with a
+ * set of locales, based on a given input value (language tag).
  *
  * <p>This class is not intended for public subclassing. New object instances must be created using
  * the builder pattern, starting with the {@link #builder()} method.
@@ -73,7 +73,7 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
   private static final int SCORE_THRESHOLD_HIGH = 30;
   private static final int SCORE_THRESHOLD_LOW = 0;
 
-  public abstract Set<ULocale> supportedLocales();
+  public abstract Set<ULocale> withLocales();
 
   @Override
   public LocaleAffinityResult calculate(@Nullable final String languageTag) {
@@ -81,7 +81,7 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
   }
 
   private LocaleAffinity getAffinity(@Nullable final String languageTag) {
-    if (supportedLocales().isEmpty()) {
+    if (withLocales().isEmpty()) {
       return LocaleAffinity.NONE;
     } else {
       int bestDistance = getBestDistance(languageTag);
@@ -95,7 +95,7 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
         .map(LocaleAffinityCalculatorBaseImpl::getMaximizedLanguageScriptRegion)
         .map(
             maxParsed ->
-                supportedLocales().stream()
+                withLocales().stream()
                     .map(LocaleAffinityCalculatorBaseImpl::getMaximizedLanguageScriptRegion)
                     .map(
                         maxSupported ->
@@ -156,14 +156,14 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
   public abstract static class Builder {
     Builder() {} // package private constructor
 
-    public abstract Builder supportedLocales(final Set<ULocale> supportedLocales);
+    public abstract Builder withLocales(final Set<ULocale> locales);
 
     abstract LocaleAffinityCalculatorBaseImpl autoBuild();
 
     /** Builds a {@link LocaleAffinityCalculator} out of this builder. */
     public final LocaleAffinityCalculator build() {
       final LocaleAffinityCalculatorBaseImpl built = autoBuild();
-      for (ULocale supportedLocale : built.supportedLocales()) {
+      for (ULocale supportedLocale : built.withLocales()) {
         Preconditions.checkState(
             !supportedLocale.equals(ULocale.ROOT),
             "The supported locales cannot contain the root.");
