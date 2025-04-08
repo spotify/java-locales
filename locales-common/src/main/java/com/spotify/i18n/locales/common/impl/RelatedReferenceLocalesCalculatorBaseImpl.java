@@ -56,14 +56,14 @@ public abstract class RelatedReferenceLocalesCalculatorBaseImpl
           .build();
 
   /**
-   * Returns the list of related reference locales, along with their calculated affinity with the
-   * supported locale, for a given language tag.
+   * Returns the list of related reference locales, along with their calculated affinity, for the
+   * given language tag.
    *
    * @param languageTag language tag
    * @return List of related reference locales, along with their calculated affinity
    */
   @Override
-  public List<RelatedReferenceLocale> getRelatedReferenceLocales(
+  public List<RelatedReferenceLocale> calculateRelatedReferenceLocales(
       @Nullable final String languageTag) {
     return LanguageTagUtils.parse(languageTag)
         .map(supportedLocale -> getRelatedReferenceLocales(supportedLocale))
@@ -97,7 +97,8 @@ public abstract class RelatedReferenceLocalesCalculatorBaseImpl
    * @return the optional best matching reference locale
    */
   @Override
-  public Optional<ULocale> getBestMatchingReferenceLocale(@Nullable final String languageTag) {
+  public Optional<ULocale> calculateBestMatchingReferenceLocale(
+      @Nullable final String languageTag) {
     return LanguageTagUtils.parse(languageTag).map(REFERENCE_LOCALE_MATCHER::getBestMatch);
   }
 

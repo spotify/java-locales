@@ -49,13 +49,14 @@ import java.util.Optional;
  *
  * <ul>
  *   <li>Calculate all related reference locales for a given supported locale (ex: supported user
- *       language). This is done using the {@link #getRelatedReferenceLocales(String)} method.
+ *       language). This is done using the {@link #calculateRelatedReferenceLocales(String)} method.
  *   <li>Calculate the best matching reference locale for a given target locale (ex: target content
- *       language). This is done using the {@link #getBestMatchingReferenceLocale(String)}
+ *       language). This is done using the {@link #calculateBestMatchingReferenceLocale(String)}
+ *       method.
  *   <li>Join datasets based on the calculated reference locale ({@link
  *       RelatedReferenceLocale#referenceLocale()} and the output of {@link
- *       #getBestMatchingReferenceLocale(String)}), and filter based on the calculated and desired
- *       level of {@link RelatedReferenceLocale#affinity()}.
+ *       #calculateBestMatchingReferenceLocale(String)}), and filter based on the desired level of
+ *       {@link RelatedReferenceLocale#affinity()}.
  * </ul>
  *
  * @author Eric Fjøsne
@@ -63,13 +64,13 @@ import java.util.Optional;
 public interface RelatedReferenceLocalesCalculator {
 
   /**
-   * Returns the list of related reference locales, along with their calculated affinity with the
-   * supported locale, for a given language tag.
+   * Returns the list of related reference locales, along with their calculated affinity, for the
+   * given language tag.
    *
    * @param languageTag language tag
    * @return List of related reference locales, along with their calculated affinity
    */
-  List<RelatedReferenceLocale> getRelatedReferenceLocales(@Nullable final String languageTag);
+  List<RelatedReferenceLocale> calculateRelatedReferenceLocales(@Nullable final String languageTag);
 
   /**
    * Returns the best matching reference locale for a given language tag.
@@ -77,5 +78,5 @@ public interface RelatedReferenceLocalesCalculator {
    * @param languageTag language tag
    * @return the optional best matching reference locale
    */
-  Optional<ULocale> getBestMatchingReferenceLocale(@Nullable final String languageTag);
+  Optional<ULocale> calculateBestMatchingReferenceLocale(@Nullable final String languageTag);
 }

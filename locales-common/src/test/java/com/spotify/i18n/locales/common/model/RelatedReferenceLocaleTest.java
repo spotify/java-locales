@@ -45,7 +45,6 @@ class RelatedReferenceLocaleTest {
 
   @Test
   void whenBuildingWithInvalidReferenceLocale_buildFails() {
-
     IllegalStateException thrown =
         assertThrows(
             IllegalStateException.class,

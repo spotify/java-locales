@@ -28,7 +28,11 @@ import static org.mockito.Mockito.when;
 
 import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.impl.LocaleAffinityCalculatorBaseImpl;
+import com.spotify.i18n.locales.common.model.LocaleAffinity;
+import com.spotify.i18n.locales.common.model.RelatedReferenceLocale;
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -150,5 +154,48 @@ class LocaleAffinityHelpersFactoryTest {
     assertTrue(
         LocaleAffinityHelpersFactory.getDefaultInstance().buildRelatedReferenceLocalesCalculator()
             instanceof RelatedReferenceLocalesCalculator);
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  void
+      whenJoiningDatasetsUsingRelatedReferenceLocalesCalculator_joinsBasedOnExpectedRelatedReferenceLocale(
+          final String languageTagInDataset1,
+          final String languageTagInDataset2,
+          final String expectedReferenceLanguageTag,
+          final LocaleAffinity expectedAffinity) {
+    RelatedReferenceLocalesCalculator calculator =
+        LocaleAffinityHelpersFactory.getDefaultInstance().buildRelatedReferenceLocalesCalculator();
+
+    List<RelatedReferenceLocale> relatedReferenceLocales =
+        calculator.calculateRelatedReferenceLocales(languageTagInDataset1);
+    Optional<ULocale> referenceLocale =
+        calculator.calculateBestMatchingReferenceLocale(languageTagInDataset2);
+
+    assertEquals(
+        RelatedReferenceLocale.builder()
+            .referenceLocale(ULocale.forLanguageTag(expectedReferenceLanguageTag))
+            .affinity(expectedAffinity)
+            .build(),
+        relatedReferenceLocales.stream()
+            .filter(rrl -> rrl.referenceLocale().equals(referenceLocale.get()))
+            .findFirst()
+            .get());
+  }
+
+  public static Stream<Arguments>
+      whenJoiningDatasetsUsingRelatedReferenceLocalesCalculator_joinsBasedOnExpectedRelatedReferenceLocale() {
+    return Stream.of(
+        // Chinese (Hong-Kong), Chinese (Traditional) -> Chinese (Taiwan)
+        Arguments.of("zh-HK", "zh-Hant", "zh-TW", LocaleAffinity.SAME_OR_INTERCHANGEABLE),
+
+        // Chinese (Hong-Kong), Cantonese (Hong-Kong) -> Cantonese
+        Arguments.of("zh-HK", "yue-HK", "yue", LocaleAffinity.HIGH),
+
+        // Dutch (Belgium), Dutch (Netherlands) -> Dutch
+        Arguments.of("nl-BE", "nl-NL", "nl", LocaleAffinity.SAME_OR_INTERCHANGEABLE),
+
+        // French (Switzerland), French (Canada) -> French
+        Arguments.of("fr-CH", "fr-CA", "fr-CA", LocaleAffinity.SAME_OR_INTERCHANGEABLE));
   }
 }
