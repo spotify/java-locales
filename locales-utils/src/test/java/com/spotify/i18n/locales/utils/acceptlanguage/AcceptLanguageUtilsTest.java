@@ -73,6 +73,8 @@ public class AcceptLanguageUtilsTest {
         "en-SE;q=1.000, he-SE;q=0.833, sV-SE;q=0.667, zh-Hans-SE;q=0.500, tlh-SE;q=0.333, en;q=0.167",
         "en-se,he-se;q=0.833,iw-se;q=0.833,sv-se;q=0.667,zh-hans-se;q=0.5,tlh-se;q=0.333,i-klingon-se;q=0.333,en;q=0.167");
     m.put("Ø", "");
+    m.put("th;q=1.00", "th");
+    m.put("vi;q=0.20", "vi;q=0.2");
     return m.entrySet().stream().map(entry -> Arguments.of(entry.getKey(), entry.getValue()));
   }
 
@@ -133,6 +135,8 @@ public class AcceptLanguageUtilsTest {
             lr("i-klingon-SE", 0.333),
             lr("en", 0.167)));
     m.put("Ø", Collections.emptyList());
+    m.put("th;q=1.00", List.of(lr("th", 1.0)));
+    m.put("vi;q=0.20", List.of(lr("vi", 0.2)));
     return m.entrySet().stream().map(entry -> Arguments.of(entry.getKey(), entry.getValue()));
   }
 
