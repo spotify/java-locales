@@ -136,7 +136,8 @@ class LocaleAffinityHelpersFactoryTest {
       when(mockedBuilder.build()).thenReturn(mockedCalculator);
 
       final LocaleAffinityCalculator built =
-          LocaleAffinityHelpersFactory.getDefaultInstance().buildAffinityWithLocalesCalculator(locales);
+          LocaleAffinityHelpersFactory.getDefaultInstance()
+              .buildAffinityWithLocalesCalculator(locales);
 
       assertEquals(mockedCalculator, built);
       verify(mockedBuilder).withLocales(locales);

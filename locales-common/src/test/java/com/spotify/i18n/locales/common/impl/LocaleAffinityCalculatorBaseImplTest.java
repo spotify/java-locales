@@ -48,7 +48,7 @@ class LocaleAffinityCalculatorBaseImplTest {
         assertThrows(
             IllegalStateException.class, () -> LocaleAffinityCalculatorBaseImpl.builder().build());
 
-    assertEquals(thrown.getMessage(), "Missing required properties: supportedLocales");
+    assertEquals(thrown.getMessage(), "Missing required properties: withLocales");
   }
 
   @Test
