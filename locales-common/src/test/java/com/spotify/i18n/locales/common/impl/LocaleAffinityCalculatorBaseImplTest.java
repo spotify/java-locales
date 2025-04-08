@@ -94,6 +94,9 @@ class LocaleAffinityCalculatorBaseImplTest {
     return Stream.of(
         // Edge cases
         Arguments.of(" Invalid language tag ", NONE),
+        Arguments.of("wellformed-junk", NONE),
+        Arguments.of("apples-and-bananas", NONE),
+        Arguments.of("", NONE),
         Arguments.of(null, NONE),
 
         // Catalan should be matched, since we support Spanish
