@@ -73,7 +73,7 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
   private static final int SCORE_THRESHOLD_HIGH = 30;
   private static final int SCORE_THRESHOLD_LOW = 0;
 
-  public abstract Set<ULocale> withLocales();
+  public abstract Set<ULocale> againstLocales();
 
   @Override
   public LocaleAffinityResult calculate(@Nullable final String languageTag) {
@@ -81,7 +81,7 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
   }
 
   private LocaleAffinity getAffinity(@Nullable final String languageTag) {
-    if (withLocales().isEmpty()) {
+    if (againstLocales().isEmpty()) {
       return LocaleAffinity.NONE;
     } else {
       int bestDistance = getBestDistance(languageTag);
@@ -95,7 +95,7 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
         .map(LocaleAffinityCalculatorBaseImpl::getMaximizedLanguageScriptRegion)
         .map(
             maxParsed ->
-                withLocales().stream()
+                againstLocales().stream()
                     .map(LocaleAffinityCalculatorBaseImpl::getMaximizedLanguageScriptRegion)
                     .map(
                         maxSupported ->
@@ -156,14 +156,14 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
   public abstract static class Builder {
     Builder() {} // package private constructor
 
-    public abstract Builder withLocales(final Set<ULocale> locales);
+    public abstract Builder againstLocales(final Set<ULocale> locales);
 
     abstract LocaleAffinityCalculatorBaseImpl autoBuild();
 
     /** Builds a {@link LocaleAffinityCalculator} out of this builder. */
     public final LocaleAffinityCalculator build() {
       final LocaleAffinityCalculatorBaseImpl built = autoBuild();
-      for (ULocale supportedLocale : built.withLocales()) {
+      for (ULocale supportedLocale : built.againstLocales()) {
         Preconditions.checkState(
             !supportedLocale.equals(ULocale.ROOT),
             "The supported locales cannot contain the root.");

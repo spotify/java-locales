@@ -56,16 +56,16 @@ class LocaleAffinityHelpersFactoryTest {
       calculatorStaticMock
           .when(() -> LocaleAffinityCalculatorBaseImpl.builder())
           .thenReturn(mockedBuilder);
-      when(mockedBuilder.withLocales(any())).thenReturn(mockedBuilder);
+      when(mockedBuilder.againstLocales(any())).thenReturn(mockedBuilder);
       when(mockedBuilder.build()).thenReturn(mockedCalculator);
 
       final LocaleAffinityCalculator built =
           LocaleAffinityHelpersFactory.getDefaultInstance()
-              .buildAffinityWithAcceptLanguageCalculator(acceptLanguage);
+              .buildAffinityCalculatorForAcceptLanguage(acceptLanguage);
 
       assertEquals(mockedCalculator, built);
       verify(mockedBuilder)
-          .withLocales(
+          .againstLocales(
               expectedLanguageTagsForBuilder.stream()
                   .map(ULocale::forLanguageTag)
                   .collect(Collectors.toSet()));
@@ -94,16 +94,16 @@ class LocaleAffinityHelpersFactoryTest {
       calculatorStaticMock
           .when(() -> LocaleAffinityCalculatorBaseImpl.builder())
           .thenReturn(mockedBuilder);
-      when(mockedBuilder.withLocales(any())).thenReturn(mockedBuilder);
+      when(mockedBuilder.againstLocales(any())).thenReturn(mockedBuilder);
       when(mockedBuilder.build()).thenReturn(mockedCalculator);
 
       final LocaleAffinityCalculator built =
           LocaleAffinityHelpersFactory.getDefaultInstance()
-              .buildAffinityWithLanguageTagsCalculator(languageTags);
+              .buildAffinityCalculatorForLanguageTags(languageTags);
 
       assertEquals(mockedCalculator, built);
       verify(mockedBuilder)
-          .withLocales(
+          .againstLocales(
               expectedLanguageTagsForBuilder.stream()
                   .map(ULocale::forLanguageTag)
                   .collect(Collectors.toSet()));
@@ -132,15 +132,15 @@ class LocaleAffinityHelpersFactoryTest {
       calculatorStaticMock
           .when(() -> LocaleAffinityCalculatorBaseImpl.builder())
           .thenReturn(mockedBuilder);
-      when(mockedBuilder.withLocales(any())).thenReturn(mockedBuilder);
+      when(mockedBuilder.againstLocales(any())).thenReturn(mockedBuilder);
       when(mockedBuilder.build()).thenReturn(mockedCalculator);
 
       final LocaleAffinityCalculator built =
           LocaleAffinityHelpersFactory.getDefaultInstance()
-              .buildAffinityWithLocalesCalculator(locales);
+              .buildAffinityCalculatorForLocales(locales);
 
       assertEquals(mockedCalculator, built);
-      verify(mockedBuilder).withLocales(locales);
+      verify(mockedBuilder).againstLocales(locales);
     }
   }
 
