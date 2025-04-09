@@ -36,8 +36,8 @@ import java.util.stream.Collectors;
  * A factory for creating instances of locale affinity related helpers:
  *
  * <ul>
- *   <li>{@link LocaleAffinityCalculator}: A helper that calculates a locale affinity for a given
- *       language tag.
+ *   <li>{@link LocaleAffinityCalculator}: A helper that calculates a locale affinity for a language
+ *       tag, against a given set of locales.
  *   <li>{@link RelatedReferenceLocalesCalculator}: A helper that enables reference locales based
  *       operations, most notably to join datasets by enabling match operations between an origin
  *       and a target locale.
@@ -55,8 +55,8 @@ public class LocaleAffinityHelpersFactory {
 
   /**
    * Returns a pre-configured, ready-to-use instance of {@link LocaleAffinityCalculator}, that will
-   * calculate affinity for a given language tag, against all valid locales present in the
-   * Accept-Language.
+   * calculate affinity for a language tag, against all valid locales present in the given
+   * Accept-Language value.
    *
    * <p>Malformed, empty or null Accept-Language values will be ignored.
    *
@@ -79,7 +79,7 @@ public class LocaleAffinityHelpersFactory {
 
   /**
    * Returns a pre-configured, ready-to-use instance of {@link LocaleAffinityCalculator}, that will
-   * calculate affinity for a given language tag, against all supplied locales.
+   * calculate affinity for a language tag, against all the given supplied locales.
    *
    * @return Pre-configured locale affinity calculator
    * @see LocaleAffinityCalculator
@@ -92,7 +92,7 @@ public class LocaleAffinityHelpersFactory {
 
   /**
    * Returns a pre-configured, ready-to-use instance of {@link LocaleAffinityCalculator}, that will
-   * calculate affinity for a given language tag, against all supplied language tags.
+   * calculate affinity for a language tag, against all the given supplied language tags.
    *
    * <p>Invalid or improperly formatted language tags will be ignored.
    *
