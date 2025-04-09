@@ -31,13 +31,14 @@ import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
 import com.spotify.i18n.locales.common.model.LocaleAffinity;
 import com.spotify.i18n.locales.common.model.LocaleAffinityResult;
+import com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils;
 import com.spotify.i18n.locales.utils.languagetag.LanguageTagUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Set;
 
 /**
- * Base implementation of {@link LocaleAffinityCalculator} that calculates a locale affinity with a
- * set of locales, based on a given input value (language tag).
+ * Base implementation of {@link LocaleAffinityCalculator} that calculates the locale affinity for a
+ * given language tag, against a set of locales.
  *
  * <p>This class is not intended for public subclassing. New object instances must be created using
  * the builder pattern, starting with the {@link #builder()} method.
@@ -48,10 +49,11 @@ import java.util.Set;
 public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinityCalculator {
 
   // LocaleDistance.INSTANCE is commented as VisibleForTesting, so not ideal ... but this is the
-  // only way to make use of this class, which contains all we need here.
+  // only way to make use of this class, which provides the features we need here.
   private static final LocaleDistance LOCALE_DISTANCE_INSTANCE = LocaleDistance.INSTANCE;
 
-  // LocaleDistance best distance arguments, all assigned to their default as per icu implementation
+  // LocaleDistance best distance method arguments, all assigned to their default as per icu
+  // implementation.
   private static final int LOCALE_DISTANCE_SHIFTED =
       LocaleDistance.shiftDistance(LOCALE_DISTANCE_INSTANCE.getDefaultScriptDistance());
   private static final int LOCALE_DISTANCE_SUPPORTED_LSRS_LENGTH = 1;
@@ -59,10 +61,10 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
   private static final Direction LOCALE_DISTANCE_DIRECTION = Direction.WITH_ONE_WAY;
 
   // LikelySubtags.INSTANCE is commented as VisibleForTesting, so not ideal ... but this is the
-  // only way to make use of this class, which contains all we need here.
+  // only way to make use of this class, which provides the features we need here.
   private static final LikelySubtags LIKELY_SUBTAGS_INSTANCE = LikelySubtags.INSTANCE;
 
-  // LikelySubtags method arguments, all assigned to their default as per icu implementation
+  // LikelySubtags method arguments, all assigned to their default as per icu implementation.
   private static final boolean LIKELY_SUBTAGS_RETURNS_INPUT_IF_UNMATCH = false;
 
   // Distance threshold: Anything above this value will be scored 0.
@@ -73,8 +75,18 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
   private static final int SCORE_THRESHOLD_HIGH = 30;
   private static final int SCORE_THRESHOLD_LOW = 0;
 
+  /**
+   * Returns the set of {@link ULocale} against which affinity is being calculated.
+   *
+   * @return set of locales
+   */
   public abstract Set<ULocale> againstLocales();
 
+  /**
+   * Returns the calculated {@link LocaleAffinityResult} for the given language tag
+   *
+   * @return the locale affinity result
+   */
   @Override
   public LocaleAffinityResult calculate(@Nullable final String languageTag) {
     return LocaleAffinityResult.builder().affinity(getAffinity(languageTag)).build();
@@ -156,6 +168,12 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
   public abstract static class Builder {
     Builder() {} // package private constructor
 
+    /**
+     * Configures the set of {@link ULocale} against which affinity will be calculated.
+     *
+     * @param locales
+     * @return The {@link Builder} instance
+     */
     public abstract Builder againstLocales(final Set<ULocale> locales);
 
     abstract LocaleAffinityCalculatorBaseImpl autoBuild();
@@ -163,10 +181,10 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
     /** Builds a {@link LocaleAffinityCalculator} out of this builder. */
     public final LocaleAffinityCalculator build() {
       final LocaleAffinityCalculatorBaseImpl built = autoBuild();
-      for (ULocale supportedLocale : built.againstLocales()) {
+      for (ULocale locale : built.againstLocales()) {
         Preconditions.checkState(
-            !supportedLocale.equals(ULocale.ROOT),
-            "The supported locales cannot contain the root.");
+            !LocalesHierarchyUtils.isSameLocale(locale, ULocale.ROOT),
+            "The locales against which affinity needs to be calculated cannot contain the root.");
       }
       return built;
     }

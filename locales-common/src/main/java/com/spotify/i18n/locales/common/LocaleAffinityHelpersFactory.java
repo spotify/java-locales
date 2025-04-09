@@ -33,7 +33,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * A factory for creating instances of {@link LocaleAffinityCalculator}.
+ * A factory for creating instances of locale affinity related helpers:
+ *
+ * <ul>
+ *   <li>{@link LocaleAffinityCalculator}: A helper that calculates a locale affinity for a given
+ *       language tag.
+ *   <li>{@link RelatedReferenceLocalesCalculator}: A helper that enables reference locales based
+ *       operations, most notably to join datasets by enabling match operations between an origin
+ *       and a target locale.
+ * </ul>
  *
  * @author Eric Fjøsne
  */
@@ -46,8 +54,9 @@ public class LocaleAffinityHelpersFactory {
   private LocaleAffinityHelpersFactory() {}
 
   /**
-   * Returns a pre-configured, ready-to-use instance of {@link LocaleAffinityCalculator}, using all
-   * valid locales present in the Accept-Language as supported locales.
+   * Returns a pre-configured, ready-to-use instance of {@link LocaleAffinityCalculator}, that will
+   * calculate affinity for a given language tag, against all valid locales present in the
+   * Accept-Language.
    *
    * <p>Malformed, empty or null Accept-Language values will be ignored.
    *
@@ -69,8 +78,8 @@ public class LocaleAffinityHelpersFactory {
   }
 
   /**
-   * Returns a pre-configured, ready-to-use instance of {@link LocaleAffinityCalculator}, using the
-   * supplied locales as supported locales.
+   * Returns a pre-configured, ready-to-use instance of {@link LocaleAffinityCalculator}, that will
+   * calculate affinity for a given language tag, against all supplied locales.
    *
    * @return Pre-configured locale affinity calculator
    * @see LocaleAffinityCalculator
@@ -82,8 +91,8 @@ public class LocaleAffinityHelpersFactory {
   }
 
   /**
-   * Returns a pre-configured, ready-to-use instance of {@link LocaleAffinityCalculator}, using the
-   * supplied language tags as supported locales.
+   * Returns a pre-configured, ready-to-use instance of {@link LocaleAffinityCalculator}, that will
+   * calculate affinity for a given language tag, against all supplied language tags.
    *
    * <p>Invalid or improperly formatted language tags will be ignored.
    *

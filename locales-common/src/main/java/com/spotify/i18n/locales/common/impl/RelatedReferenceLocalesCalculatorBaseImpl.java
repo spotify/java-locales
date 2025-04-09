@@ -37,11 +37,11 @@ import java.util.stream.Collectors;
 
 /**
  * Base implementation of an engine that enables reference locales based operations, most notably to
- * join datasets by enabling match operations between an origin source supported locale, and a
- * target locale.
+ * join datasets by enabling match operations between an origin and a target locale.
  *
  * <p>Read more about when to use this implementation in {@link RelatedReferenceLocalesCalculator}.
  *
+ * @see RelatedReferenceLocale
  * @author Eric Fjøsne
  */
 @AutoValue
@@ -66,12 +66,12 @@ public abstract class RelatedReferenceLocalesCalculatorBaseImpl
   public List<RelatedReferenceLocale> calculateRelatedReferenceLocales(
       @Nullable final String languageTag) {
     return LanguageTagUtils.parse(languageTag)
-        .map(supportedLocale -> getRelatedReferenceLocales(supportedLocale))
+        .map(this::getRelatedReferenceLocales)
         .orElse(Collections.emptyList());
   }
 
-  private List<RelatedReferenceLocale> getRelatedReferenceLocales(final ULocale supportedLocale) {
-    final LocaleAffinityCalculator affinityCalculator = buildAffinityCalculator(supportedLocale);
+  private List<RelatedReferenceLocale> getRelatedReferenceLocales(final ULocale locale) {
+    final LocaleAffinityCalculator affinityCalculator = buildAffinityCalculator(locale);
     return RelatedReferenceLocale.availableReferenceLocales().stream()
         .map(
             refLocale ->
@@ -79,13 +79,13 @@ public abstract class RelatedReferenceLocalesCalculatorBaseImpl
                     .referenceLocale(refLocale)
                     .affinity(affinityCalculator.calculate(refLocale.toLanguageTag()).affinity())
                     .build())
-        // We only retain reference locales with some affinity
+        // We only retain reference locales with some level of affinity
         .filter(refLocale -> refLocale.affinity() != LocaleAffinity.NONE)
         .collect(Collectors.toList());
   }
 
-  private LocaleAffinityCalculator buildAffinityCalculator(final ULocale supportedLocale) {
-    return LocaleAffinityCalculatorBaseImpl.builder().againstLocales(Set.of(supportedLocale)).build();
+  private LocaleAffinityCalculator buildAffinityCalculator(final ULocale locale) {
+    return LocaleAffinityCalculatorBaseImpl.builder().againstLocales(Set.of(locale)).build();
   }
 
   /**
