@@ -21,14 +21,15 @@
 package com.spotify.i18n.locales.common;
 
 import com.ibm.icu.util.ULocale;
-import com.spotify.i18n.locales.common.model.RelatedReferenceLocale;
+import com.spotify.i18n.locales.common.model.ReferenceLocale;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * Represents an engine that enables reference locales based operations, most notably to join
- * datasets by enabling match operations between an origin and a target locale.
+ * datasets by enabling match operations between an origin and a target locale, and enabling
+ * filtering on the affinity between these locales.
  *
  * <p>We define a reference locale as a unique and standard locale based on which join operations
  * between datasets are safe to perform. This is required as different locales (or language tags)
@@ -53,16 +54,15 @@ import java.util.Optional;
  *   <li>Calculate the best matching reference locale for a given target locale (ex: content
  *       language identifier). This is done using the {@link
  *       #calculateBestMatchingReferenceLocale(String)} method.
- *   <li>Join datasets based on the calculated reference locale ({@link
- *       RelatedReferenceLocale#referenceLocale()} and the output of {@link
- *       #calculateBestMatchingReferenceLocale(String)}), and filter based on the desired level of
- *       {@link RelatedReferenceLocale#affinity()}.
+ *   <li>Join datasets based on the calculated reference locale ({@link ReferenceLocale#locale()}
+ *       and the output of {@link #calculateBestMatchingReferenceLocale(String)}), and filter based
+ *       on the desired level of {@link ReferenceLocale#affinity()}.
  * </ul>
  *
- * @see RelatedReferenceLocale
+ * @see ReferenceLocale
  * @author Eric Fjøsne
  */
-public interface RelatedReferenceLocalesCalculator {
+public interface ReferenceLocalesCalculator {
 
   /**
    * Returns the list of related reference locales, along with their calculated affinity, for the
@@ -71,7 +71,7 @@ public interface RelatedReferenceLocalesCalculator {
    * @param languageTag language tag
    * @return List of related reference locales, along with their calculated affinity
    */
-  List<RelatedReferenceLocale> calculateRelatedReferenceLocales(@Nullable final String languageTag);
+  List<ReferenceLocale> calculateRelatedReferenceLocales(@Nullable final String languageTag);
 
   /**
    * Returns the best matching reference locale for a given language tag.

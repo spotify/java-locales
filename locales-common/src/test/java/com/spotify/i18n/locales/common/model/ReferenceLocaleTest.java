@@ -26,44 +26,49 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.ibm.icu.util.ULocale;
 import org.junit.jupiter.api.Test;
 
-class RelatedReferenceLocaleTest {
+class ReferenceLocaleTest {
 
   @Test
   void whenBuildingWithMissingRequiredProperties_buildFails() {
     IllegalStateException thrown =
-        assertThrows(IllegalStateException.class, () -> RelatedReferenceLocale.builder().build());
+        assertThrows(IllegalStateException.class, () -> ReferenceLocale.builder().build());
 
-    assertEquals("Missing required properties: referenceLocale affinity", thrown.getMessage());
+    assertEquals("Missing required properties: locale affinity", thrown.getMessage());
+  }
+
+  @Test
+  void availableReferenceLocalesDoesNotContainRoot() {
+    assertFalse(ReferenceLocale.availableReferenceLocales().contains(ULocale.ROOT));
   }
 
   @Test
   void whenGettingAvailableReferenceLocales_allAreMinimized() {
-    for (ULocale referenceLocale : RelatedReferenceLocale.availableReferenceLocales()) {
+    for (ULocale referenceLocale : ReferenceLocale.availableReferenceLocales()) {
       assertTrue(isSameLocale(ULocale.minimizeSubtags(referenceLocale), referenceLocale));
     }
   }
 
   @Test
-  void whenBuildingWithInvalidReferenceLocale_buildFails() {
+  void whenBuildingWithInvalidLocale_buildFails() {
     IllegalStateException thrown =
         assertThrows(
             IllegalStateException.class,
             () ->
-                RelatedReferenceLocale.builder()
+                ReferenceLocale.builder()
                     .affinity(LocaleAffinity.HIGH)
-                    .referenceLocale(ULocale.forLanguageTag("zh-Hant-TW"))
+                    .locale(ULocale.forLanguageTag("zh-Hant-TW"))
                     .build());
 
     assertEquals(
-        "Given parameter referenceLocale could not be matched with an available reference locale: zh-Hant-TW",
+        "Given parameter locale could not be matched with an available reference locale: zh-Hant-TW",
         thrown.getMessage());
   }
 
   @Test
   void whenBuildingWithValidParameters_buildSucceeds() {
-    RelatedReferenceLocale.builder()
+    ReferenceLocale.builder()
         .affinity(LocaleAffinity.HIGH)
-        .referenceLocale(ULocale.forLanguageTag("zh-TW"))
+        .locale(ULocale.forLanguageTag("zh-TW"))
         .build();
   }
 }

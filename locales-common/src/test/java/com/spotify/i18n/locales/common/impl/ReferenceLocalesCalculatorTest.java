@@ -30,9 +30,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.ibm.icu.util.ULocale;
 import com.ibm.icu.util.ULocale.Builder;
-import com.spotify.i18n.locales.common.RelatedReferenceLocalesCalculator;
+import com.spotify.i18n.locales.common.ReferenceLocalesCalculator;
 import com.spotify.i18n.locales.common.model.LocaleAffinity;
-import com.spotify.i18n.locales.common.model.RelatedReferenceLocale;
+import com.spotify.i18n.locales.common.model.ReferenceLocale;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -41,11 +41,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class RelatedReferenceLocalesCalculatorTest {
+class ReferenceLocalesCalculatorTest {
 
   public static final ULocale EN_US_POSIX = ULocale.forLanguageTag("en-US-POSIX");
+  public static final ReferenceLocalesCalculator REFERENCE_LOCALES_CALCULATOR =
+      ReferenceLocalesCalculatorBaseImpl.builder().build();
 
-  public static Stream<Arguments> validateReferenceLocaleAffinityScoreRanges() {
+  public static Stream<Arguments> validateLocaleAffinityScoreRanges() {
     return Arrays.stream(ULocale.getAvailableLocales())
         .filter(l -> !isSameLocale(l, EN_US_POSIX))
         .map(Arguments::of);
@@ -53,33 +55,24 @@ class RelatedReferenceLocalesCalculatorTest {
 
   @ParameterizedTest
   @MethodSource
-  public void validateReferenceLocaleAffinityScoreRanges(final ULocale input) {
-    RelatedReferenceLocalesCalculator calculator =
-        RelatedReferenceLocalesCalculatorBaseImpl.builder().build();
-    assertTrue(calculator.calculateBestMatchingReferenceLocale(input.toLanguageTag()).isPresent());
+  public void validateLocaleAffinityScoreRanges(final ULocale input) {
+    assertTrue(
+        REFERENCE_LOCALES_CALCULATOR
+            .calculateBestMatchingReferenceLocale(input.toLanguageTag())
+            .isPresent());
 
-    List<RelatedReferenceLocale> relatedReferenceLocales =
-        calculator.calculateRelatedReferenceLocales(input.toLanguageTag());
+    List<ReferenceLocale> relatedReferenceLocales =
+        REFERENCE_LOCALES_CALCULATOR.calculateRelatedReferenceLocales(input.toLanguageTag());
 
-    ULocale inputLS =
-        new Builder()
-            .setLocale(ULocale.addLikelySubtags(input))
-            .setRegion(null)
-            .clearExtensions()
-            .build();
+    ULocale inputLanguageScriptOnly = getLocaleWithLanguageAndScriptOnly(input);
 
-    for (RelatedReferenceLocale relatedReferenceLocale : relatedReferenceLocales) {
-      ULocale referenceLocale = relatedReferenceLocale.referenceLocale();
+    for (ReferenceLocale relatedReferenceLocale : relatedReferenceLocales) {
+      ULocale referenceLocale = relatedReferenceLocale.locale();
       LocaleAffinity affinity = relatedReferenceLocale.affinity();
 
-      ULocale referenceLS =
-          new Builder()
-              .setLocale(ULocale.addLikelySubtags(referenceLocale))
-              .setRegion(null)
-              .clearExtensions()
-              .build();
+      ULocale referenceLanguageScriptOnly = getLocaleWithLanguageAndScriptOnly(referenceLocale);
 
-      if (isSameLocale(inputLS, referenceLS)) {
+      if (isSameLocale(inputLanguageScriptOnly, referenceLanguageScriptOnly)) {
         assertEquals(
             SAME_OR_INTERCHANGEABLE,
             affinity,
@@ -87,9 +80,10 @@ class RelatedReferenceLocalesCalculatorTest {
                 "Reference locale [%s] for input locale [%s] share the same language & script [%s], Yet, affinity is %s.",
                 referenceLocale.toLanguageTag(),
                 input.toLanguageTag(),
-                inputLS.toLanguageTag(),
+                inputLanguageScriptOnly.toLanguageTag(),
                 affinity));
-      } else if (areKnownInterchangeableLocales(inputLS, referenceLS)) {
+      } else if (areKnownInterchangeableLocales(
+          inputLanguageScriptOnly, referenceLanguageScriptOnly)) {
         assertEquals(
             SAME_OR_INTERCHANGEABLE,
             affinity,
@@ -97,7 +91,7 @@ class RelatedReferenceLocalesCalculatorTest {
                 "Reference locale [%s] for input locale [%s] are known interchangeable locales, Yet, affinity is %s.",
                 referenceLocale.toLanguageTag(),
                 input.toLanguageTag(),
-                inputLS.toLanguageTag(),
+                inputLanguageScriptOnly.toLanguageTag(),
                 affinity));
       } else {
         assertNotEquals(
@@ -108,6 +102,14 @@ class RelatedReferenceLocalesCalculatorTest {
                 referenceLocale.toLanguageTag(), input.toLanguageTag(), affinity));
       }
     }
+  }
+
+  private static ULocale getLocaleWithLanguageAndScriptOnly(ULocale input) {
+    return new Builder()
+        .setLocale(ULocale.addLikelySubtags(input))
+        .setRegion(null)
+        .clearExtensions()
+        .build();
   }
 
   private boolean areKnownInterchangeableLocales(ULocale inputLS, ULocale referenceLS) {
@@ -149,19 +151,14 @@ class RelatedReferenceLocalesCalculatorTest {
 
   @ParameterizedTest
   @MethodSource
-  public void getGettingCorrespondingReferenceLocales_returnsExpected(
-      final String input, final List<RelatedReferenceLocale> expectedRelatedReferenceLocales) {
-    RelatedReferenceLocalesCalculator joiner =
-        RelatedReferenceLocalesCalculatorBaseImpl.builder().build();
-    List<RelatedReferenceLocale> relatedReferenceLocaleForAffinities =
-        joiner.calculateRelatedReferenceLocales(input);
-
+  public void whenCalculatingRelatedReferenceLocales_returnsExpected(
+      final String input, final List<ReferenceLocale> expectedRelatedReferenceLocales) {
     assertTrue(
-        relatedReferenceLocaleForAffinities.stream()
+        REFERENCE_LOCALES_CALCULATOR.calculateRelatedReferenceLocales(input).stream()
             .allMatch(expectedRelatedReferenceLocales::contains));
   }
 
-  public static Stream<Arguments> getGettingCorrespondingReferenceLocales_returnsExpected() {
+  public static Stream<Arguments> whenCalculatingRelatedReferenceLocales_returnsExpected() {
     return Stream.of(
         Arguments.of("da-SE", danish()),
         Arguments.of("de-NL", german()),
@@ -179,16 +176,14 @@ class RelatedReferenceLocalesCalculatorTest {
 
   @ParameterizedTest
   @MethodSource
-  public void calculateBestMatchingReferenceLocale_returnsExpected(
+  public void whenCalculatingBestMatchingLocale_returnsExpected(
       final String input, final String expectedLanguageTag) {
-    RelatedReferenceLocalesCalculator joiner =
-        RelatedReferenceLocalesCalculatorBaseImpl.builder().build();
     assertThat(
-        joiner.calculateBestMatchingReferenceLocale(input),
+        REFERENCE_LOCALES_CALCULATOR.calculateBestMatchingReferenceLocale(input),
         is(Optional.of(ULocale.forLanguageTag(expectedLanguageTag))));
   }
 
-  public static Stream<Arguments> calculateBestMatchingReferenceLocale_returnsExpected() {
+  public static Stream<Arguments> whenCalculatingBestMatchingLocale_returnsExpected() {
     return Stream.of(
         Arguments.of("ZH_us", "zh-TW"),
         Arguments.of("zh-Hant", "zh-TW"),
@@ -201,15 +196,14 @@ class RelatedReferenceLocalesCalculatorTest {
         Arguments.of("en-US", "en"));
   }
 
-  private static RelatedReferenceLocale rl(
-      final String languageTag, final LocaleAffinity affinity) {
-    return RelatedReferenceLocale.builder()
-        .referenceLocale(ULocale.forLanguageTag(languageTag))
+  private static ReferenceLocale rl(final String languageTag, final LocaleAffinity affinity) {
+    return ReferenceLocale.builder()
+        .locale(ULocale.forLanguageTag(languageTag))
         .affinity(affinity)
         .build();
   }
 
-  private static List<RelatedReferenceLocale> chineseTraditional() {
+  private static List<ReferenceLocale> chineseTraditional() {
     return List.of(
         // Traditional Chinese
         rl("zh-HK", SAME_OR_INTERCHANGEABLE),
@@ -219,7 +213,7 @@ class RelatedReferenceLocalesCalculatorTest {
         rl("yue", HIGH));
   }
 
-  private static List<RelatedReferenceLocale> danish() {
+  private static List<ReferenceLocale> danish() {
     return List.of(
         // Danish
         rl("da", SAME_OR_INTERCHANGEABLE),
@@ -234,7 +228,7 @@ class RelatedReferenceLocalesCalculatorTest {
         rl("fo-DK", LOW));
   }
 
-  private static List<RelatedReferenceLocale> english() {
+  private static List<ReferenceLocale> english() {
     return List.of(
         // Welsh
         rl("cy", LOW),
@@ -362,7 +356,7 @@ class RelatedReferenceLocalesCalculatorTest {
         rl("pcm", LOW));
   }
 
-  private static List<RelatedReferenceLocale> french() {
+  private static List<ReferenceLocale> french() {
     return List.of(
         // Breton
         rl("br", LOW),
@@ -418,7 +412,7 @@ class RelatedReferenceLocalesCalculatorTest {
         rl("oc-ES", LOW));
   }
 
-  private static List<RelatedReferenceLocale> german() {
+  private static List<ReferenceLocale> german() {
     return List.of(
         // German
         rl("de", SAME_OR_INTERCHANGEABLE),
@@ -438,7 +432,7 @@ class RelatedReferenceLocalesCalculatorTest {
         rl("rm", LOW));
   }
 
-  private static List<RelatedReferenceLocale> italian() {
+  private static List<ReferenceLocale> italian() {
     return List.of(
         rl("it", SAME_OR_INTERCHANGEABLE),
         rl("it-CH", SAME_OR_INTERCHANGEABLE),
@@ -446,7 +440,7 @@ class RelatedReferenceLocalesCalculatorTest {
         rl("it-VA", SAME_OR_INTERCHANGEABLE));
   }
 
-  private static List<RelatedReferenceLocale> norwegian() {
+  private static List<ReferenceLocale> norwegian() {
     return List.of(
         // Danish
         rl("da", HIGH),
@@ -460,7 +454,7 @@ class RelatedReferenceLocalesCalculatorTest {
         rl("nn", LOW));
   }
 
-  private static List<RelatedReferenceLocale> serbian() {
+  private static List<ReferenceLocale> serbian() {
     return List.of(
         rl("sr", SAME_OR_INTERCHANGEABLE),
         rl("sr-BA", SAME_OR_INTERCHANGEABLE),
@@ -472,7 +466,7 @@ class RelatedReferenceLocalesCalculatorTest {
         rl("sr-XK", SAME_OR_INTERCHANGEABLE));
   }
 
-  private static List<RelatedReferenceLocale> swedish() {
+  private static List<ReferenceLocale> swedish() {
     return List.of(
         rl("sv", SAME_OR_INTERCHANGEABLE),
         rl("sv-AX", SAME_OR_INTERCHANGEABLE),

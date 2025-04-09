@@ -20,6 +20,8 @@
 
 package com.spotify.i18n.locales.common.impl;
 
+import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isSameLocale;
+
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import com.ibm.icu.impl.locale.LSR;
@@ -31,7 +33,6 @@ import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
 import com.spotify.i18n.locales.common.model.LocaleAffinity;
 import com.spotify.i18n.locales.common.model.LocaleAffinityResult;
-import com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils;
 import com.spotify.i18n.locales.utils.languagetag.LanguageTagUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Set;
@@ -183,7 +184,7 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
       final LocaleAffinityCalculatorBaseImpl built = autoBuild();
       for (ULocale locale : built.againstLocales()) {
         Preconditions.checkState(
-            !LocalesHierarchyUtils.isSameLocale(locale, ULocale.ROOT),
+            !isSameLocale(locale, ULocale.ROOT),
             "The locales against which affinity needs to be calculated cannot contain the root.");
       }
       return built;

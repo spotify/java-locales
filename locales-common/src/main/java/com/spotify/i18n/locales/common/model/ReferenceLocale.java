@@ -20,6 +20,8 @@
 
 package com.spotify.i18n.locales.common.model;
 
+import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isSameLocale;
+
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import com.ibm.icu.util.ULocale;
@@ -28,7 +30,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * A model class that represents a {@link RelatedReferenceLocale}.
+ * A model class that represents a {@link ReferenceLocale}.
  *
  * <p>This class is not intended for public subclassing. New object instances must be created using
  * the builder pattern, starting with the {@link #builder()} method.
@@ -36,7 +38,7 @@ import java.util.stream.Collectors;
  * @author Eric Fjøsne
  */
 @AutoValue
-public abstract class RelatedReferenceLocale {
+public abstract class ReferenceLocale {
 
   public static final ULocale EN_US_POSIX = ULocale.forLanguageTag("en-US-POSIX");
 
@@ -46,7 +48,7 @@ public abstract class RelatedReferenceLocale {
    */
   private static final Set<ULocale> REFERENCE_LOCALES =
       Arrays.stream(ULocale.getAvailableLocales())
-          .filter(l -> !l.equals(EN_US_POSIX))
+          .filter(l -> !isSameLocale(l, ULocale.ROOT) && !isSameLocale(l, EN_US_POSIX))
           .map(ULocale::minimizeSubtags)
           .collect(Collectors.toUnmodifiableSet());
 
@@ -56,19 +58,19 @@ public abstract class RelatedReferenceLocale {
   }
 
   /** Returns the reference locale */
-  public abstract ULocale referenceLocale();
+  public abstract ULocale locale();
 
   /** Returns the calculated affinity for the reference locale */
   public abstract LocaleAffinity affinity();
 
   /**
    * Returns a {@link Builder} instance that will allow you to manually create a {@link
-   * RelatedReferenceLocale} instance.
+   * ReferenceLocale} instance.
    *
    * @return The builder
    */
   public static Builder builder() {
-    return new AutoValue_RelatedReferenceLocale.Builder();
+    return new AutoValue_ReferenceLocale.Builder();
   }
 
   @AutoValue.Builder
@@ -77,24 +79,24 @@ public abstract class RelatedReferenceLocale {
 
     public abstract Builder affinity(final LocaleAffinity affinity);
 
-    public abstract Builder referenceLocale(final ULocale referenceLocale);
+    public abstract Builder locale(final ULocale locale);
 
-    abstract RelatedReferenceLocale autoBuild(); // not public
+    abstract ReferenceLocale autoBuild(); // not public
 
     /**
-     * Builds a {@link RelatedReferenceLocale} out of this builder.
+     * Builds a {@link ReferenceLocale} out of this builder.
      *
      * <p>This is safe to be called several times on the same builder.
      *
      * @throws IllegalStateException if any of the builder property does not match the requirements.
      */
-    public final RelatedReferenceLocale build() {
-      final RelatedReferenceLocale mrl = autoBuild();
+    public final ReferenceLocale build() {
+      final ReferenceLocale mrl = autoBuild();
 
       Preconditions.checkState(
-          REFERENCE_LOCALES.contains(mrl.referenceLocale()),
-          "Given parameter referenceLocale could not be matched with an available reference locale: %s",
-          mrl.referenceLocale().toLanguageTag());
+          REFERENCE_LOCALES.contains(mrl.locale()),
+          "Given parameter locale could not be matched with an available reference locale: %s",
+          mrl.locale().toLanguageTag());
 
       return mrl;
     }

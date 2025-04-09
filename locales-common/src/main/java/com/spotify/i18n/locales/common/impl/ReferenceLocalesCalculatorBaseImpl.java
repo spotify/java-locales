@@ -24,9 +24,9 @@ import com.google.auto.value.AutoValue;
 import com.ibm.icu.util.LocaleMatcher;
 import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
-import com.spotify.i18n.locales.common.RelatedReferenceLocalesCalculator;
+import com.spotify.i18n.locales.common.ReferenceLocalesCalculator;
 import com.spotify.i18n.locales.common.model.LocaleAffinity;
-import com.spotify.i18n.locales.common.model.RelatedReferenceLocale;
+import com.spotify.i18n.locales.common.model.ReferenceLocale;
 import com.spotify.i18n.locales.utils.languagetag.LanguageTagUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Collections;
@@ -37,21 +37,21 @@ import java.util.stream.Collectors;
 
 /**
  * Base implementation of an engine that enables reference locales based operations, most notably to
- * join datasets by enabling match operations between an origin and a target locale.
+ * join datasets by enabling match operations between an origin and a target locale, and enabling
+ * filtering on the affinity between these locales.
  *
- * <p>Read more about when to use this implementation in {@link RelatedReferenceLocalesCalculator}.
+ * <p>Read more about when to use this implementation in {@link ReferenceLocalesCalculator}.
  *
- * @see RelatedReferenceLocale
+ * @see ReferenceLocale
  * @author Eric Fjøsne
  */
 @AutoValue
-public abstract class RelatedReferenceLocalesCalculatorBaseImpl
-    implements RelatedReferenceLocalesCalculator {
+public abstract class ReferenceLocalesCalculatorBaseImpl implements ReferenceLocalesCalculator {
 
   /** Prepared {@link LocaleMatcher}, ready to find the best matching reference locale */
   private static final LocaleMatcher REFERENCE_LOCALE_MATCHER =
       LocaleMatcher.builder()
-          .setSupportedULocales(RelatedReferenceLocale.availableReferenceLocales())
+          .setSupportedULocales(ReferenceLocale.availableReferenceLocales())
           .setNoDefaultLocale()
           .build();
 
@@ -63,20 +63,20 @@ public abstract class RelatedReferenceLocalesCalculatorBaseImpl
    * @return List of related reference locales, along with their calculated affinity
    */
   @Override
-  public List<RelatedReferenceLocale> calculateRelatedReferenceLocales(
+  public List<ReferenceLocale> calculateRelatedReferenceLocales(
       @Nullable final String languageTag) {
     return LanguageTagUtils.parse(languageTag)
         .map(this::getRelatedReferenceLocales)
         .orElse(Collections.emptyList());
   }
 
-  private List<RelatedReferenceLocale> getRelatedReferenceLocales(final ULocale locale) {
+  private List<ReferenceLocale> getRelatedReferenceLocales(final ULocale locale) {
     final LocaleAffinityCalculator affinityCalculator = buildAffinityCalculator(locale);
-    return RelatedReferenceLocale.availableReferenceLocales().stream()
+    return ReferenceLocale.availableReferenceLocales().stream()
         .map(
             refLocale ->
-                RelatedReferenceLocale.builder()
-                    .referenceLocale(refLocale)
+                ReferenceLocale.builder()
+                    .locale(refLocale)
                     .affinity(affinityCalculator.calculate(refLocale.toLanguageTag()).affinity())
                     .build())
         // We only retain reference locales with some level of affinity
@@ -102,23 +102,23 @@ public abstract class RelatedReferenceLocalesCalculatorBaseImpl
 
   /**
    * Returns a {@link Builder} instance that will allow you to manually create a {@link
-   * RelatedReferenceLocalesCalculatorBaseImpl} instance.
+   * ReferenceLocalesCalculatorBaseImpl} instance.
    *
    * @return The builder
    */
   public static Builder builder() {
-    return new AutoValue_RelatedReferenceLocalesCalculatorBaseImpl.Builder();
+    return new AutoValue_ReferenceLocalesCalculatorBaseImpl.Builder();
   }
 
-  /** A builder for a {@link RelatedReferenceLocalesCalculatorBaseImpl}. */
+  /** A builder for a {@link ReferenceLocalesCalculatorBaseImpl}. */
   @AutoValue.Builder
   public abstract static class Builder {
     Builder() {}
 
-    abstract RelatedReferenceLocalesCalculatorBaseImpl autoBuild();
+    abstract ReferenceLocalesCalculatorBaseImpl autoBuild();
 
-    /** Builds a {@link RelatedReferenceLocalesCalculator} out of this builder. */
-    public final RelatedReferenceLocalesCalculator build() {
+    /** Builds a {@link ReferenceLocalesCalculator} out of this builder. */
+    public final ReferenceLocalesCalculator build() {
       return autoBuild();
     }
   }

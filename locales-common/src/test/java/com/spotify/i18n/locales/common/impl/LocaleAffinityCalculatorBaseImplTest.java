@@ -42,6 +42,17 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class LocaleAffinityCalculatorBaseImplTest {
 
+  public static final LocaleAffinityCalculator CALCULATOR_AGAINST_EMPTY_SET =
+      LocaleAffinityCalculatorBaseImpl.builder().againstLocales(Collections.emptySet()).build();
+
+  public static final LocaleAffinityCalculator CALCULATOR_AGAINST_TEST_SET_OF_LOCALES =
+      LocaleAffinityCalculatorBaseImpl.builder()
+          .againstLocales(
+              Set.of("ar", "bs", "es", "fr", "ja", "pt", "sr-Latn", "zh-Hant").stream()
+                  .map(ULocale::forLanguageTag)
+                  .collect(Collectors.toSet()))
+          .build();
+
   @Test
   void whenBuildingWithMissingRequiredProperties_buildFails() {
     final IllegalStateException thrown =
@@ -67,36 +78,25 @@ class LocaleAffinityCalculatorBaseImplTest {
   }
 
   @ParameterizedTest
-  @MethodSource(value = "whenMatching_returnsExpectedResult")
-  void whenMatchingAgainstEmptySetOfLocales_returnsExpectedResult(String languageTag) {
-    final LocaleAffinityCalculator matcher =
-        LocaleAffinityCalculatorBaseImpl.builder().againstLocales(Collections.emptySet()).build();
-
-    assertEquals(NONE, matcher.calculate(languageTag).affinity());
+  @MethodSource(value = "whenCalculating_returnsExpectedAffinity")
+  void whenCalculatingAgainstEmptySetOfLocales_alwaysReturnsAffinityNone(final String languageTag) {
+    assertEquals(NONE, CALCULATOR_AGAINST_EMPTY_SET.calculate(languageTag).affinity());
   }
 
   @ParameterizedTest
   @MethodSource
-  void whenMatching_returnsExpectedResult(
+  void whenCalculating_returnsExpectedAffinity(
       final String languageTag, final LocaleAffinity expectedAffinity) {
-    final LocaleAffinityCalculator matcher =
-        LocaleAffinityCalculatorBaseImpl.builder()
-            .againstLocales(
-                Set.of("ar", "bs", "es", "fr", "ja", "pt", "sr-Latn", "zh-Hant").stream()
-                    .map(ULocale::forLanguageTag)
-                    .collect(Collectors.toSet()))
-            .build();
-
     assertThat(
-        matcher.calculate(languageTag),
+        CALCULATOR_AGAINST_TEST_SET_OF_LOCALES.calculate(languageTag),
         is(LocaleAffinityResult.builder().affinity(expectedAffinity).build()));
   }
 
-  public static Stream<Arguments> whenMatching_returnsExpectedResult() {
+  public static Stream<Arguments> whenCalculating_returnsExpectedAffinity() {
     return Stream.of(
         // Edge cases
         Arguments.of(" Invalid language tag ", NONE),
-        Arguments.of("wellformed-junk", NONE),
+        Arguments.of("ok-junk", NONE),
         Arguments.of("apples-and-bananas", NONE),
         Arguments.of("", NONE),
         Arguments.of(null, NONE),
@@ -152,7 +152,7 @@ class LocaleAffinityCalculatorBaseImplTest {
   }
 
   @Test
-  void whenMatchingSwedishAgainstBokmaalNorwegianAndDanish_returnsNoAffinity() {
+  void whenCalculatingAffinityForSwedishAgainstBokmaalNorwegianAndDanish_returnsNone() {
     final LocaleAffinityCalculator matcher =
         LocaleAffinityCalculatorBaseImpl.builder()
             .againstLocales(

@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.impl.LocaleAffinityCalculatorBaseImpl;
 import com.spotify.i18n.locales.common.model.LocaleAffinity;
-import com.spotify.i18n.locales.common.model.RelatedReferenceLocale;
+import com.spotify.i18n.locales.common.model.ReferenceLocale;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -154,38 +154,38 @@ class LocaleAffinityHelpersFactoryTest {
   void whenBuildingRelatedReferenceLocalesCalculator_returnsExpectedCalculator() {
     assertTrue(
         LocaleAffinityHelpersFactory.getDefaultInstance().buildRelatedReferenceLocalesCalculator()
-            instanceof RelatedReferenceLocalesCalculator);
+            instanceof ReferenceLocalesCalculator);
   }
 
   @ParameterizedTest
   @MethodSource
   void
-      whenJoiningDatasetsUsingRelatedReferenceLocalesCalculator_joinsBasedOnExpectedRelatedReferenceLocale(
+      whenJoiningDatasetsUsingReferenceLocalesCalculator_joinsBasedOnExpectedRelatedReferenceLocale(
           final String languageTagInDataset1,
           final String languageTagInDataset2,
           final String expectedReferenceLanguageTag,
           final LocaleAffinity expectedAffinity) {
-    RelatedReferenceLocalesCalculator calculator =
+    ReferenceLocalesCalculator calculator =
         LocaleAffinityHelpersFactory.getDefaultInstance().buildRelatedReferenceLocalesCalculator();
 
-    List<RelatedReferenceLocale> relatedReferenceLocales =
+    List<ReferenceLocale> relatedReferenceLocales =
         calculator.calculateRelatedReferenceLocales(languageTagInDataset1);
     Optional<ULocale> referenceLocale =
         calculator.calculateBestMatchingReferenceLocale(languageTagInDataset2);
 
     assertEquals(
-        RelatedReferenceLocale.builder()
-            .referenceLocale(ULocale.forLanguageTag(expectedReferenceLanguageTag))
+        ReferenceLocale.builder()
+            .locale(ULocale.forLanguageTag(expectedReferenceLanguageTag))
             .affinity(expectedAffinity)
             .build(),
         relatedReferenceLocales.stream()
-            .filter(rrl -> rrl.referenceLocale().equals(referenceLocale.get()))
+            .filter(rrl -> rrl.locale().equals(referenceLocale.get()))
             .findFirst()
             .get());
   }
 
   public static Stream<Arguments>
-      whenJoiningDatasetsUsingRelatedReferenceLocalesCalculator_joinsBasedOnExpectedRelatedReferenceLocale() {
+      whenJoiningDatasetsUsingReferenceLocalesCalculator_joinsBasedOnExpectedRelatedReferenceLocale() {
     return Stream.of(
         // Chinese (Hong-Kong), Chinese (Traditional) -> Chinese (Taiwan)
         Arguments.of("zh-HK", "zh-Hant", "zh-TW", LocaleAffinity.SAME_OR_INTERCHANGEABLE),

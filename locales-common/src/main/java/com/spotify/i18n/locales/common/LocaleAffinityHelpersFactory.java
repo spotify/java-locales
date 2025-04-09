@@ -23,7 +23,7 @@ package com.spotify.i18n.locales.common;
 import com.google.common.base.Preconditions;
 import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.impl.LocaleAffinityCalculatorBaseImpl;
-import com.spotify.i18n.locales.common.impl.RelatedReferenceLocalesCalculatorBaseImpl;
+import com.spotify.i18n.locales.common.impl.ReferenceLocalesCalculatorBaseImpl;
 import com.spotify.i18n.locales.utils.acceptlanguage.AcceptLanguageUtils;
 import com.spotify.i18n.locales.utils.languagetag.LanguageTagUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -38,9 +38,9 @@ import java.util.stream.Collectors;
  * <ul>
  *   <li>{@link LocaleAffinityCalculator}: A helper that calculates a locale affinity for a language
  *       tag, against a given set of locales.
- *   <li>{@link RelatedReferenceLocalesCalculator}: A helper that enables reference locales based
+ *   <li>{@link ReferenceLocalesCalculator}: A helper that enables reference locales based
  *       operations, most notably to join datasets by enabling match operations between an origin
- *       and a target locale.
+ *       and a target locale, and enabling filtering on the affinity between these locales.
  * </ul>
  *
  * @author Eric Fjøsne
@@ -111,12 +111,12 @@ public class LocaleAffinityHelpersFactory {
   }
 
   /**
-   * Returns a pre-configured, ready-to-use instance of {@link RelatedReferenceLocalesCalculator}.
+   * Returns a pre-configured, ready-to-use instance of {@link ReferenceLocalesCalculator}.
    *
    * @return Pre-configured calculator
-   * @see RelatedReferenceLocalesCalculator
+   * @see ReferenceLocalesCalculator
    */
-  public RelatedReferenceLocalesCalculator buildRelatedReferenceLocalesCalculator() {
-    return RelatedReferenceLocalesCalculatorBaseImpl.builder().build();
+  public ReferenceLocalesCalculator buildRelatedReferenceLocalesCalculator() {
+    return ReferenceLocalesCalculatorBaseImpl.builder().build();
   }
 }
