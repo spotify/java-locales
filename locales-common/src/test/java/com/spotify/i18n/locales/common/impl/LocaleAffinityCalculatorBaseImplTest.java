@@ -20,12 +20,16 @@
 
 package com.spotify.i18n.locales.common.impl;
 
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.LOW;
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.NONE;
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.SAME_OR_INTERCHANGEABLE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
+import com.spotify.i18n.locales.common.model.LocaleAffinity;
 import com.spotify.i18n.locales.common.model.LocaleAffinityResult;
 import java.util.Collections;
 import java.util.Set;
@@ -38,105 +42,125 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class LocaleAffinityCalculatorBaseImplTest {
 
+  public static final LocaleAffinityCalculator CALCULATOR_AGAINST_EMPTY_SET =
+      LocaleAffinityCalculatorBaseImpl.builder().againstLocales(Collections.emptySet()).build();
+
+  public static final LocaleAffinityCalculator CALCULATOR_AGAINST_TEST_SET_OF_LOCALES =
+      LocaleAffinityCalculatorBaseImpl.builder()
+          .againstLocales(
+              Set.of("ar", "bs", "es", "fr", "ja", "pt", "sr-Latn", "zh-Hant").stream()
+                  .map(ULocale::forLanguageTag)
+                  .collect(Collectors.toSet()))
+          .build();
+
   @Test
   void whenBuildingWithMissingRequiredProperties_buildFails() {
     final IllegalStateException thrown =
         assertThrows(
             IllegalStateException.class, () -> LocaleAffinityCalculatorBaseImpl.builder().build());
 
-    assertEquals(thrown.getMessage(), "Missing required properties: supportedLocales");
+    assertEquals(thrown.getMessage(), "Missing required properties: againstLocales");
   }
 
   @Test
-  void whenBuildingWithRootAsPartOfSupportedLocales_buildFails() {
+  void whenBuildingWithRootAsPartOfAgainstLocales_buildFails() {
     final IllegalStateException thrown =
         assertThrows(
             IllegalStateException.class,
             () ->
                 LocaleAffinityCalculatorBaseImpl.builder()
-                    .supportedLocales(Set.of(ULocale.ROOT))
+                    .againstLocales(Set.of(ULocale.ROOT))
                     .build());
 
-    assertEquals(thrown.getMessage(), "The supported locales cannot contain the root.");
+    assertEquals(
+        thrown.getMessage(),
+        "The locales against which affinity needs to be calculated cannot contain the root.");
   }
 
   @ParameterizedTest
-  @MethodSource(value = "whenMatching_returnsExpectedResult")
-  void whenMatchingAgainstEmptySetOfSupportedLocales_returnsExpectedResult(String languageTag) {
-    final LocaleAffinityCalculator matcher =
-        LocaleAffinityCalculatorBaseImpl.builder().supportedLocales(Collections.emptySet()).build();
-
-    assertEquals(0, matcher.calculate(languageTag).affinityScore());
+  @MethodSource(value = "whenCalculating_returnsExpectedAffinity")
+  void whenCalculatingAgainstEmptySetOfLocales_alwaysReturnsAffinityNone(final String languageTag) {
+    assertEquals(NONE, CALCULATOR_AGAINST_EMPTY_SET.calculate(languageTag).affinity());
   }
 
   @ParameterizedTest
   @MethodSource
-  void whenMatching_returnsExpectedResult(final String languageTag, final int expectedScore) {
+  void whenCalculating_returnsExpectedAffinity(
+      final String languageTag, final LocaleAffinity expectedAffinity) {
+    assertThat(
+        CALCULATOR_AGAINST_TEST_SET_OF_LOCALES.calculate(languageTag),
+        is(LocaleAffinityResult.builder().affinity(expectedAffinity).build()));
+  }
+
+  public static Stream<Arguments> whenCalculating_returnsExpectedAffinity() {
+    return Stream.of(
+        // Edge cases
+        Arguments.of(" Invalid language tag ", NONE),
+        Arguments.of("ok-junk", NONE),
+        Arguments.of("apples-and-bananas", NONE),
+        Arguments.of("", NONE),
+        Arguments.of(null, NONE),
+
+        // Catalan should be matched, since we support Spanish
+        Arguments.of("ca", LOW),
+        Arguments.of("ca-ES", LOW),
+        Arguments.of("ca-AD", LOW),
+
+        // No english should be matched
+        Arguments.of("en", NONE),
+        Arguments.of("en-GB", NONE),
+        Arguments.of("en-US", NONE),
+
+        // Spanish in Europe should be ranked higher
+        Arguments.of("es-419", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("es-GB", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("es-US", SAME_OR_INTERCHANGEABLE),
+
+        // Basque should be matched, since we support Spanish
+        Arguments.of("eu", LOW),
+
+        // French
+        Arguments.of("fr", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("fr-BE", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("fr-CA", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("fr-FR", SAME_OR_INTERCHANGEABLE),
+
+        // Galician should be matched, since we support Spanish
+        Arguments.of("gl", LOW),
+
+        // Hindi shouldn't be matched
+        Arguments.of("hi", NONE),
+
+        // Croatian should be nicely matched with Bosnian
+        Arguments.of("hr-HR", SAME_OR_INTERCHANGEABLE),
+
+        // Serbian Cyrillic should be matched, although only Latin script is supported
+        Arguments.of("sr", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("sr-Latn", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("sr-Cyrl-ME", SAME_OR_INTERCHANGEABLE),
+
+        // Portuguese
+        Arguments.of("pt", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("pt-BR", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("pt-SE", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("pt-US", SAME_OR_INTERCHANGEABLE),
+
+        // Only Traditional Chinese should be matched, not Simplified
+        Arguments.of("zh-CN", NONE),
+        Arguments.of("zh-TW", SAME_OR_INTERCHANGEABLE),
+        Arguments.of("zh-HK", SAME_OR_INTERCHANGEABLE));
+  }
+
+  @Test
+  void whenCalculatingAffinityForSwedishAgainstBokmaalNorwegianAndDanish_returnsNone() {
     final LocaleAffinityCalculator matcher =
         LocaleAffinityCalculatorBaseImpl.builder()
-            .supportedLocales(
-                Set.of("ar", "bs", "es", "fr", "ja", "pt", "sr-Latn", "zh-Hant").stream()
+            .againstLocales(
+                Set.of("da", "nb", "no").stream()
                     .map(ULocale::forLanguageTag)
                     .collect(Collectors.toSet()))
             .build();
 
-    assertThat(
-        matcher.calculate(languageTag),
-        is(LocaleAffinityResult.builder().affinityScore(expectedScore).build()));
-  }
-
-  public static Stream<Arguments> whenMatching_returnsExpectedResult() {
-    return Stream.of(
-        // Edge cases
-        Arguments.of(" Invalid language tag ", 0),
-        Arguments.of(null, 0),
-
-        // Catalan should be matched, since we support Spanish
-        Arguments.of("ca", 28),
-        Arguments.of("ca-ES", 28), // Higher score for Spain than other countries
-        Arguments.of("ca-AD", 14),
-
-        // No english should be matched
-        Arguments.of("en", 0),
-        Arguments.of("en-GB", 0),
-        Arguments.of("en-US", 0),
-
-        // Spanish in Europe should be ranked higher
-        Arguments.of("es-419", 82),
-        Arguments.of("es-GB", 85),
-        Arguments.of("es-US", 82),
-
-        // Basque should be matched, since we support Spanish
-        Arguments.of("eu", 28),
-
-        // French
-        Arguments.of("fr", 100),
-        Arguments.of("fr-BE", 85),
-        Arguments.of("fr-CA", 85),
-        Arguments.of("fr-FR", 99),
-
-        // Galician should be matched, since we support Spanish
-        Arguments.of("gl", 28),
-
-        // Hindi shouldn't be matched
-        Arguments.of("hi", 0),
-
-        // Croatian should be nicely matched with Bosnian
-        Arguments.of("hr-HR", 71),
-
-        // Serbian Cyrillic should be matched, although only Latin script is supported
-        Arguments.of("sr", 82),
-        Arguments.of("sr-Latn", 100),
-
-        // Portuguese
-        Arguments.of("pt", 100),
-        Arguments.of("pt-BR", 99),
-        Arguments.of("pt-SE", 82),
-        Arguments.of("pt-US", 85),
-
-        // Only Traditional Chinese should be matched, not Simplified
-        Arguments.of("zh-CN", 0),
-        Arguments.of("zh-TW", 98),
-        Arguments.of("zh-HK", 82));
+    assertThat(matcher.calculate("sv"), is(LocaleAffinityResult.builder().affinity(NONE).build()));
   }
 }

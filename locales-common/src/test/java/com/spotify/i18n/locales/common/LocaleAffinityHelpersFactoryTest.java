@@ -28,17 +28,22 @@ import static org.mockito.Mockito.when;
 
 import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.impl.LocaleAffinityCalculatorBaseImpl;
+import com.spotify.i18n.locales.common.model.LocaleAffinity;
+import com.spotify.i18n.locales.common.model.ReferenceLocale;
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
-class LocaleAffinityCalculatorFactoryTest {
+class LocaleAffinityHelpersFactoryTest {
 
   @ParameterizedTest
   @MethodSource
@@ -51,16 +56,16 @@ class LocaleAffinityCalculatorFactoryTest {
       calculatorStaticMock
           .when(() -> LocaleAffinityCalculatorBaseImpl.builder())
           .thenReturn(mockedBuilder);
-      when(mockedBuilder.supportedLocales(any())).thenReturn(mockedBuilder);
+      when(mockedBuilder.againstLocales(any())).thenReturn(mockedBuilder);
       when(mockedBuilder.build()).thenReturn(mockedCalculator);
 
       final LocaleAffinityCalculator built =
-          LocaleAffinityCalculatorFactory.getDefaultInstance()
-              .buildLocaleAffinityCalculatorForAcceptLanguage(acceptLanguage);
+          LocaleAffinityHelpersFactory.getDefaultInstance()
+              .buildAffinityCalculatorForAcceptLanguage(acceptLanguage);
 
       assertEquals(mockedCalculator, built);
       verify(mockedBuilder)
-          .supportedLocales(
+          .againstLocales(
               expectedLanguageTagsForBuilder.stream()
                   .map(ULocale::forLanguageTag)
                   .collect(Collectors.toSet()));
@@ -89,16 +94,16 @@ class LocaleAffinityCalculatorFactoryTest {
       calculatorStaticMock
           .when(() -> LocaleAffinityCalculatorBaseImpl.builder())
           .thenReturn(mockedBuilder);
-      when(mockedBuilder.supportedLocales(any())).thenReturn(mockedBuilder);
+      when(mockedBuilder.againstLocales(any())).thenReturn(mockedBuilder);
       when(mockedBuilder.build()).thenReturn(mockedCalculator);
 
       final LocaleAffinityCalculator built =
-          LocaleAffinityCalculatorFactory.getDefaultInstance()
-              .buildLocaleAffinityCalculatorForLanguageTags(languageTags);
+          LocaleAffinityHelpersFactory.getDefaultInstance()
+              .buildAffinityCalculatorForLanguageTags(languageTags);
 
       assertEquals(mockedCalculator, built);
       verify(mockedBuilder)
-          .supportedLocales(
+          .againstLocales(
               expectedLanguageTagsForBuilder.stream()
                   .map(ULocale::forLanguageTag)
                   .collect(Collectors.toSet()));
@@ -127,15 +132,15 @@ class LocaleAffinityCalculatorFactoryTest {
       calculatorStaticMock
           .when(() -> LocaleAffinityCalculatorBaseImpl.builder())
           .thenReturn(mockedBuilder);
-      when(mockedBuilder.supportedLocales(any())).thenReturn(mockedBuilder);
+      when(mockedBuilder.againstLocales(any())).thenReturn(mockedBuilder);
       when(mockedBuilder.build()).thenReturn(mockedCalculator);
 
       final LocaleAffinityCalculator built =
-          LocaleAffinityCalculatorFactory.getDefaultInstance()
-              .buildLocaleAffinityCalculatorForLocales(locales);
+          LocaleAffinityHelpersFactory.getDefaultInstance()
+              .buildAffinityCalculatorForLocales(locales);
 
       assertEquals(mockedCalculator, built);
-      verify(mockedBuilder).supportedLocales(locales);
+      verify(mockedBuilder).againstLocales(locales);
     }
   }
 
@@ -143,5 +148,55 @@ class LocaleAffinityCalculatorFactoryTest {
     return Stream.of(
         Arguments.of(Collections.emptySet(), Collections.emptySet()),
         Arguments.of(Set.of(ULocale.ROOT, ULocale.FRENCH, ULocale.JAPANESE)));
+  }
+
+  @Test
+  void whenBuildingRelatedReferenceLocalesCalculator_returnsExpectedCalculator() {
+    assertTrue(
+        LocaleAffinityHelpersFactory.getDefaultInstance().buildRelatedReferenceLocalesCalculator()
+            instanceof ReferenceLocalesCalculator);
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  void
+      whenJoiningDatasetsUsingReferenceLocalesCalculator_joinsBasedOnExpectedRelatedReferenceLocale(
+          final String languageTagInDataset1,
+          final String languageTagInDataset2,
+          final String expectedReferenceLanguageTag,
+          final LocaleAffinity expectedAffinity) {
+    ReferenceLocalesCalculator calculator =
+        LocaleAffinityHelpersFactory.getDefaultInstance().buildRelatedReferenceLocalesCalculator();
+
+    List<ReferenceLocale> relatedReferenceLocales =
+        calculator.calculateRelatedReferenceLocales(languageTagInDataset1);
+    Optional<ULocale> referenceLocale =
+        calculator.calculateBestMatchingReferenceLocale(languageTagInDataset2);
+
+    assertEquals(
+        ReferenceLocale.builder()
+            .locale(ULocale.forLanguageTag(expectedReferenceLanguageTag))
+            .affinity(expectedAffinity)
+            .build(),
+        relatedReferenceLocales.stream()
+            .filter(rrl -> rrl.locale().equals(referenceLocale.get()))
+            .findFirst()
+            .get());
+  }
+
+  public static Stream<Arguments>
+      whenJoiningDatasetsUsingReferenceLocalesCalculator_joinsBasedOnExpectedRelatedReferenceLocale() {
+    return Stream.of(
+        // Chinese (Hong-Kong), Chinese (Traditional) -> Chinese (Taiwan)
+        Arguments.of("zh-HK", "zh-Hant", "zh-TW", LocaleAffinity.SAME_OR_INTERCHANGEABLE),
+
+        // Chinese (Hong-Kong), Cantonese (Hong-Kong) -> Cantonese
+        Arguments.of("zh-HK", "yue-HK", "yue", LocaleAffinity.HIGH),
+
+        // Dutch (Belgium), Dutch (Netherlands) -> Dutch
+        Arguments.of("nl-BE", "nl-NL", "nl", LocaleAffinity.SAME_OR_INTERCHANGEABLE),
+
+        // French (Switzerland), French (Canada) -> French
+        Arguments.of("fr-CH", "fr-CA", "fr-CA", LocaleAffinity.SAME_OR_INTERCHANGEABLE));
   }
 }

@@ -23,6 +23,7 @@ package com.spotify.i18n.locales.common;
 import com.google.common.base.Preconditions;
 import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.impl.LocaleAffinityCalculatorBaseImpl;
+import com.spotify.i18n.locales.common.impl.ReferenceLocalesCalculatorBaseImpl;
 import com.spotify.i18n.locales.utils.acceptlanguage.AcceptLanguageUtils;
 import com.spotify.i18n.locales.utils.languagetag.LanguageTagUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -32,23 +33,32 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * A factory for creating instances of {@link LocaleAffinityCalculator}.
+ * A factory for creating instances of locale affinity related helpers:
+ *
+ * <ul>
+ *   <li>{@link LocaleAffinityCalculator}: A helper that calculates a locale affinity for a language
+ *       tag, against a given set of locales.
+ *   <li>{@link ReferenceLocalesCalculator}: A helper that enables reference locales based
+ *       operations, most notably to join datasets by enabling match operations between an origin
+ *       and a target locale, and enabling filtering on the affinity between these locales.
+ * </ul>
  *
  * @author Eric Fjøsne
  */
-public class LocaleAffinityCalculatorFactory {
+public class LocaleAffinityHelpersFactory {
 
-  public static LocaleAffinityCalculatorFactory getDefaultInstance() {
-    return new LocaleAffinityCalculatorFactory();
+  public static LocaleAffinityHelpersFactory getDefaultInstance() {
+    return new LocaleAffinityHelpersFactory();
   }
 
-  private LocaleAffinityCalculatorFactory() {}
+  private LocaleAffinityHelpersFactory() {}
 
   /**
-   * Returns a preconfigured, ready-to-use instance of {@link LocaleAffinityCalculator}, using all
-   * valid locales present in the Accept-Language as target supported locales.
+   * Returns a pre-configured, ready-to-use instance of {@link LocaleAffinityCalculator}, that will
+   * calculate affinity for a language tag, against all valid locales present in the given
+   * Accept-Language value.
    *
-   * <p>Malformed or null Accept-Language values will be ignored.
+   * <p>Malformed, empty or null Accept-Language values will be ignored.
    *
    * <p>Invalid or improperly formatted contained language tags will be ignored.
    *
@@ -59,32 +69,30 @@ public class LocaleAffinityCalculatorFactory {
    *     href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language">Accept-Language
    *     headers documentation</a>
    */
-  public LocaleAffinityCalculator buildLocaleAffinityCalculatorForAcceptLanguage(
+  public LocaleAffinityCalculator buildAffinityCalculatorForAcceptLanguage(
       @Nullable final String acceptLanguage) {
-    return buildLocaleAffinityCalculatorForLanguageTags(
+    return buildAffinityCalculatorForLanguageTags(
         AcceptLanguageUtils.parse(acceptLanguage).stream()
             .map(LanguageRange::getRange)
             .collect(Collectors.toSet()));
   }
 
   /**
-   * Returns a preconfigured, ready-to-use instance of {@link LocaleAffinityCalculator}, using the
-   * supplied language tags as supported locales.
-   *
-   * <p>Invalid or improperly formatted language tags will be ignored.
+   * Returns a pre-configured, ready-to-use instance of {@link LocaleAffinityCalculator}, that will
+   * calculate affinity for a language tag, against all the given supplied locales.
    *
    * @return Pre-configured locale affinity calculator
+   * @see LocaleAffinityCalculator
    * @see ULocale
    */
-  public LocaleAffinityCalculator buildLocaleAffinityCalculatorForLocales(
-      final Set<ULocale> locales) {
+  public LocaleAffinityCalculator buildAffinityCalculatorForLocales(final Set<ULocale> locales) {
     Preconditions.checkNotNull(locales);
-    return LocaleAffinityCalculatorBaseImpl.builder().supportedLocales(locales).build();
+    return LocaleAffinityCalculatorBaseImpl.builder().againstLocales(locales).build();
   }
 
   /**
-   * Returns a preconfigured, ready-to-use instance of {@link LocaleAffinityCalculator}, using the
-   * supplied language tags as supported locales.
+   * Returns a pre-configured, ready-to-use instance of {@link LocaleAffinityCalculator}, that will
+   * calculate affinity for a language tag, against all the given supplied language tags.
    *
    * <p>Invalid or improperly formatted language tags will be ignored.
    *
@@ -92,13 +100,23 @@ public class LocaleAffinityCalculatorFactory {
    * @see LocaleAffinityCalculator
    * @see <a href="https://en.wikipedia.org/wiki/IETF_language_tag">IETF BCP 47 language tag</a>
    */
-  public LocaleAffinityCalculator buildLocaleAffinityCalculatorForLanguageTags(
+  public LocaleAffinityCalculator buildAffinityCalculatorForLanguageTags(
       final Set<String> languageTags) {
     Preconditions.checkNotNull(languageTags);
-    return buildLocaleAffinityCalculatorForLocales(
+    return buildAffinityCalculatorForLocales(
         languageTags.stream()
             .map(LanguageTagUtils::parse)
             .flatMap(Optional::stream)
             .collect(Collectors.toSet()));
+  }
+
+  /**
+   * Returns a pre-configured, ready-to-use instance of {@link ReferenceLocalesCalculator}.
+   *
+   * @return Pre-configured calculator
+   * @see ReferenceLocalesCalculator
+   */
+  public ReferenceLocalesCalculator buildRelatedReferenceLocalesCalculator() {
+    return ReferenceLocalesCalculatorBaseImpl.builder().build();
   }
 }
