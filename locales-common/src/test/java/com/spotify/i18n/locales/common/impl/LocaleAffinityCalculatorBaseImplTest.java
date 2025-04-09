@@ -48,7 +48,7 @@ class LocaleAffinityCalculatorBaseImplTest {
         assertThrows(
             IllegalStateException.class, () -> LocaleAffinityCalculatorBaseImpl.builder().build());
 
-    assertEquals(thrown.getMessage(), "Missing required properties: withLocales");
+    assertEquals(thrown.getMessage(), "Missing required properties: againstLocales");
   }
 
   @Test
@@ -61,7 +61,9 @@ class LocaleAffinityCalculatorBaseImplTest {
                     .againstLocales(Set.of(ULocale.ROOT))
                     .build());
 
-    assertEquals(thrown.getMessage(), "The supported locales cannot contain the root.");
+    assertEquals(
+        thrown.getMessage(),
+        "The locales against which affinity needs to be calculated cannot contain the root.");
   }
 
   @ParameterizedTest
