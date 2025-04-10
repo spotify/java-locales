@@ -150,9 +150,10 @@ class ReferenceLocalesCalculatorBaseImplTest {
   @MethodSource
   public void whenCalculatingRelatedReferenceLocales_returnsExpected(
       final String input, final List<RelatedReferenceLocale> expectedRelatedReferenceLocales) {
+    List<RelatedReferenceLocale> relatedReferenceLocales =
+        REFERENCE_LOCALES_CALCULATOR.calculateRelatedReferenceLocales(input);
     assertTrue(
-        REFERENCE_LOCALES_CALCULATOR.calculateRelatedReferenceLocales(input).stream()
-            .allMatch(expectedRelatedReferenceLocales::contains));
+        expectedRelatedReferenceLocales.stream().allMatch(relatedReferenceLocales::contains));
   }
 
   public static Stream<Arguments> whenCalculatingRelatedReferenceLocales_returnsExpected() {
