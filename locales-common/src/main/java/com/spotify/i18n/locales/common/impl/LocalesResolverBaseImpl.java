@@ -28,9 +28,9 @@ import com.spotify.i18n.locales.common.LocalesResolver;
 import com.spotify.i18n.locales.common.model.ResolvedLocale;
 import com.spotify.i18n.locales.common.model.SupportedLocale;
 import com.spotify.i18n.locales.utils.acceptlanguage.AcceptLanguageUtils;
+import com.spotify.i18n.locales.utils.available.AvailableLocalesUtils;
 import com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils;
 import com.spotify.i18n.locales.utils.languagetag.LanguageTagUtils;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale.LanguageRange;
 import java.util.Map;
@@ -55,20 +55,18 @@ import java.util.stream.Stream;
 @AutoValue
 public abstract class LocalesResolverBaseImpl implements LocalesResolver {
 
-  /** Set containing all CLDR available {@link ULocale} */
-  private static final Set<ULocale> AVAILABLE_UNICODE_LOCALES =
-      Arrays.stream(ULocale.getAvailableLocales()).collect(Collectors.toSet());
-
   /** Prepared {@link LocaleMatcher} ready to find the best matching CDLR available locale */
   private static final LocaleMatcher AVAILABLE_UNICODE_LOCALES_MATCHER =
       LocaleMatcher.builder()
-          .setSupportedULocales(AVAILABLE_UNICODE_LOCALES)
+          .setSupportedULocales(AvailableLocalesUtils.getCldrLocales())
           .setNoDefaultLocale()
           .build();
 
   /** Set containing all distinct language codes for locales available in CLDR */
   private static final Set<String> AVAILABLE_UNICODE_LANGUAGE_CODES =
-      AVAILABLE_UNICODE_LOCALES.stream().map(ULocale::getLanguage).collect(Collectors.toSet());
+      AvailableLocalesUtils.getCldrLocales().stream()
+          .map(ULocale::getLanguage)
+          .collect(Collectors.toSet());
 
   /** Wildcard character for language ranges */
   private static final String LANGUAGE_RANGE_WILDCARD = "*";
@@ -254,7 +252,7 @@ public abstract class LocalesResolverBaseImpl implements LocalesResolver {
                     .map(
                         supportedLocale ->
                             mitigateParsedLocaleUndefinedCodes(supportedLocale, parsedLocale))
-                    .filter(AVAILABLE_UNICODE_LOCALES::contains)
+                    .filter(AvailableLocalesUtils.getCldrLocales()::contains)
                     // We remove potential duplicates
                     .distinct()
                     .map(

@@ -23,6 +23,7 @@ package com.spotify.i18n.locales.common.model;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import com.ibm.icu.util.ULocale;
+import com.spotify.i18n.locales.utils.available.AvailableLocalesUtils;
 import com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils;
 import java.util.Collections;
 import java.util.List;
@@ -88,16 +89,16 @@ public abstract class ResolvedLocale {
             .collect(Collectors.toList());
 
     Preconditions.checkState(
-        SupportedLocale.ALL_AVAILABLE_LOCALES.contains(localeForTranslations),
+        AvailableLocalesUtils.getCldrLocales().contains(localeForTranslations),
         "Given parameter languageTagForTranslations could not be matched with a locale available in CLDR: %s",
         languageTagForTranslations);
     Preconditions.checkState(
         localeForTranslationsFallbacks.stream()
-            .allMatch(SupportedLocale.ALL_AVAILABLE_LOCALES::contains),
+            .allMatch(AvailableLocalesUtils.getCldrLocales()::contains),
         "Given parameter languageTagForTranslationsFallbacks contains entries that could not be matched with a locale available in CLDR: %s",
         languageTagForTranslationsFallbacks);
     Preconditions.checkState(
-        SupportedLocale.ALL_AVAILABLE_LOCALES.contains(localeForFormatting),
+        AvailableLocalesUtils.getCldrLocales().contains(localeForFormatting),
         "Given parameter languageTagForFormatting could not be matched with a locale available in CLDR: %s",
         languageTagForFormatting);
 
@@ -211,7 +212,7 @@ public abstract class ResolvedLocale {
           "The given localeForTranslations cannot be the root.");
 
       Preconditions.checkState(
-          SupportedLocale.ALL_AVAILABLE_LOCALES.contains(resolvedLocale.localeForTranslations()),
+          AvailableLocalesUtils.getCldrLocales().contains(resolvedLocale.localeForTranslations()),
           "The given localeForTranslations %s must be canonical and available in CLDR.",
           resolvedLocale.localeForTranslations().toLanguageTag());
     }
@@ -237,7 +238,7 @@ public abstract class ResolvedLocale {
 
       List<ULocale> nonCldrFallbackLocalesForTranslations =
           resolvedLocale.localeForTranslationsFallbacks().stream()
-              .filter(Predicate.not(SupportedLocale.ALL_AVAILABLE_LOCALES::contains))
+              .filter(Predicate.not(AvailableLocalesUtils.getCldrLocales()::contains))
               .collect(Collectors.toList());
 
       Preconditions.checkState(
@@ -276,7 +277,7 @@ public abstract class ResolvedLocale {
           "The given localeForFormatting cannot be the root.");
 
       Preconditions.checkState(
-          SupportedLocale.ALL_AVAILABLE_LOCALES.contains(resolvedLocale.localeForFormatting()),
+          AvailableLocalesUtils.getCldrLocales().contains(resolvedLocale.localeForFormatting()),
           "The given localeForFormatting %s must be canonical and available in CLDR.",
           resolvedLocale.localeForFormatting().toLanguageTag());
 
