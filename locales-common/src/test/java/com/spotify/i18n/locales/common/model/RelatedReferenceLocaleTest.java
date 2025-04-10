@@ -20,43 +20,30 @@
 
 package com.spotify.i18n.locales.common.model;
 
-import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isSameLocale;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.ibm.icu.util.ULocale;
 import org.junit.jupiter.api.Test;
 
-class ReferenceLocaleTest {
+class RelatedReferenceLocaleTest {
 
   @Test
   void whenBuildingWithMissingRequiredProperties_buildFails() {
     IllegalStateException thrown =
-        assertThrows(IllegalStateException.class, () -> ReferenceLocale.builder().build());
+        assertThrows(IllegalStateException.class, () -> RelatedReferenceLocale.builder().build());
 
-    assertEquals("Missing required properties: locale affinity", thrown.getMessage());
+    assertEquals("Missing required properties: referenceLocale affinity", thrown.getMessage());
   }
 
   @Test
-  void availableReferenceLocalesDoesNotContainRoot() {
-    assertFalse(ReferenceLocale.availableReferenceLocales().contains(ULocale.ROOT));
-  }
-
-  @Test
-  void whenGettingAvailableReferenceLocales_allAreMinimized() {
-    for (ULocale referenceLocale : ReferenceLocale.availableReferenceLocales()) {
-      assertTrue(isSameLocale(ULocale.minimizeSubtags(referenceLocale), referenceLocale));
-    }
-  }
-
-  @Test
-  void whenBuildingWithInvalidLocale_buildFails() {
+  void whenBuildingWithInvalidReferenceLocale_buildFails() {
     IllegalStateException thrown =
         assertThrows(
             IllegalStateException.class,
             () ->
-                ReferenceLocale.builder()
+                RelatedReferenceLocale.builder()
                     .affinity(LocaleAffinity.HIGH)
-                    .locale(ULocale.forLanguageTag("zh-Hant-TW"))
+                    .referenceLocale(ULocale.forLanguageTag("zh-Hant-TW"))
                     .build());
 
     assertEquals(
@@ -66,9 +53,9 @@ class ReferenceLocaleTest {
 
   @Test
   void whenBuildingWithValidParameters_buildSucceeds() {
-    ReferenceLocale.builder()
+    RelatedReferenceLocale.builder()
         .affinity(LocaleAffinity.HIGH)
-        .locale(ULocale.forLanguageTag("zh-TW"))
+        .referenceLocale(ULocale.forLanguageTag("zh-TW"))
         .build();
   }
 }

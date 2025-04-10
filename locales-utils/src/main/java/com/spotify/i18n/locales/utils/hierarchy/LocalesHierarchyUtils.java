@@ -23,8 +23,8 @@ package com.spotify.i18n.locales.utils.hierarchy;
 import com.google.common.base.Preconditions;
 import com.ibm.icu.util.ULocale;
 import com.ibm.icu.util.ULocale.Builder;
+import com.spotify.i18n.locales.utils.available.AvailableLocalesUtils;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,11 +56,9 @@ public class LocalesHierarchyUtils {
     Preconditions.checkNotNull(locale);
     if (isSameLocale(locale, ULocale.ROOT)) {
       // Optimization when requesting descendants of ROOT
-      return Arrays.stream(ULocale.getAvailableLocales())
-          .filter(uLocale -> !isSameLocale(uLocale, ULocale.ROOT))
-          .collect(Collectors.toSet());
+      return AvailableLocalesUtils.getCldrLocales();
     } else {
-      return Arrays.stream(ULocale.getAvailableLocales())
+      return AvailableLocalesUtils.getCldrLocales().stream()
           .filter(ul -> isDescendantLocale(ul, locale))
           .collect(Collectors.toSet());
     }

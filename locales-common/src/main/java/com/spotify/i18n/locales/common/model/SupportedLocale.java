@@ -23,8 +23,8 @@ package com.spotify.i18n.locales.common.model;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import com.ibm.icu.util.ULocale;
+import com.spotify.i18n.locales.utils.available.AvailableLocalesUtils;
 import com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils;
-import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
@@ -65,10 +65,6 @@ import java.util.stream.Stream;
 @AutoValue
 public abstract class SupportedLocale {
 
-  static final Set<ULocale> ALL_AVAILABLE_LOCALES =
-      Arrays.stream(ULocale.getAvailableLocales()).collect(Collectors.toSet());
-  private static final ULocale EN_US_POSIX = ULocale.forLanguageTag("en-US-POSIX");
-
   /**
    * Returns a {@link SupportedLocale} instance for the specified IETF BCP 47 language tag string.
    *
@@ -82,7 +78,7 @@ public abstract class SupportedLocale {
     Preconditions.checkNotNull(languageTag, "Given input cannot be null");
     ULocale locale = ULocale.forLanguageTag(languageTag);
     Preconditions.checkState(
-        Objects.nonNull(locale) && ALL_AVAILABLE_LOCALES.contains(locale),
+        Objects.nonNull(locale) && AvailableLocalesUtils.getCldrLocales().contains(locale),
         "Given parameter languageTag could not be matched with a locale available in CLDR: %s",
         languageTag);
     return fromValidatedULocale(locale);
@@ -102,7 +98,7 @@ public abstract class SupportedLocale {
     Preconditions.checkNotNull(locale, "Given input cannot be null");
     ULocale uLocale = ULocale.forLocale(locale);
     Preconditions.checkState(
-        Objects.nonNull(uLocale) && ALL_AVAILABLE_LOCALES.contains(uLocale),
+        Objects.nonNull(uLocale) && AvailableLocalesUtils.getCldrLocales().contains(uLocale),
         "Given parameter locale could not be matched with a locale available in CLDR: %s",
         locale);
     return fromValidatedULocale(uLocale);
@@ -121,7 +117,7 @@ public abstract class SupportedLocale {
   public static SupportedLocale fromULocale(final ULocale uLocale) {
     Preconditions.checkNotNull(uLocale, "Given input cannot be null");
     Preconditions.checkState(
-        ALL_AVAILABLE_LOCALES.contains(uLocale),
+        AvailableLocalesUtils.getCldrLocales().contains(uLocale),
         "Given parameter uLocale could not be matched with a locale available in CLDR: %s",
         uLocale);
     return fromValidatedULocale(uLocale);
@@ -136,7 +132,6 @@ public abstract class SupportedLocale {
             Stream.concat(
                     Stream.of(rootLocaleForFormatting),
                     LocalesHierarchyUtils.getDescendantLocales(rootLocaleForFormatting).stream())
-                .filter(locale -> !LocalesHierarchyUtils.isSameLocale(locale, EN_US_POSIX))
                 .collect(Collectors.toSet()))
         .build();
   }
@@ -213,7 +208,7 @@ public abstract class SupportedLocale {
           "The given localeForTranslations cannot be the root.");
 
       Preconditions.checkState(
-          ALL_AVAILABLE_LOCALES.contains(sl.localeForTranslations()),
+          AvailableLocalesUtils.getCldrLocales().contains(sl.localeForTranslations()),
           "The given localeForTranslations %s must be canonical and available in CLDR.",
           sl.localeForTranslations().toLanguageTag());
 
@@ -228,7 +223,7 @@ public abstract class SupportedLocale {
           .forEach(
               relatedLocale -> {
                 Preconditions.checkState(
-                    ALL_AVAILABLE_LOCALES.contains(relatedLocale),
+                    AvailableLocalesUtils.getCldrLocales().contains(relatedLocale),
                     "The given relatedLocaleForFormatting %s must be canonical and available in CLDR.",
                     relatedLocale.toLanguageTag());
                 Preconditions.checkState(

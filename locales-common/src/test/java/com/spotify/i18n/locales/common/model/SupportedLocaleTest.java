@@ -23,7 +23,6 @@ package com.spotify.i18n.locales.common.model;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.ibm.icu.util.ULocale;
@@ -35,7 +34,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 class SupportedLocaleTest {
-  private static final ULocale EN_US_POSIX = ULocale.forLanguageTag("en-US-POSIX");
 
   @Test
   void whenBuildingWithMissingRequiredProperties_buildFails() {
@@ -284,14 +282,7 @@ class SupportedLocaleTest {
     return Stream.concat(
             Stream.of(rootLocaleForFormatting),
             LocalesHierarchyUtils.getDescendantLocales(rootLocaleForFormatting).stream())
-        .filter(relatedLocale -> !LocalesHierarchyUtils.isSameLocale(relatedLocale, EN_US_POSIX))
         .collect(Collectors.toSet());
-  }
-
-  @Test
-  void whenGettingRelatedLocalesForFormatting_enUSPOSIXIsRemoved() {
-    SupportedLocale en = SupportedLocale.fromLanguageTag("en");
-    assertFalse(en.relatedLocalesForFormatting().contains(EN_US_POSIX));
   }
 
   @Test
