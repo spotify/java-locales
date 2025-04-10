@@ -17,7 +17,8 @@ in all interactions with the community.
 * @ericfjosne <efjosne@spotify.com>
 * @jsahleen <jsahleen@spotify.com>
 
-A full list of [contributors](https://github.com/spotify/java-locales/graphs/contributors?type=a) can be found on GHC
+A full list of [contributors](https://github.com/spotify/java-locales/graphs/contributors?type=a)
+can be found on GHC
 
 Follow [@SpotifyEng](https://x.com/spotifyeng) on X for updates.
 
@@ -27,8 +28,8 @@ This open-source library was created to ensure a consistent and culturally relev
 end-user experience, by leveraging Unicode locale data and standardized internationalization
 algorithms, across software components in a microservices architecture.
 
-Its main purpose is to make sure that the code will leverage the best matching localized end-user
-experience using the right [locales available in CLDR](https://cldr.unicode.org/), meaning:
+Its main purpose is to make sure that the code will seamlessly leverage the best matching localized
+end-user experience using the right [locales available in CLDR](https://cldr.unicode.org/), meaning:
 
 - the best matching supported locale for translations
 - the possible supported fallback locales for translations, compatible for combined usage with the
@@ -41,7 +42,10 @@ generic way to a given locale.
 
 ### Features
 
-This library offers the following 2 main features:
+#### Resolve/negotiate locales
+
+This feature enables you to get the best matching locales as described above, for a given list of
+supported locales. Essentially, this requires the following 2 logics:
 
 - **Supply the list of supported locales:** For a given product, we defined a supported locales as
   the ones the product is available for. This means locales for which translations are readily
@@ -58,12 +62,26 @@ localization quality assurance testers only.
 You can see all these concepts in action
 in [our HTTP server example implementation](./examples/locales-http-examples).
 
+#### Calculate the affinity between two locales
+
+This feature enables you to get a sense of how close two given locales are to each other, by
+calculating an affinity level between them.
+
+- `NONE`: Locales are totally unrelated
+- `LOW`: Locales are somewhat related, meaning they either have low similarities from a linguistic
+  perspective or co-exist in given geopolitical or cultural contexts.
+- `HIGH`: Locales are quite related, meaning they have similarities from a linguistic perspective.
+- `SAME_OR_INTERCHANGEABLE`: Locales either identify the same language, or languages that are
+  similar to a point where a person should understand both if they understand one of them.
+
 ### Utility helpers
 
 It also offers utility classes to deal with specific problems:
 
 - [AcceptLanguageUtils](./locales-utils/src/main/java/com/spotify/i18n/locales/utils/acceptlanguage/AcceptLanguageUtils.java):
   Parse and/or normalize raw Accept-Language header values
+- [AvailableLocalesUtils](./locales-utils/src/main/java/com/spotify/i18n/locales/utils/available/AvaibleLocalesUtils.java):
+  Retrieve specific sets of locales
 - [LanguageTagUtils](./locales-utils/src/main/java/com/spotify/i18n/locales/utils/languagetag/LanguageTagUtils.java):
   Parse and/or normalize raw language tags
 - [LocalesHierarchyUtils](./locales-utils/src/main/java/com/spotify/i18n/locales/utils/hierarchy/LocalesHierarchyUtils.java):
@@ -90,9 +108,9 @@ end-users.
 
 ### Future developments
 
-We are currently seeking feedback on the internal resolution logic, to ensure that it can expand to
-all the world's languages. We also welcome contributions, as long as they remain use-case generic
-and benefit all users of the library.
+We are currently seeking feedback on the internal resolution and affinity logics, to ensure that
+they can expand to all the world's languages in a reliable and scalable way. We also welcome
+contributions, as long as they remain use-case generic and benefit all users of the library.
 
 ## Develop
 
