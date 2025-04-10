@@ -14,6 +14,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>examples/locales-affinity-examples</module>
     <module>examples/locales-http-examples</module>
     <module>locales-common</module>
     <module>locales-utils</module>
