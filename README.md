@@ -64,8 +64,7 @@ in [our HTTP server example implementation](./examples/locales-http-examples).
 
 #### Calculate the affinity between two locales
 
-This feature enables you to get a sense of how close two given locales are to each other, by
-calculating an affinity level between them.
+We define the affinity between two locales using a `LocaleAffinity` enum value:
 
 - `NONE`: Locales are totally unrelated
 - `LOW`: Locales are somewhat related, meaning they either have low similarities from a linguistic
@@ -73,6 +72,19 @@ calculating an affinity level between them.
 - `HIGH`: Locales are quite related, meaning they have similarities from a linguistic perspective.
 - `SAME_OR_INTERCHANGEABLE`: Locales either identify the same language, or languages that are
   similar to a point where a person should understand both if they understand one of them.
+
+We offer two separate logics, each dedicated to separate use-cases:
+
+- **Locale affinity calculation**: To be used when we need visibility on the affinity of a given
+  locale against a set of locales.
+- **Reference locales calculation:** To be used when we need to join two datasets based on language
+  identifiers. It is indeed impossible to perform such a join operation out of the box, as language
+  identifiers can immensely differ even when they are syntactically valid and identify the very same
+  language. For Example: `zh`, `zh-Hans`, `zh-CN`, `zh-Hans-CN`, `zh-Hans-FR`, `zh-Hans-US` all
+  identify Simplified Chinese.
+
+You can see all these concepts in action
+in [our locales affinity example implementations](./examples/locales-affinity-examples).
 
 ### Utility helpers
 
