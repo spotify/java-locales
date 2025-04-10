@@ -18,15 +18,15 @@
  * -/-/-
  */
 
-package com.spotify.i18n.translations.http.examples;
+package com.spotify.i18n.locales.http.handlers;
 
 import com.spotify.i18n.locales.common.ContextBasedLocalesResolver;
 import com.spotify.i18n.locales.common.LocalesHelpersFactory;
 import com.spotify.i18n.locales.common.SupportedLocalesSupplier;
 import com.spotify.i18n.locales.common.impl.LocalesHelpersFactoryBaseImpl;
 import com.spotify.i18n.locales.common.model.ResolvedLocale;
-import com.spotify.i18n.translations.http.examples.handlers.ResolveLocaleHandler;
-import com.spotify.i18n.translations.http.examples.handlers.SupportedLocalesHandler;
+import com.spotify.i18n.locales.http.handlers.handlers.ResolveLocaleHandler;
+import com.spotify.i18n.locales.http.handlers.handlers.SupportedLocalesHandler;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
@@ -46,7 +46,8 @@ import java.util.stream.StreamSupport;
 import org.apache.http.client.utils.URLEncodedUtils;
 
 /**
- * Showcase implementation of Java-locales, which starts a new HTTP server locally, on port 8080.
+ * Showcase implementation of a Java-locales locale resolution logic implementation, which starts a
+ * new HTTP server locally, on port 8080.
  *
  * <h1>Audiences
  *

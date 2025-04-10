@@ -18,7 +18,7 @@
  * -/-/-
  */
 
-package com.spotify.i18n.translations.http.examples;
+package com.spotify.i18n.locales.http.handlers;
 
 import com.spotify.i18n.locales.common.SupportedLocalesSupplier;
 import com.spotify.i18n.locales.common.impl.SupportedLocalesSupplierBaseImpl;
