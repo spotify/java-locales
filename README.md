@@ -92,7 +92,7 @@ It also offers utility classes to deal with specific problems:
 
 - [AcceptLanguageUtils](./locales-utils/src/main/java/com/spotify/i18n/locales/utils/acceptlanguage/AcceptLanguageUtils.java):
   Parse and/or normalize raw Accept-Language header values
-- [AvailableLocalesUtils](./locales-utils/src/main/java/com/spotify/i18n/locales/utils/available/AvaibleLocalesUtils.java):
+- [AvailableLocalesUtils](./locales-utils/src/main/java/com/spotify/i18n/locales/utils/available/AvailableLocalesUtils.java):
   Retrieve specific sets of locales
 - [LanguageTagUtils](./locales-utils/src/main/java/com/spotify/i18n/locales/utils/languagetag/LanguageTagUtils.java):
   Parse and/or normalize raw language tags
