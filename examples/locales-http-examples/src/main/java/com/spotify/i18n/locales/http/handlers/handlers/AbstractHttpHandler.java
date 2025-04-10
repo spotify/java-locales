@@ -18,7 +18,7 @@
  * -/-/-
  */
 
-package com.spotify.i18n.translations.http.examples.handlers;
+package com.spotify.i18n.locales.http.handlers.handlers;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
