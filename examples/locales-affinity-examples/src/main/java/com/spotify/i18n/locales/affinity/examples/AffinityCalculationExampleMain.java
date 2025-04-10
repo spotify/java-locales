@@ -42,8 +42,9 @@ import java.util.stream.Collectors;
 public class AffinityCalculationExampleMain {
 
   /**
-   * Returns a random locale affinity calculator. This method is mostly meant to showcase that there
-   * are several ways to create a locale affinity calculator.
+   * Returns a locale affinity calculator. This method is mostly meant to showcase that there are
+   * several ways to create a locale affinity calculator, and therefore returns an instance at
+   * random.
    *
    * <p>All built instances will calculate affinity against the same set of locales.
    */
