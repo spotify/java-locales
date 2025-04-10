@@ -26,7 +26,8 @@ import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
 import com.spotify.i18n.locales.common.ReferenceLocalesCalculator;
 import com.spotify.i18n.locales.common.model.LocaleAffinity;
-import com.spotify.i18n.locales.common.model.ReferenceLocale;
+import com.spotify.i18n.locales.common.model.RelatedReferenceLocale;
+import com.spotify.i18n.locales.utils.available.AvailableLocalesUtils;
 import com.spotify.i18n.locales.utils.languagetag.LanguageTagUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Collections;
@@ -42,7 +43,7 @@ import java.util.stream.Collectors;
  *
  * <p>Read more about when to use this implementation in {@link ReferenceLocalesCalculator}.
  *
- * @see ReferenceLocale
+ * @see RelatedReferenceLocale
  * @author Eric Fjøsne
  */
 @AutoValue
@@ -51,7 +52,7 @@ public abstract class ReferenceLocalesCalculatorBaseImpl implements ReferenceLoc
   /** Prepared {@link LocaleMatcher}, ready to find the best matching reference locale */
   private static final LocaleMatcher REFERENCE_LOCALE_MATCHER =
       LocaleMatcher.builder()
-          .setSupportedULocales(ReferenceLocale.availableReferenceLocales())
+          .setSupportedULocales(AvailableLocalesUtils.getReferenceLocales())
           .setNoDefaultLocale()
           .build();
 
@@ -63,20 +64,20 @@ public abstract class ReferenceLocalesCalculatorBaseImpl implements ReferenceLoc
    * @return List of related reference locales, along with their calculated affinity
    */
   @Override
-  public List<ReferenceLocale> calculateRelatedReferenceLocales(
+  public List<RelatedReferenceLocale> calculateRelatedReferenceLocales(
       @Nullable final String languageTag) {
     return LanguageTagUtils.parse(languageTag)
         .map(this::getRelatedReferenceLocales)
         .orElse(Collections.emptyList());
   }
 
-  private List<ReferenceLocale> getRelatedReferenceLocales(final ULocale locale) {
+  private List<RelatedReferenceLocale> getRelatedReferenceLocales(final ULocale locale) {
     final LocaleAffinityCalculator affinityCalculator = buildAffinityCalculator(locale);
-    return ReferenceLocale.availableReferenceLocales().stream()
+    return AvailableLocalesUtils.getReferenceLocales().stream()
         .map(
             refLocale ->
-                ReferenceLocale.builder()
-                    .locale(refLocale)
+                RelatedReferenceLocale.builder()
+                    .referenceLocale(refLocale)
                     .affinity(affinityCalculator.calculate(refLocale.toLanguageTag()).affinity())
                     .build())
         // We only retain reference locales with some level of affinity

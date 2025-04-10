@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.impl.LocaleAffinityCalculatorBaseImpl;
 import com.spotify.i18n.locales.common.model.LocaleAffinity;
-import com.spotify.i18n.locales.common.model.ReferenceLocale;
+import com.spotify.i18n.locales.common.model.RelatedReferenceLocale;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -168,18 +168,18 @@ class LocaleAffinityHelpersFactoryTest {
     ReferenceLocalesCalculator calculator =
         LocaleAffinityHelpersFactory.getDefaultInstance().buildRelatedReferenceLocalesCalculator();
 
-    List<ReferenceLocale> relatedReferenceLocales =
+    List<RelatedReferenceLocale> relatedReferenceLocales =
         calculator.calculateRelatedReferenceLocales(languageTagInDataset1);
     Optional<ULocale> referenceLocale =
         calculator.calculateBestMatchingReferenceLocale(languageTagInDataset2);
 
     assertEquals(
-        ReferenceLocale.builder()
-            .locale(ULocale.forLanguageTag(expectedReferenceLanguageTag))
+        RelatedReferenceLocale.builder()
+            .referenceLocale(ULocale.forLanguageTag(expectedReferenceLanguageTag))
             .affinity(expectedAffinity)
             .build(),
         relatedReferenceLocales.stream()
-            .filter(rrl -> rrl.locale().equals(referenceLocale.get()))
+            .filter(rrl -> rrl.referenceLocale().equals(referenceLocale.get()))
             .findFirst()
             .get());
   }
