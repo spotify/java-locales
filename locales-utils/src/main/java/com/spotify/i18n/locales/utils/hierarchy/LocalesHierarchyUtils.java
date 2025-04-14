@@ -25,11 +25,13 @@ import com.ibm.icu.util.ULocale;
 import com.ibm.icu.util.ULocale.Builder;
 import com.spotify.i18n.locales.utils.available.AvailableLocalesUtils;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +46,13 @@ public class LocalesHierarchyUtils {
 
   private static final Map<ULocale, ULocale> CHILD_TO_PARENT_MAP =
       generateSpecialCldrChildToParentsMap();
+
+  /** Set of language codes for which the script is a differentiator in CLDR */
+  static final Set<String> LANGUAGE_CODES_WITH_MULTIPLE_SCRIPTS_IN_CLDR =
+      Arrays.stream(ULocale.getAvailableLocales())
+          .filter(locale -> !locale.getScript().isEmpty())
+          .map(ULocale::getLanguage)
+          .collect(Collectors.toSet());
 
   /**
    * Returns the {@link Set} of all {@link ULocale}s that are descendants of the given locale,
@@ -176,8 +185,9 @@ public class LocalesHierarchyUtils {
 
   /**
    * Returns the parent {@link ULocale} according to CLDR, for a given locale, based on its
-   * fallback. We need this to handle cases like zh-TW, for which the parent locale should be
-   * zh-Hant and not zh. By default, the fallback logic removes the last identifier from the tag.
+   * fallback. By default, the fallback removes the last identifier from the tag, which might not be
+   * enough as the script associated with the locale can be a language differentiator for selected
+   * languages.
    *
    * @param locale A locale for which no explicit parent mapping is defined in CLDR
    * @return The parent locale, according to CLDR
@@ -187,35 +197,85 @@ public class LocalesHierarchyUtils {
       return Optional.empty();
     } else if (isSameLocale(locale.getFallback(), ULocale.ROOT)) {
       return Optional.of(ULocale.ROOT);
+    } else if (scriptIsMajorLanguageDifferentiator(locale)) {
+      // When we know the script is a major differentiator, we assess the parent locale based on it.
+      return getParentLocaleBasedOnLocaleAndScript(locale);
     } else {
-      // We retrieve the script from the given locale
-      final String localeScript = ULocale.addLikelySubtags(locale).getScript();
-      // We retrieve the script from the fallback locale
-      final String parentLocaleScript = ULocale.addLikelySubtags(locale.getFallback()).getScript();
-
-      if (localeScript.equals(parentLocaleScript)) {
-        // If they are a match, we can safely return the fallback.
+      // When the script isn't a major differentiator, we can confidently return the fallback
+      // property of the given locale as parent locale, as long as it doesn't contain any script
+      // code. Otherwise, we assess the parent locale based on the locale script, to prevent
+      // unavailable yet valid locales like es-Arab from being considered.
+      if (locale.getScript().isEmpty()) {
         return Optional.of(locale.getFallback());
       } else {
-        final ULocale localeWithScriptOverride =
-            new Builder()
-                // Build with the base language tag
-                .setLanguageTag(locale.toLanguageTag())
-                // Override the script only
-                .setScript(localeScript)
-                .build();
-        if (isSameLocale(locale, localeWithScriptOverride)) {
-          // This is most likely a locale that is not available in CLDR, with a wrong combination
-          // of language code and script code.
-          return Optional.empty();
-        } else {
-          // When they are not a match, we call the same method by force-feeding the script
-          // identifier to the given locale. Ex: for zh-TW, we will be calling this same method,
-          // with the overridden zh-Hant-TW locale.
-          return getParentLocale(localeWithScriptOverride);
-        }
+        return getParentLocaleBasedOnLocaleAndScript(locale);
       }
     }
+  }
+
+  /**
+   * Returns a flag indicating whether the given locale identifies a language for which the script
+   * can be a language differentiator.
+   *
+   * @param locale any locale
+   * @return boolean value
+   */
+  private static boolean scriptIsMajorLanguageDifferentiator(final ULocale locale) {
+    return LANGUAGE_CODES_WITH_MULTIPLE_SCRIPTS_IN_CLDR.contains(locale.getLanguage());
+  }
+
+  /**
+   * Returns the parent {@link ULocale} according to CLDR, for a given locale for which the script
+   * can be a language differentiator, based on its fallback. We need this to handle cases like
+   * zh-TW, for which the parent locale should be zh-Hant and not zh. By default, the fallback logic
+   * removes the last identifier from the tag.
+   *
+   * @param locale A locale for which no explicit parent mapping is defined in CLDR
+   * @return The parent locale, according to CLDR
+   */
+  private static Optional<ULocale> getParentLocaleBasedOnLocaleAndScript(final ULocale locale) {
+    // We retrieve the script from the given locale
+    final String localeScript = getLocaleScript(locale);
+    // We retrieve the script from the fallback locale
+    final String parentLocaleScript = getLocaleScript(locale.getFallback());
+
+    if (localeScript.equals(parentLocaleScript)) {
+      // If they are a match, we can safely return the fallback.
+      return Optional.of(locale.getFallback());
+    } else {
+      final ULocale localeWithScriptOverride =
+          new Builder()
+              // Build with the base language tag
+              .setLanguageTag(locale.toLanguageTag())
+              // Override the script only
+              .setScript(localeScript)
+              .build();
+      if (isSameLocale(locale, localeWithScriptOverride)) {
+        // This is most likely a locale that is not available in CLDR, with a wrong combination
+        // of language code and script code.
+        return Optional.empty();
+      } else {
+        // When they are not a match, we call the same method by force-feeding the script
+        // identifier to the given locale. Ex: for zh-TW, we will be calling this same method,
+        // with the overridden zh-Hant-TW locale.
+        return getParentLocale(localeWithScriptOverride);
+      }
+    }
+  }
+
+  /**
+   * Returns a given locale script
+   *
+   * @param locale any locale
+   * @return the script associated with the locale
+   */
+  private static String getLocaleScript(final ULocale locale) {
+    // We only calculate the script if it isn't yet present in the locale, as addLikelySubtag can be
+    // a time-consuming operation.
+    return Optional.of(locale)
+        .map(ULocale::getScript)
+        .filter(Predicate.not(String::isEmpty))
+        .orElseGet(() -> ULocale.addLikelySubtags(locale).getScript());
   }
 
   /**

@@ -20,6 +20,7 @@
 
 package com.spotify.i18n.locales.utils.hierarchy;
 
+import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.LANGUAGE_CODES_WITH_MULTIPLE_SCRIPTS_IN_CLDR;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,6 +42,22 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class LocalesHierarchyUtilsTest {
+
+  @Test
+  void languageCodesWithMultipleScriptsInCldr() {
+    final Set<String> expectedLanguageCodesWithMultipleScriptsInCldr =
+        Set.of(
+            "az", "bs", "ff", "hi", "ks", "kxv", "mni", "pa", "sat", "sd", "shi", "sr", "su", "uz",
+            "vai", "yue", "zh");
+
+    assertEquals(
+        expectedLanguageCodesWithMultipleScriptsInCldr.size(),
+        LANGUAGE_CODES_WITH_MULTIPLE_SCRIPTS_IN_CLDR.size());
+
+    expectedLanguageCodesWithMultipleScriptsInCldr.forEach(
+        languageCode ->
+            assertTrue(LANGUAGE_CODES_WITH_MULTIPLE_SCRIPTS_IN_CLDR.contains(languageCode)));
+  }
 
   @ParameterizedTest
   @MethodSource
