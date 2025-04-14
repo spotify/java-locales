@@ -185,7 +185,9 @@ public class LocalesHierarchyUtils {
 
   /**
    * Returns the parent {@link ULocale} according to CLDR, for a given locale, based on its
-   * fallback. By default, the fallback logic removes the last identifier from the tag.
+   * fallback. By default, the fallback removes the last identifier from the tag, which might not be
+   * enough as the script associated with the locale can be a language differentiator for selected
+   * languages.
    *
    * @param locale A locale for which no explicit parent mapping is defined in CLDR
    * @return The parent locale, according to CLDR
@@ -196,12 +198,13 @@ public class LocalesHierarchyUtils {
     } else if (isSameLocale(locale.getFallback(), ULocale.ROOT)) {
       return Optional.of(ULocale.ROOT);
     } else if (scriptIsMajorLanguageDifferentiator(locale)) {
+      // When we know the script is a major differentiator, we assess the parent locale based on it.
       return getParentLocaleBasedOnLocaleAndScript(locale);
     } else {
       // When the script isn't a major differentiator, we can confidently return the fallback
-      // property of the given locale as parent locale when it doesn't contain any script code.
-      // Otherwise, we assess the parent locale based on the locale script, to prevent unavailable
-      // locales like es-Arab from being considered.
+      // property of the given locale as parent locale, as long as it doesn't contain any script
+      // code. Otherwise, we assess the parent locale based on the locale script, to prevent
+      // unavailable yet valid locales like es-Arab from being considered.
       if (locale.getScript().isEmpty()) {
         return Optional.of(locale.getFallback());
       } else {
@@ -211,8 +214,8 @@ public class LocalesHierarchyUtils {
   }
 
   /**
-   * Returns a flag on whether the given locale identifies a language for which the script can be a
-   * language differentiator.
+   * Returns a flag indicating whether the given locale identifies a language for which the script
+   * can be a language differentiator.
    *
    * @param locale any locale
    * @return boolean value
@@ -263,11 +266,12 @@ public class LocalesHierarchyUtils {
   /**
    * Returns a given locale script
    *
-   * @param locale
-   * @return
+   * @param locale any locale
+   * @return the script associated with the locale
    */
   private static String getLocaleScript(final ULocale locale) {
-    // We only calculate the script if it isn't yet present in the locale.
+    // We only calculate the script if it isn't yet present in the locale, as addLikelySubtag can be
+    // a time-consuming operation.
     return Optional.of(locale)
         .map(ULocale::getScript)
         .filter(Predicate.not(String::isEmpty))
