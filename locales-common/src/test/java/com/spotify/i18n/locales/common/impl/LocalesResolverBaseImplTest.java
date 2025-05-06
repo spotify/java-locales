@@ -322,7 +322,7 @@ class LocalesResolverBaseImplTest {
         Arguments.of("gn-PY", "es-419", List.of("es"), "es-PY"),
         Arguments.of("kk-KZ", "ru", Collections.emptyList(), "ru-KZ"),
         Arguments.of("mn-MN", "ru", Collections.emptyList(), "ru-RU"),
-        Arguments.of("nso-ZA", "en-GB", List.of("en"), "en-ZA"),
+        Arguments.of("nso-ZA", "en", Collections.emptyList(), "en-ZA"),
         Arguments.of("sq-XK", "en", Collections.emptyList(), "en-US"),
         Arguments.of("sr-Latn-XK", "sr-Latn", Collections.emptyList(), "sr-Latn-XK"),
         Arguments.of("sr-XK", "sr-Latn", Collections.emptyList(), "sr-Latn-XK"));

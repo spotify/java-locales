@@ -47,8 +47,8 @@ class LocalesHierarchyUtilsTest {
   void languageCodesWithMultipleScriptsInCldr() {
     final Set<String> expectedLanguageCodesWithMultipleScriptsInCldr =
         Set.of(
-            "az", "bs", "ff", "hi", "ks", "kxv", "mni", "pa", "sat", "sd", "shi", "sr", "su", "uz",
-            "vai", "yue", "zh");
+            "az", "bs", "ff", "hi", "kk", "kok", "ks", "kxv", "mni", "pa", "sat", "sd", "shi", "sr",
+            "su", "uz", "vai", "yue", "zh");
 
     assertEquals(
         expectedLanguageCodesWithMultipleScriptsInCldr.size(),
@@ -78,9 +78,9 @@ class LocalesHierarchyUtilsTest {
             "fr",
             "fr-BE,fr-BF,fr-BI,fr-BJ,fr-BL,fr-CA,fr-CD,fr-CF,fr-CG,fr-CH,fr-CI,fr-CM,fr-DJ,fr-DZ,fr-FR,fr-GA,fr-GF,fr-GN,fr-GP,fr-GQ,fr-HT,fr-KM,fr-LU,fr-MA,fr-MC,fr-MF,fr-MG,fr-ML,fr-MQ,fr-MR,fr-MU,fr-NC,fr-NE,fr-PF,fr-PM,fr-RE,fr-RW,fr-SC,fr-SN,fr-SY,fr-TD,fr-TG,fr-TN,fr-VU,fr-WF,fr-YT",
             "en",
-            "en-001,en-150,en-AE,en-AG,en-AI,en-AS,en-AT,en-AU,en-BB,en-BE,en-BI,en-BM,en-BS,en-BW,en-BZ,en-CA,en-CC,en-CH,en-CK,en-CM,en-CX,en-CY,en-DE,en-DG,en-DK,en-DM,en-ER,en-FI,en-FJ,en-FK,en-FM,en-GB,en-GD,en-GG,en-GH,en-GI,en-GM,en-GU,en-GY,en-HK,en-ID,en-IE,en-IL,en-IM,en-IN,en-IO,en-JE,en-JM,en-KE,en-KI,en-KN,en-KY,en-LC,en-LR,en-LS,en-MG,en-MH,en-MO,en-MP,en-MS,en-MT,en-MU,en-MV,en-MW,en-MY,en-NA,en-NF,en-NG,en-NL,en-NR,en-NU,en-NZ,en-PG,en-PH,en-PK,en-PN,en-PR,en-PW,en-RW,en-SB,en-SC,en-SD,en-SE,en-SG,en-SH,en-SI,en-SL,en-SS,en-SX,en-SZ,en-TC,en-TK,en-TO,en-TT,en-TV,en-TZ,en-UG,en-UM,en-US,en-VC,en-VG,en-VI,en-VU,en-WS,en-ZA,en-ZM,en-ZW,hi-Latn,hi-Latn-IN",
+            "en-001,en-150,en-AE,en-AG,en-AI,en-AS,en-AT,en-AU,en-BB,en-BE,en-BI,en-BM,en-BS,en-BW,en-BZ,en-CA,en-CC,en-CH,en-CK,en-CM,en-CX,en-CY,en-CZ,en-DE,en-DG,en-DK,en-DM,en-ER,en-ES,en-FI,en-FJ,en-FK,en-FM,en-FR,en-GB,en-GD,en-GG,en-GH,en-GI,en-GM,en-GS,en-GU,en-GY,en-HK,en-HU,en-ID,en-IE,en-IL,en-IM,en-IN,en-IO,en-IT,en-JE,en-JM,en-KE,en-KI,en-KN,en-KY,en-LC,en-LR,en-LS,en-MG,en-MH,en-MO,en-MP,en-MS,en-MT,en-MU,en-MV,en-MW,en-MY,en-NA,en-NF,en-NG,en-NL,en-NO,en-NR,en-NU,en-NZ,en-PG,en-PH,en-PK,en-PL,en-PN,en-PR,en-PT,en-PW,en-RO,en-RW,en-SB,en-SC,en-SD,en-SE,en-SG,en-SH,en-SI,en-SK,en-SL,en-SS,en-SX,en-SZ,en-TC,en-TK,en-TO,en-TT,en-TV,en-TZ,en-UG,en-UM,en-US,en-VC,en-VG,en-VI,en-VU,en-WS,en-ZA,en-ZM,en-ZW,hi-Latn,hi-Latn-IN",
             "zh-Hant",
-            "zh-Hant-HK,zh-Hant-MO,zh-Hant-TW")
+            "zh-Hant-HK,zh-Hant-MO,zh-Hant-MY,zh-Hant-TW")
         .entrySet()
         .stream()
         .map(e -> Arguments.arguments(e.getKey(), e.getValue()));

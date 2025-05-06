@@ -154,6 +154,7 @@ class ReferenceLocalesCalculatorBaseImplTest {
         REFERENCE_LOCALES_CALCULATOR.calculateRelatedReferenceLocales(input);
     assertTrue(
         expectedRelatedReferenceLocales.stream().allMatch(relatedReferenceLocales::contains));
+    assertEquals(expectedRelatedReferenceLocales.size(), relatedReferenceLocales.size());
   }
 
   public static Stream<Arguments> whenCalculatingRelatedReferenceLocales_returnsExpected() {
@@ -184,10 +185,10 @@ class ReferenceLocalesCalculatorBaseImplTest {
   public static Stream<Arguments> whenCalculatingBestMatchingLocale_returnsExpected() {
     return Stream.of(
         Arguments.of("zh-Hans-CN", "zh"),
-        Arguments.of("ZH_us", "zh-TW"),
+        Arguments.of("ZH_us", "zh-Hant-MY"),
         Arguments.of("zh-Hant", "zh-TW"),
         Arguments.of("zh-Hant-HK", "zh-HK"),
-        Arguments.of("zh-Hant-CN", "zh-TW"),
+        Arguments.of("zh-Hant-CN", "zh-Hant-MY"),
         Arguments.of("fr-Latn-FR", "fr"),
         Arguments.of("fr-BE", "fr-BE"),
         Arguments.of("sr-RS", "sr"),
@@ -209,8 +210,11 @@ class ReferenceLocalesCalculatorBaseImplTest {
         rrl("zh-HK", SAME_OR_INTERCHANGEABLE),
         rrl("zh-MO", SAME_OR_INTERCHANGEABLE),
         rrl("zh-TW", SAME_OR_INTERCHANGEABLE),
+        rrl("zh-Hant-MY", SAME_OR_INTERCHANGEABLE),
         // Cantonese
-        rrl("yue", HIGH));
+        rrl("yue", HIGH),
+        rrl("yue-MO", HIGH),
+        rrl("yue-Hant-CN", HIGH));
   }
 
   private static List<RelatedReferenceLocale> danish() {
@@ -230,6 +234,9 @@ class ReferenceLocalesCalculatorBaseImplTest {
 
   private static List<RelatedReferenceLocale> english() {
     return List.of(
+        // Afrikaans
+        rrl("af", LOW),
+        rrl("af-NA", LOW),
         // Welsh
         rrl("cy", LOW),
         // English
@@ -256,16 +263,20 @@ class ReferenceLocalesCalculatorBaseImplTest {
         rrl("en-CM", SAME_OR_INTERCHANGEABLE),
         rrl("en-CX", SAME_OR_INTERCHANGEABLE),
         rrl("en-CY", SAME_OR_INTERCHANGEABLE),
+        rrl("en-CZ", SAME_OR_INTERCHANGEABLE),
         rrl("en-DE", SAME_OR_INTERCHANGEABLE),
         rrl("en-DG", SAME_OR_INTERCHANGEABLE),
         rrl("en-DK", SAME_OR_INTERCHANGEABLE),
         rrl("en-DM", SAME_OR_INTERCHANGEABLE),
         rrl("en-ER", SAME_OR_INTERCHANGEABLE),
+        rrl("en-ES", SAME_OR_INTERCHANGEABLE),
         rrl("en-FI", SAME_OR_INTERCHANGEABLE),
         rrl("en-FJ", SAME_OR_INTERCHANGEABLE),
+        rrl("en-FR", SAME_OR_INTERCHANGEABLE),
         rrl("en-FK", SAME_OR_INTERCHANGEABLE),
         rrl("en-FM", SAME_OR_INTERCHANGEABLE),
         rrl("en-GB", SAME_OR_INTERCHANGEABLE),
+        rrl("en-GS", SAME_OR_INTERCHANGEABLE),
         rrl("en-GD", SAME_OR_INTERCHANGEABLE),
         rrl("en-GG", SAME_OR_INTERCHANGEABLE),
         rrl("en-GH", SAME_OR_INTERCHANGEABLE),
@@ -274,12 +285,14 @@ class ReferenceLocalesCalculatorBaseImplTest {
         rrl("en-GU", SAME_OR_INTERCHANGEABLE),
         rrl("en-GY", SAME_OR_INTERCHANGEABLE),
         rrl("en-HK", SAME_OR_INTERCHANGEABLE),
+        rrl("en-HU", SAME_OR_INTERCHANGEABLE),
         rrl("en-ID", SAME_OR_INTERCHANGEABLE),
         rrl("en-IE", SAME_OR_INTERCHANGEABLE),
         rrl("en-IL", SAME_OR_INTERCHANGEABLE),
         rrl("en-IM", SAME_OR_INTERCHANGEABLE),
         rrl("en-IN", SAME_OR_INTERCHANGEABLE),
         rrl("en-IO", SAME_OR_INTERCHANGEABLE),
+        rrl("en-IT", SAME_OR_INTERCHANGEABLE),
         rrl("en-JE", SAME_OR_INTERCHANGEABLE),
         rrl("en-JM", SAME_OR_INTERCHANGEABLE),
         rrl("en-KE", SAME_OR_INTERCHANGEABLE),
@@ -303,15 +316,19 @@ class ReferenceLocalesCalculatorBaseImplTest {
         rrl("en-NF", SAME_OR_INTERCHANGEABLE),
         rrl("en-NG", SAME_OR_INTERCHANGEABLE),
         rrl("en-NL", SAME_OR_INTERCHANGEABLE),
+        rrl("en-NO", SAME_OR_INTERCHANGEABLE),
         rrl("en-NR", SAME_OR_INTERCHANGEABLE),
         rrl("en-NU", SAME_OR_INTERCHANGEABLE),
         rrl("en-NZ", SAME_OR_INTERCHANGEABLE),
         rrl("en-PG", SAME_OR_INTERCHANGEABLE),
         rrl("en-PH", SAME_OR_INTERCHANGEABLE),
         rrl("en-PK", SAME_OR_INTERCHANGEABLE),
+        rrl("en-PL", SAME_OR_INTERCHANGEABLE),
         rrl("en-PN", SAME_OR_INTERCHANGEABLE),
         rrl("en-PR", SAME_OR_INTERCHANGEABLE),
+        rrl("en-PT", SAME_OR_INTERCHANGEABLE),
         rrl("en-PW", SAME_OR_INTERCHANGEABLE),
+        rrl("en-RO", SAME_OR_INTERCHANGEABLE),
         rrl("en-RW", SAME_OR_INTERCHANGEABLE),
         rrl("en-SB", SAME_OR_INTERCHANGEABLE),
         rrl("en-SC", SAME_OR_INTERCHANGEABLE),
@@ -320,6 +337,7 @@ class ReferenceLocalesCalculatorBaseImplTest {
         rrl("en-SG", SAME_OR_INTERCHANGEABLE),
         rrl("en-SH", SAME_OR_INTERCHANGEABLE),
         rrl("en-SI", SAME_OR_INTERCHANGEABLE),
+        rrl("en-SK", SAME_OR_INTERCHANGEABLE),
         rrl("en-SL", SAME_OR_INTERCHANGEABLE),
         rrl("en-SS", SAME_OR_INTERCHANGEABLE),
         rrl("en-SX", SAME_OR_INTERCHANGEABLE),

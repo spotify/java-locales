@@ -284,7 +284,7 @@ public class LocalesHierarchyUtils {
    * by the {@link ULocale#getFallback()} method, according to CLDR.
    *
    * <p>The list of special parents used here is based on the linked json file below, as it existed
-   * for commit ff1f2a4 from Apr 4 2024.
+   * for commit 30c5cce from Feb 4 2025.
    *
    * @see <a
    *     href="https://github.com/unicode-org/cldr-json/blob/main/cldr-json/cldr-core/supplemental/parentLocales.json">parentLocales.json</a>
@@ -318,6 +318,7 @@ public class LocalesHierarchyUtils {
     map.put("en-GH", "en-001");
     map.put("en-GI", "en-001");
     map.put("en-GM", "en-001");
+    map.put("en-GS", "en-001");
     map.put("en-GY", "en-001");
     map.put("en-HK", "en-001");
     map.put("en-ID", "en-001");
@@ -380,12 +381,22 @@ public class LocalesHierarchyUtils {
     map.put("en-AT", "en-150");
     map.put("en-BE", "en-150");
     map.put("en-CH", "en-150");
+    map.put("en-CZ", "en-150");
     map.put("en-DE", "en-150");
     map.put("en-DK", "en-150");
+    map.put("en-ES", "en-150");
     map.put("en-FI", "en-150");
+    map.put("en-FR", "en-150");
+    map.put("en-HU", "en-150");
+    map.put("en-IT", "en-150");
     map.put("en-NL", "en-150");
+    map.put("en-NO", "en-150");
+    map.put("en-PL", "en-150");
+    map.put("en-PT", "en-150");
+    map.put("en-RO", "en-150");
     map.put("en-SE", "en-150");
     map.put("en-SI", "en-150");
+    map.put("en-SK", "en-150");
     map.put("hi-Latn", "en-IN");
     map.put("es-AR", "es-419");
     map.put("es-BO", "es-419");
@@ -441,7 +452,9 @@ public class LocalesHierarchyUtils {
     map.put("ff-Arab", "und");
     map.put("ha-Arab", "und");
     map.put("iu-Latn", "und");
+    map.put("kaa-Latn", "und");
     map.put("kk-Arab", "und");
+    map.put("kok-Latn", "und");
     map.put("ks-Deva", "und");
     map.put("ku-Arab", "und");
     map.put("kxv-Deva", "und");
