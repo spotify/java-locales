@@ -31,6 +31,7 @@ import com.spotify.i18n.locales.utils.available.AvailableLocalesUtils;
 import com.spotify.i18n.locales.utils.languagetag.LanguageTagUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -52,7 +53,10 @@ public abstract class ReferenceLocalesCalculatorBaseImpl implements ReferenceLoc
   /** Prepared {@link LocaleMatcher}, ready to find the best matching reference locale */
   private static final LocaleMatcher REFERENCE_LOCALE_MATCHER =
       LocaleMatcher.builder()
-          .setSupportedULocales(AvailableLocalesUtils.getReferenceLocales())
+          .setSupportedULocales(
+              AvailableLocalesUtils.getReferenceLocales().stream()
+                  .sorted(Comparator.comparing(ULocale::toLanguageTag))
+                  .collect(Collectors.toList()))
           .setNoDefaultLocale()
           .build();
 
