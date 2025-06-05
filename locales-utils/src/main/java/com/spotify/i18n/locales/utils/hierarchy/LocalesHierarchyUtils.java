@@ -63,7 +63,7 @@ public class LocalesHierarchyUtils {
    */
   public static Set<ULocale> getDescendantLocales(final ULocale locale) {
     Preconditions.checkNotNull(locale);
-    if (isSameLocale(locale, ULocale.ROOT)) {
+    if (isRootLocale(locale)) {
       // Optimization when requesting descendants of ROOT
       return AvailableLocalesUtils.getCldrLocales();
     } else {
@@ -83,7 +83,7 @@ public class LocalesHierarchyUtils {
    */
   public static List<ULocale> getAncestorLocales(final ULocale locale) {
     Preconditions.checkNotNull(locale);
-    if (isSameLocale(locale, ULocale.ROOT)) {
+    if (isRootLocale(locale)) {
       return List.of();
     }
     List<ULocale> ancestors = new ArrayList<>();
@@ -106,8 +106,7 @@ public class LocalesHierarchyUtils {
    */
   public static ULocale getHighestAncestorLocale(final ULocale locale) {
     Preconditions.checkNotNull(locale);
-    Preconditions.checkArgument(
-        !isSameLocale(locale, ULocale.ROOT), "Param locale cannot be the ROOT.");
+    Preconditions.checkArgument(!isRootLocale(locale), "Param locale cannot be the ROOT.");
     ULocale highestAncestor = locale;
     while (true) {
       Optional<ULocale> currentOpt = getParentLocale(highestAncestor);
@@ -119,6 +118,16 @@ public class LocalesHierarchyUtils {
       }
       highestAncestor = currentOpt.get();
     }
+  }
+
+  /**
+   * Returns true if the given locale is the ROOT locale
+   *
+   * @param underTest the locale under test
+   * @return true if the given locale is the ROOT locale
+   */
+  public static boolean isRootLocale(final ULocale underTest) {
+    return isSameLocale(underTest, ULocale.ROOT);
   }
 
   /**
@@ -193,9 +202,9 @@ public class LocalesHierarchyUtils {
    * @return The parent locale, according to CLDR
    */
   private static Optional<ULocale> getParentLocaleBasedOnFallback(final ULocale locale) {
-    if (isSameLocale(locale, ULocale.ROOT)) {
+    if (isRootLocale(locale)) {
       return Optional.empty();
-    } else if (isSameLocale(locale.getFallback(), ULocale.ROOT)) {
+    } else if (isRootLocale(locale.getFallback())) {
       return Optional.of(ULocale.ROOT);
     } else if (scriptIsMajorLanguageDifferentiator(locale)) {
       // When we know the script is a major differentiator, we assess the parent locale based on it.

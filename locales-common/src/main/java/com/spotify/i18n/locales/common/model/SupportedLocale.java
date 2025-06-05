@@ -20,6 +20,8 @@
 
 package com.spotify.i18n.locales.common.model;
 
+import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isRootLocale;
+
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import com.ibm.icu.util.ULocale;
@@ -204,7 +206,7 @@ public abstract class SupportedLocale {
       SupportedLocale sl = autoBuild();
 
       Preconditions.checkState(
-          !sl.localeForTranslations().equals(ULocale.ROOT),
+          !isRootLocale(sl.localeForTranslations()),
           "The given localeForTranslations cannot be the root.");
 
       Preconditions.checkState(
