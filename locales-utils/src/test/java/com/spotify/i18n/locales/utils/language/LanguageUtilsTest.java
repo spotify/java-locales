@@ -22,6 +22,7 @@ package com.spotify.i18n.locales.utils.language;
 
 import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isDescendantLocale;
 import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isRootLocale;
+import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isSameLocale;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.ibm.icu.util.ULocale;
