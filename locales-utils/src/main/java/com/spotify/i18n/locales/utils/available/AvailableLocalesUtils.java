@@ -20,6 +20,7 @@
 
 package com.spotify.i18n.locales.utils.available;
 
+import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isRootLocale;
 import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isSameLocale;
 
 import com.ibm.icu.util.ULocale;
@@ -35,7 +36,7 @@ public class AvailableLocalesUtils {
   // Set containing all CLDR available locales, except the ROOT and en-US-POSIX
   private static final Set<ULocale> CLDR_LOCALES =
       Arrays.stream(ULocale.getAvailableLocales())
-          .filter(l -> !isSameLocale(l, ULocale.ROOT) && !isSameLocale(l, EN_US_POSIX))
+          .filter(l -> !isRootLocale(l) && !isSameLocale(l, EN_US_POSIX))
           .collect(Collectors.toSet());
 
   /**

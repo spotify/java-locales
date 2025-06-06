@@ -242,4 +242,11 @@ class LocalesHierarchyUtilsTest {
 
     assertEquals("Param locale cannot be the ROOT.", thrown.getMessage());
   }
+
+  @Test
+  public void whenTestingForRootLocales_returnsExpected() {
+    assertTrue(LocalesHierarchyUtils.isRootLocale(ULocale.ROOT));
+    assertFalse(LocalesHierarchyUtils.isRootLocale(ULocale.FRANCE));
+    assertFalse(LocalesHierarchyUtils.isRootLocale(ULocale.FRENCH));
+  }
 }

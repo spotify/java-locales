@@ -20,6 +20,9 @@
 
 package com.spotify.i18n.locales.common.model;
 
+import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isRootLocale;
+import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isSameLocale;
+
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import com.ibm.icu.util.ULocale;
@@ -208,7 +211,7 @@ public abstract class ResolvedLocale {
 
     private static void validateLocaleForTranslations(ResolvedLocale resolvedLocale) {
       Preconditions.checkState(
-          !resolvedLocale.localeForTranslations().equals(ULocale.ROOT),
+          !isRootLocale(resolvedLocale.localeForTranslations()),
           "The given localeForTranslations cannot be the root.");
 
       Preconditions.checkState(
@@ -224,15 +227,12 @@ public abstract class ResolvedLocale {
 
       Preconditions.checkState(
           !resolvedLocale.localeForTranslationsFallbacks().stream()
-              .anyMatch(locale -> LocalesHierarchyUtils.isSameLocale(locale, ULocale.ROOT)),
+              .anyMatch(locale -> isRootLocale(locale)),
           "The given fallbackLocalesForTranslations cannot contain the root.");
 
       Preconditions.checkState(
           !resolvedLocale.localeForTranslationsFallbacks().stream()
-              .anyMatch(
-                  locale ->
-                      LocalesHierarchyUtils.isSameLocale(
-                          locale, resolvedLocale.localeForTranslations())),
+              .anyMatch(locale -> isSameLocale(locale, resolvedLocale.localeForTranslations())),
           "The given fallbackLocalesForTranslations cannot contain the localeForTranslations [%s].",
           resolvedLocale.localeForTranslations().toLanguageTag());
 
@@ -256,7 +256,7 @@ public abstract class ResolvedLocale {
           resolvedLocale.localeForTranslationsFallbacks().stream()
               .filter(
                   locale ->
-                      !LocalesHierarchyUtils.isSameLocale(
+                      !isSameLocale(
                           localeForTranslationsHighestAncestor,
                           LocalesHierarchyUtils.getHighestAncestorLocale(locale)))
               .collect(Collectors.toList());
@@ -273,7 +273,7 @@ public abstract class ResolvedLocale {
 
     private static void validateLocaleForFormatting(ResolvedLocale resolvedLocale) {
       Preconditions.checkState(
-          !resolvedLocale.localeForFormatting().equals(ULocale.ROOT),
+          !isRootLocale(resolvedLocale.localeForFormatting()),
           "The given localeForFormatting cannot be the root.");
 
       Preconditions.checkState(
@@ -284,8 +284,7 @@ public abstract class ResolvedLocale {
       ULocale rootLocaleForFormatting =
           LocalesHierarchyUtils.getHighestAncestorLocale(resolvedLocale.localeForTranslations());
       Preconditions.checkState(
-          LocalesHierarchyUtils.isSameLocale(
-                  resolvedLocale.localeForFormatting(), rootLocaleForFormatting)
+          isSameLocale(resolvedLocale.localeForFormatting(), rootLocaleForFormatting)
               || LocalesHierarchyUtils.isDescendantLocale(
                   resolvedLocale.localeForFormatting(), rootLocaleForFormatting),
           "The given localeForFormatting %s is not the same as, or a descendant of the localeForTranslations %s.",
