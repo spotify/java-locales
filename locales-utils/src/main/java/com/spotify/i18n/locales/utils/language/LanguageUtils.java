@@ -20,6 +20,9 @@
 
 package com.spotify.i18n.locales.utils.language;
 
+import static com.ibm.icu.util.ULocale.CHINESE;
+import static com.ibm.icu.util.ULocale.SIMPLIFIED_CHINESE;
+import static com.ibm.icu.util.ULocale.TRADITIONAL_CHINESE;
 import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.getHighestAncestorLocale;
 import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isRootLocale;
 import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isSameLocale;
@@ -30,7 +33,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * A Utility class that provides helpers around the concepts of written and spoken languages. It
@@ -42,21 +44,20 @@ import java.util.stream.Stream;
  */
 public class LanguageUtils {
 
-  /** Chinese (Traditional) */
-  private static final ULocale CHINESE_TRADITIONAL = ULocale.forLanguageTag("zh-Hant");
-
   /**
    * Map containing locales identifying languages for which multiple scripts are supported in CLDR,
-   * with their most likely equivalent in terms of language+script (no region code).
+   * with their most likely equivalent in terms of language+script (no region code). We consider
+   * them as ambiguous, as the language code only doesn't provide enough information to fully
+   * identify the written language without looking into CLDR data.
    */
-  static final Map<ULocale, ULocale> LANGUAGE_TO_LIKELY_LANGUAGE_SCRIPT_MAP =
+  private static final Map<ULocale, ULocale> AMBIGUOUS_LANGUAGE_TO_LIKELY_WRITTEN_LANGUAGE_MAP =
       Arrays.stream(ULocale.getAvailableLocales())
           .filter(locale -> hasScript(locale))
           .map(ULocale::getLanguage)
           .distinct()
           .collect(
               Collectors.toMap(
-                  languageCode -> ULocale.forLanguageTag(languageCode),
+                  languageCode -> new ULocale.Builder().setLanguage(languageCode).build(),
                   languageCode ->
                       new ULocale.Builder()
                           .setLocale(ULocale.addLikelySubtags(ULocale.forLanguageTag(languageCode)))
@@ -64,29 +65,14 @@ public class LanguageUtils {
                           .build()));
 
   /**
-   * Set of locales for which the fallback locale (language code only) identifies the same spoken
-   * language.
+   * Set containing the codes for languages which can only be written in a single script, and are
+   * therefore considered as unambiguous.
    */
-  private static final Set<ULocale> FALLBACK_LOCALE_IS_SPOKEN_LANGUAGE_LOCALES =
-      Stream.of(
-              "az-Cyrl", // https://www.omniglot.com/writing/azeri.htm
-              "bs-Cyrl", // https://www.omniglot.com/writing/bosnian.htm
-              "ff-Adlm", // https://www.omniglot.com/writing/fula.htm
-              "kok-Latn", // https://www.omniglot.com/writing/konkani.htm
-              "ks-Deva", // https://www.omniglot.com/writing/kashmiri.htm
-              "kxv-Deva", //
-              "kxv-Orya", //
-              "kxv-Telu", //
-              "pa-Arab", // https://www.omniglot.com/writing/punjabi.htm
-              "sd-Deva", // https://www.omniglot.com/writing/sindhi.htm
-              "shi-Latn", // https://www.omniglot.com/writing/shilha.htm
-              "sr-Latn", // https://www.omniglot.com/writing/serbian.htm
-              "uz-Arab", // https://www.omniglot.com/writing/uzbek.htm
-              "uz-Cyrl", // https://www.omniglot.com/writing/uzbek.htm
-              "vai-Latn", // https://www.omniglot.com/writing/vai.htm
-              "yue-Hans" // https://www.omniglot.com/chinese/cantonese.htm
-              )
-          .map(ULocale::forLanguageTag)
+  private static final Set<String> UNAMBIGUOUS_WRITTEN_LANGUAGE_CODES =
+      Arrays.stream(ULocale.getAvailableLocales())
+          .filter(locale -> locale.getScript().isEmpty() && locale.getCountry().isEmpty())
+          .filter(locale -> !AMBIGUOUS_LANGUAGE_TO_LIKELY_WRITTEN_LANGUAGE_MAP.containsKey(locale))
+          .map(ULocale::getLanguage)
           .collect(Collectors.toSet());
 
   /**
@@ -101,25 +87,32 @@ public class LanguageUtils {
   public static ULocale getWrittenLanguageLocale(final ULocale locale) {
     Preconditions.checkNotNull(locale);
     Preconditions.checkArgument(!isRootLocale(locale), "Param locale cannot be the ROOT.");
-    final ULocale highestAncestorLocale = getHighestAncestorLocale(locale);
-    if (hasScript(highestAncestorLocale)) {
-      // When the highest ancestor locale already has a script, we know it is the best possible
-      // identifier for the corresponding written language.
-      return highestAncestorLocale;
+
+    if (UNAMBIGUOUS_WRITTEN_LANGUAGE_CODES.contains(locale.getLanguage())) {
+      // The language code is enough to identify the written language fully.
+      return new ULocale.Builder().setLanguage(locale.getLanguage()).build();
     } else {
-      // When the highest ancestor locale doesn't have a script code defined, we add one for
-      // languages for which we need the differentiation to be explicit. Ex: for Serbian, we will
-      // return sr-Cyrl and not sr, as the language can also be written in sr-Latn. For French, we
-      // will return fr as the language is never written in another script.
-      return LANGUAGE_TO_LIKELY_LANGUAGE_SCRIPT_MAP.getOrDefault(
-          highestAncestorLocale, highestAncestorLocale);
+      final ULocale highestAncestorLocale = getHighestAncestorLocale(locale);
+      if (hasScript(highestAncestorLocale)) {
+        // When the highest ancestor locale already has a script, we know it is the best possible
+        // identifier for the corresponding written language.
+        return highestAncestorLocale;
+      } else {
+        // When the highest ancestor locale doesn't have a script code defined, we add one for
+        // languages for which we need the differentiation to be explicit. Ex: for Serbian, we will
+        // return sr-Cyrl and not sr, as the language can also be written in sr-Latn. For French, we
+        // will return fr as the language is never written in another script.
+        return AMBIGUOUS_LANGUAGE_TO_LIKELY_WRITTEN_LANGUAGE_MAP.getOrDefault(
+            highestAncestorLocale, highestAncestorLocale);
+      }
     }
   }
 
   /**
    * Returns the {@link ULocale} identifying the spoken language associated with the given locale.
-   * The returned locale will consist of a language code only, except for Chinese (Traditional)
-   * which will be identified as zh-Hant.
+   * The returned locale will consist of a language code only, except for Chinese (Simplified),
+   * which will be identified as zh-Hans, and Chinese (Traditional) which will be identified as
+   * zh-Hant.
    *
    * @param locale the locale
    * @return locale identifying the spoken language
@@ -128,23 +121,17 @@ public class LanguageUtils {
   public static ULocale getSpokenLanguageLocale(final ULocale locale) {
     Preconditions.checkNotNull(locale);
     Preconditions.checkArgument(!isRootLocale(locale), "Param locale cannot be the ROOT.");
-    final ULocale highestAncestorLocale = getHighestAncestorLocale(locale);
-    if (!hasScript(highestAncestorLocale)
-        || isSameLocale(highestAncestorLocale, CHINESE_TRADITIONAL)) {
-      // When the highest ancestor locale has no script, or is Chinese (Traditional), it
-      // appropriately identifies the spoken language.
-      return highestAncestorLocale;
-    } else if (FALLBACK_LOCALE_IS_SPOKEN_LANGUAGE_LOCALES.contains(highestAncestorLocale)) {
-      // When we encounter a highest ancestor locale for which we know the fallback locale is the
-      // spoken language one, we return the fallback.
-      return highestAncestorLocale.getFallback();
+
+    if (CHINESE.getLanguage().equals(locale.getLanguage())) {
+      // Chinese is the only language for which the script is a language differentiator.
+      if (isSameLocale(getHighestAncestorLocale(locale), TRADITIONAL_CHINESE)) {
+        return TRADITIONAL_CHINESE;
+      } else {
+        return SIMPLIFIED_CHINESE;
+      }
     } else {
-      // This exception is mostly thrown as a safety measure, to ensure that we detect a new highest
-      // ancestor locale which this code doesn't support yet when we update icu4j. This will cause
-      // the unit tests to fail.
-      throw new IllegalArgumentException(
-          String.format(
-              "Unexpected language tag encountered: %s", highestAncestorLocale.toLanguageTag()));
+      // All other spoken languages only require the language code to be defined.
+      return new ULocale.Builder().setLanguage(locale.getLanguage()).build();
     }
   }
 

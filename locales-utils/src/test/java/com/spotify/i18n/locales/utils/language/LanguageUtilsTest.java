@@ -20,16 +20,22 @@
 
 package com.spotify.i18n.locales.utils.language;
 
+import static com.ibm.icu.util.ULocale.CHINESE;
+import static com.ibm.icu.util.ULocale.SIMPLIFIED_CHINESE;
+import static com.ibm.icu.util.ULocale.TRADITIONAL_CHINESE;
 import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isDescendantLocale;
 import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isRootLocale;
 import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isSameLocale;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.ibm.icu.util.ULocale;
+import com.spotify.i18n.locales.utils.available.AvailableLocalesUtils;
 import com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -71,8 +77,6 @@ class LanguageUtilsTest {
     }
   }
 
-  static final ULocale CHINESE_TRADITIONAL = ULocale.forLanguageTag("zh-Hant");
-
   @ParameterizedTest
   @MethodSource("cldrAvailableLocales")
   void canGetSpokenLanguageLocaleForCldrAvailableLocales(final ULocale locale) {
@@ -80,8 +84,13 @@ class LanguageUtilsTest {
     assertNotNull(spokenLanguageLocale);
     assertFalse(isRootLocale(spokenLanguageLocale));
     assertTrue(spokenLanguageLocale.getCountry().isEmpty());
-    if (!isSameLocale(locale, CHINESE_TRADITIONAL)
-        && !isDescendantLocale(locale, CHINESE_TRADITIONAL)) {
+
+    if (isSameLocale(locale, CHINESE) || isDescendantLocale(locale, CHINESE)) {
+      isSameLocale(spokenLanguageLocale, SIMPLIFIED_CHINESE);
+    } else if (isSameLocale(locale, TRADITIONAL_CHINESE)
+        || isDescendantLocale(locale, TRADITIONAL_CHINESE)) {
+      isSameLocale(spokenLanguageLocale, TRADITIONAL_CHINESE);
+    } else {
       assertTrue(spokenLanguageLocale.getScript().isEmpty());
     }
   }
@@ -90,5 +99,44 @@ class LanguageUtilsTest {
     return Arrays.stream(ULocale.getAvailableLocales())
         .filter(Predicate.not(LocalesHierarchyUtils::isRootLocale))
         .map(Arguments::of);
+  }
+
+  @Test
+  public void confirmLogicAccountsForAllHighestAncestorLocalesWithScript() {
+    // Set of highest ancestor locales for which the fallback locale (language code only) identifies
+    // the same spoken language. Assessed and confirmed as valid as of CLDR 47.
+    final Set<String> fallbackIsSpokenLanguage =
+        Set.of(
+            "az-Cyrl", // https://www.omniglot.com/writing/azeri.htm
+            "bs-Cyrl", // https://www.omniglot.com/writing/bosnian.htm
+            "ff-Adlm", // https://www.omniglot.com/writing/fula.htm
+            "kok-Latn", // https://www.omniglot.com/writing/konkani.htm
+            "ks-Deva", // https://www.omniglot.com/writing/kashmiri.htm
+            "kxv-Deva", //
+            "kxv-Orya", //
+            "kxv-Telu", //
+            "pa-Arab", // https://www.omniglot.com/writing/punjabi.htm
+            "sd-Deva", // https://www.omniglot.com/writing/sindhi.htm
+            "shi-Latn", // https://www.omniglot.com/writing/shilha.htm
+            "sr-Latn", // https://www.omniglot.com/writing/serbian.htm
+            "uz-Arab", // https://www.omniglot.com/writing/uzbek.htm
+            "uz-Cyrl", // https://www.omniglot.com/writing/uzbek.htm
+            "vai-Latn", // https://www.omniglot.com/writing/vai.htm
+            "yue-Hans" // https://www.omniglot.com/chinese/cantonese.htm
+            );
+
+    final Set<String> fallbackIsNotSpokenLanguage = Set.of("zh-Hant");
+
+    assertEquals(
+        // After filtering out all locales we have assessed, there shouldn't remain any entry here
+        0,
+        AvailableLocalesUtils.getCldrLocales().stream()
+            .map(LocalesHierarchyUtils::getHighestAncestorLocale)
+            // We only retain highest ancestor locales which have a script defined.
+            .filter(locale -> !locale.getScript().isEmpty())
+            // We discard all locales that we have assessed.
+            .filter(locale -> !fallbackIsSpokenLanguage.contains(locale.toLanguageTag()))
+            .filter(locale -> !fallbackIsNotSpokenLanguage.contains(locale.toLanguageTag()))
+            .count());
   }
 }
