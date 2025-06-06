@@ -112,9 +112,9 @@ class LanguageUtilsTest {
             "ff-Adlm", // https://www.omniglot.com/writing/fula.htm
             "kok-Latn", // https://www.omniglot.com/writing/konkani.htm
             "ks-Deva", // https://www.omniglot.com/writing/kashmiri.htm
-            "kxv-Deva", //
-            "kxv-Orya", //
-            "kxv-Telu", //
+            "kxv-Deva", // https://www.businesswireindia.com/two-of-indias-endangered-languages-kuvi-and-kangri-get-a-lease-of-revival-as-motorola-and-lenovo-foundation-bring-alive-their-indigenous-languages-digital-inclusion-initiative-83131.html
+            "kxv-Orya", // https://www.businesswireindia.com/two-of-indias-endangered-languages-kuvi-and-kangri-get-a-lease-of-revival-as-motorola-and-lenovo-foundation-bring-alive-their-indigenous-languages-digital-inclusion-initiative-83131.html
+            "kxv-Telu", // https://www.businesswireindia.com/two-of-indias-endangered-languages-kuvi-and-kangri-get-a-lease-of-revival-as-motorola-and-lenovo-foundation-bring-alive-their-indigenous-languages-digital-inclusion-initiative-83131.html
             "pa-Arab", // https://www.omniglot.com/writing/punjabi.htm
             "sd-Deva", // https://www.omniglot.com/writing/sindhi.htm
             "shi-Latn", // https://www.omniglot.com/writing/shilha.htm
