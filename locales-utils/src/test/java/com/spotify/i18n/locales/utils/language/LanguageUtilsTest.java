@@ -32,6 +32,7 @@ import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.utils.available.AvailableLocalesUtils;
 import com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -45,11 +46,12 @@ class LanguageUtilsTest {
   @ParameterizedTest
   @MethodSource("cldrAvailableLocales")
   void canGetWrittenLanguageLocaleForCldrAvailableLocales(final ULocale locale) {
-    final ULocale writtenLanguageLocale = LanguageUtils.getWrittenLanguageLocale(locale);
-    assertNotNull(writtenLanguageLocale);
-    assertFalse(isRootLocale(writtenLanguageLocale));
-    assertTrue(writtenLanguageLocale.getCountry().isEmpty());
-    switch (writtenLanguageLocale.getLanguage()) {
+    final Optional<ULocale> writtenLanguageLocale =
+        LanguageUtils.getWrittenLanguageLocale(locale.toLanguageTag());
+    assertFalse(writtenLanguageLocale.isEmpty());
+    assertFalse(isRootLocale(writtenLanguageLocale.get()));
+    assertTrue(writtenLanguageLocale.get().getCountry().isEmpty());
+    switch (writtenLanguageLocale.get().getLanguage()) {
       case "az":
       case "bs":
       case "ff":
@@ -69,10 +71,10 @@ class LanguageUtilsTest {
       case "vai":
       case "yue":
       case "zh":
-        assertFalse(writtenLanguageLocale.getScript().isEmpty());
+        assertFalse(writtenLanguageLocale.get().getScript().isEmpty());
         break;
       default:
-        assertTrue(writtenLanguageLocale.getScript().isEmpty());
+        assertTrue(writtenLanguageLocale.get().getScript().isEmpty());
         break;
     }
   }
@@ -80,18 +82,19 @@ class LanguageUtilsTest {
   @ParameterizedTest
   @MethodSource("cldrAvailableLocales")
   void canGetSpokenLanguageLocaleForCldrAvailableLocales(final ULocale locale) {
-    final ULocale spokenLanguageLocale = LanguageUtils.getSpokenLanguageLocale(locale);
-    assertNotNull(spokenLanguageLocale);
-    assertFalse(isRootLocale(spokenLanguageLocale));
-    assertTrue(spokenLanguageLocale.getCountry().isEmpty());
+    final Optional<ULocale> spokenLanguageLocale =
+        LanguageUtils.getSpokenLanguageLocale(locale.toLanguageTag());
+    assertFalse(spokenLanguageLocale.isEmpty());
+    assertFalse(isRootLocale(spokenLanguageLocale.get()));
+    assertTrue(spokenLanguageLocale.get().getCountry().isEmpty());
 
     if (isSameLocale(locale, CHINESE) || isDescendantLocale(locale, CHINESE)) {
-      isSameLocale(spokenLanguageLocale, SIMPLIFIED_CHINESE);
+      isSameLocale(spokenLanguageLocale.get(), SIMPLIFIED_CHINESE);
     } else if (isSameLocale(locale, TRADITIONAL_CHINESE)
         || isDescendantLocale(locale, TRADITIONAL_CHINESE)) {
-      isSameLocale(spokenLanguageLocale, TRADITIONAL_CHINESE);
+      isSameLocale(spokenLanguageLocale.get(), TRADITIONAL_CHINESE);
     } else {
-      assertTrue(spokenLanguageLocale.getScript().isEmpty());
+      assertTrue(spokenLanguageLocale.get().getScript().isEmpty());
     }
   }
 

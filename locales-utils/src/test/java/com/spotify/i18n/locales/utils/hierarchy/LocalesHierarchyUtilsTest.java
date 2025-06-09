@@ -126,6 +126,94 @@ class LocalesHierarchyUtilsTest {
 
   @ParameterizedTest
   @MethodSource
+  void whenCallingIsChildLocale_returnsExpected(
+      String childLanguageTag, String parentLanguageTag, boolean expected) {
+    if (parentLanguageTag.isBlank()) {
+      if (childLanguageTag.isBlank()) {
+        assertEquals(expected, LocalesHierarchyUtils.isChildLocale(ULocale.ROOT, ULocale.ROOT));
+      } else {
+        assertEquals(
+            expected,
+            LocalesHierarchyUtils.isChildLocale(
+                ULocale.forLanguageTag(childLanguageTag), ULocale.ROOT));
+      }
+    } else {
+      assertEquals(
+          expected,
+          LocalesHierarchyUtils.isChildLocale(
+              ULocale.forLanguageTag(childLanguageTag), ULocale.forLanguageTag(parentLanguageTag)));
+    }
+  }
+
+  static Stream<Arguments> whenCallingIsChildLocale_returnsExpected() {
+    return Stream.of(
+        Arguments.of("en", "en", false),
+        Arguments.of("", "", false),
+        Arguments.of("en-SE", "en", false),
+        Arguments.of("en-150", "en-001", true),
+        Arguments.of("en-GB", "en-001", true),
+        Arguments.of("en-US", "en", true),
+        Arguments.of("fr", "", true),
+        Arguments.of("ja-JP", "ja", true),
+        Arguments.of("wo-Arab", "", true),
+        Arguments.of("zh-CN", "zh", true),
+        Arguments.of("zh-TW", "zh-Hant", true),
+        Arguments.of("zh-MO", "zh-Hant-HK", true),
+        Arguments.of("zh-Hans", "zh", true),
+        Arguments.of("zh-Hant", "", true),
+        Arguments.of("ht", "fr-HT", true),
+        Arguments.of("zh-Hant-MO", "zh-Hant-HK", true));
+  }
+
+  @Test
+  public void allRootChildLocalesAreHighestAncestorLocales() {
+    for (ULocale locale : AvailableLocalesUtils.getCldrLocales()) {
+      if (LocalesHierarchyUtils.isChildLocale(locale, ULocale.ROOT)) {
+        assertTrue(LocalesHierarchyUtils.isHighestAncestorLocale(locale));
+      } else {
+        assertFalse(LocalesHierarchyUtils.isHighestAncestorLocale(locale));
+      }
+    }
+  }
+
+  @Test
+  public void whenCallingIsLanguageWrittenInSeveralScripts_returnsExpected() {
+    final Set<String> uniqueLanguageCodes =
+        AvailableLocalesUtils.getCldrLocales().stream()
+            .map(ULocale::getLanguage)
+            .collect(Collectors.toSet());
+    for (String languageCode : uniqueLanguageCodes) {
+      switch (languageCode) {
+        case "az":
+        case "bs":
+        case "ff":
+        case "hi":
+        case "kk":
+        case "kok":
+        case "ks":
+        case "kxv":
+        case "mni":
+        case "pa":
+        case "sat":
+        case "sd":
+        case "shi":
+        case "sr":
+        case "su":
+        case "uz":
+        case "vai":
+        case "yue":
+        case "zh":
+          assertTrue(LocalesHierarchyUtils.isLanguageWrittenInSeveralScripts(languageCode));
+          break;
+        default:
+          assertFalse(LocalesHierarchyUtils.isLanguageWrittenInSeveralScripts(languageCode));
+          break;
+      }
+    }
+  }
+
+  @ParameterizedTest
+  @MethodSource
   void emptyParentLocaleForUnsupportedCombinationsOfLanguageScriptCodes(String languageTag) {
     assertTrue(
         LocalesHierarchyUtils.getParentLocale(ULocale.forLanguageTag(languageTag)).isEmpty());

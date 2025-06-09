@@ -20,11 +20,17 @@
 
 package com.spotify.i18n.locales.utils.available;
 
+import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isLanguageWrittenInSeveralScripts;
+import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isRootLocale;
 import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isSameLocale;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.ibm.icu.util.ULocale;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class AvailableLocalesUtilsTest {
 
@@ -56,5 +62,37 @@ class AvailableLocalesUtilsTest {
     for (ULocale referenceLocale : AvailableLocalesUtils.getReferenceLocales()) {
       assertTrue(isSameLocale(ULocale.minimizeSubtags(referenceLocale), referenceLocale));
     }
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  void writtenLanguageLocaleIsUnambiguous(final ULocale locale) {
+    assertFalse(isRootLocale(locale));
+    assertTrue(locale.getCountry().isEmpty());
+    if (isLanguageWrittenInSeveralScripts(locale.getLanguage())) {
+      assertFalse(locale.getScript().isEmpty());
+    } else {
+      assertTrue(locale.getScript().isEmpty());
+    }
+  }
+
+  public static Stream<Arguments> writtenLanguageLocaleIsUnambiguous() {
+    return AvailableLocalesUtils.getWrittenLanguageLocales().stream().map(Arguments::of);
+  }
+
+  @ParameterizedTest
+  @MethodSource
+  void spokenLanguageLocaleIsUnambiguous(final ULocale locale) {
+    assertFalse(isRootLocale(locale));
+    assertTrue(locale.getCountry().isEmpty());
+    if (ULocale.CHINESE.getLanguage().equals(locale.getLanguage())) {
+      assertFalse(locale.getScript().isEmpty());
+    } else {
+      assertTrue(locale.getScript().isEmpty());
+    }
+  }
+
+  public static Stream<Arguments> spokenLanguageLocaleIsUnambiguous() {
+    return AvailableLocalesUtils.getSpokenLanguageLocales().stream().map(Arguments::of);
   }
 }
