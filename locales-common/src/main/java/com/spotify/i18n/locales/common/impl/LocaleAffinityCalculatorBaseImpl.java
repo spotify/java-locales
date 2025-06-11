@@ -21,6 +21,7 @@
 package com.spotify.i18n.locales.common.impl;
 
 import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isRootLocale;
+import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isSameLocale;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
@@ -33,8 +34,10 @@ import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
 import com.spotify.i18n.locales.common.model.LocaleAffinity;
 import com.spotify.i18n.locales.common.model.LocaleAffinityResult;
+import com.spotify.i18n.locales.utils.language.LanguageUtils;
 import com.spotify.i18n.locales.utils.languagetag.LanguageTagUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -97,10 +100,34 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
     if (againstLocales().isEmpty()) {
       return LocaleAffinity.NONE;
     } else {
-      int bestDistance = getBestDistance(languageTag);
-      int correspondingScore = convertDistanceToAffinityScore(bestDistance);
-      return convertScoreToLocaleAffinity(correspondingScore);
+      // We attempt to match based on corresponding spoken language first, and make use of the
+      // score-based affinity calculation as fallback.
+      if (hasSameSpokenLanguageAffinity(languageTag)) {
+        return LocaleAffinity.SAME_OR_INTERCHANGEABLE;
+      } else {
+        return calculateScoreBasedAffinity(languageTag);
+      }
     }
+  }
+
+  private boolean hasSameSpokenLanguageAffinity(final String languageTag) {
+    return LanguageUtils.getSpokenLanguageLocale(languageTag)
+        .map(
+            spokenLanguageLocale ->
+                againstLocales().stream()
+                    .map(ULocale::toLanguageTag)
+                    .map(LanguageUtils::getSpokenLanguageLocale)
+                    .flatMap(Optional::stream)
+                    .anyMatch(
+                        againstSpokenLocale ->
+                            isSameLocale(spokenLanguageLocale, againstSpokenLocale)))
+        .orElse(false);
+  }
+
+  private LocaleAffinity calculateScoreBasedAffinity(String languageTag) {
+    int bestDistance = getBestDistance(languageTag);
+    int correspondingScore = convertDistanceToAffinityScore(bestDistance);
+    return convertScoreToLocaleAffinity(correspondingScore);
   }
 
   private int getBestDistance(@Nullable final String languageTag) {

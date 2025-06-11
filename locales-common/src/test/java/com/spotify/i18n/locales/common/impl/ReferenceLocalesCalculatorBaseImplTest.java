@@ -34,6 +34,7 @@ import com.spotify.i18n.locales.common.ReferenceLocalesCalculator;
 import com.spotify.i18n.locales.common.model.LocaleAffinity;
 import com.spotify.i18n.locales.common.model.RelatedReferenceLocale;
 import com.spotify.i18n.locales.utils.available.AvailableLocalesUtils;
+import com.spotify.i18n.locales.utils.language.LanguageUtils;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -69,7 +70,8 @@ class ReferenceLocalesCalculatorBaseImplTest {
 
       ULocale referenceLanguageScriptOnly = getLocaleWithLanguageAndScriptOnly(referenceLocale);
 
-      if (isSameLocale(inputLanguageScriptOnly, referenceLanguageScriptOnly)) {
+      if (isSameLocale(inputLanguageScriptOnly, referenceLanguageScriptOnly)
+          || isSameSpokenLanguage(inputLanguageScriptOnly, referenceLanguageScriptOnly)) {
         assertEquals(
             SAME_OR_INTERCHANGEABLE,
             affinity,
@@ -101,6 +103,12 @@ class ReferenceLocalesCalculatorBaseImplTest {
     }
   }
 
+  private boolean isSameSpokenLanguage(
+      ULocale inputLanguageScriptOnly, ULocale referenceLanguageScriptOnly) {
+    return LanguageUtils.getSpokenLanguageLocale(inputLanguageScriptOnly.toLanguageTag())
+        .equals(LanguageUtils.getSpokenLanguageLocale(referenceLanguageScriptOnly.toLanguageTag()));
+  }
+
   private static ULocale getLocaleWithLanguageAndScriptOnly(ULocale input) {
     return new Builder()
         .setLocale(ULocale.addLikelySubtags(input))
@@ -117,9 +125,12 @@ class ReferenceLocalesCalculatorBaseImplTest {
         // Bosnian and Croatian
       case "bs-Latn":
         return reference.equals("hr-Latn");
+        // Bosnian and Croatian
+      case "bs-Cyrl":
+        return reference.equals("hr-Latn");
         // Croatian and Bosnian
       case "hr-Latn":
-        return reference.equals("bs-Latn");
+        return reference.equals("bs-Latn") || reference.equals("bs-Cyrl");
         // German and Luxembourgish or Swiss German
       case "de-Latn":
         return reference.equals("lb-Latn") || reference.equals("gsw-Latn");
@@ -469,7 +480,7 @@ class ReferenceLocalesCalculatorBaseImplTest {
         // Norwegian
         rrl("no", SAME_OR_INTERCHANGEABLE),
         // Nynorsk
-        rrl("nn", LOW));
+        rrl("nn", SAME_OR_INTERCHANGEABLE));
   }
 
   private static List<RelatedReferenceLocale> serbian() {
