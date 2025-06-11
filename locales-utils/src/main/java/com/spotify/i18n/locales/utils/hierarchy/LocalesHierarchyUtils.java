@@ -144,8 +144,8 @@ public class LocalesHierarchyUtils {
   }
 
   /**
-   * Returns true if a given locale is the descendant (direct of subsequent) of the other one,
-   * according to the CLDR hierarchy
+   * Returns true if the locale under test is the descendant (direct of subsequent) of the given
+   * ancestor locale, according to the CLDR hierarchy
    *
    * @param underTest the locale under test
    * @param ancestorLocale the locale supposed to be one of the ancestors of underTest
@@ -173,6 +173,51 @@ public class LocalesHierarchyUtils {
       }
       currentOpt = getParentLocale(currentOpt.get());
     }
+  }
+
+  /**
+   * Returns true if the locale under test is the direct child of the given parent locale, according
+   * to the CLDR hierarchy
+   *
+   * @param underTest the locale under test
+   * @param parentLocale the locale supposed to be one of the ancestors of underTest
+   * @return true if underTest is a direct child of the parentLocale.
+   */
+  public static boolean isChildLocale(final ULocale underTest, final ULocale parentLocale) {
+    Preconditions.checkNotNull(underTest);
+    Preconditions.checkNotNull(parentLocale);
+
+    // Both locales are the same
+    if (isSameLocale(underTest, parentLocale)) {
+      return false;
+    }
+
+    Optional<ULocale> parentOpt = getParentLocale(underTest);
+    return parentOpt.isPresent() && isSameLocale(parentOpt.get(), parentLocale);
+  }
+
+  /**
+   * Returns true if the locale under test is a direct child of the ROOT locale, according to the
+   * CLDR hierarchy
+   *
+   * @param underTest the locale under test
+   * @return true if underTest is a direct child of the ROOT locale.
+   */
+  public static boolean isHighestAncestorLocale(final ULocale underTest) {
+    Preconditions.checkNotNull(underTest);
+    return isChildLocale(underTest, ULocale.ROOT);
+  }
+
+  /**
+   * Returns true for the given language code identifying a language that can be written using
+   * different scripts.
+   *
+   * @param languageCode the language code
+   * @return true if language can be written using different scripts.
+   */
+  public static boolean isLanguageWrittenInSeveralScripts(final String languageCode) {
+    Preconditions.checkNotNull(languageCode);
+    return LANGUAGE_CODES_WITH_MULTIPLE_SCRIPTS_IN_CLDR.contains(languageCode);
   }
 
   /**
@@ -206,7 +251,7 @@ public class LocalesHierarchyUtils {
       return Optional.empty();
     } else if (isRootLocale(locale.getFallback())) {
       return Optional.of(ULocale.ROOT);
-    } else if (scriptIsMajorLanguageDifferentiator(locale)) {
+    } else if (isLanguageWrittenInSeveralScripts(locale.getLanguage())) {
       // When we know the script is a major differentiator, we assess the parent locale based on it.
       return getParentLocaleBasedOnLocaleAndScript(locale);
     } else {
@@ -220,17 +265,6 @@ public class LocalesHierarchyUtils {
         return getParentLocaleBasedOnLocaleAndScript(locale);
       }
     }
-  }
-
-  /**
-   * Returns a flag indicating whether the given locale identifies a language for which the script
-   * can be a language differentiator.
-   *
-   * @param locale any locale
-   * @return boolean value
-   */
-  private static boolean scriptIsMajorLanguageDifferentiator(final ULocale locale) {
-    return LANGUAGE_CODES_WITH_MULTIPLE_SCRIPTS_IN_CLDR.contains(locale.getLanguage());
   }
 
   /**
