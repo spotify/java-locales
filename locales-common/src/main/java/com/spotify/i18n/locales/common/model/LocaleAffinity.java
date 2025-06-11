@@ -43,5 +43,5 @@ public enum LocaleAffinity {
    * Locales either identify the same language, or languages that are similar to a point where a
    * person should understand both if they understand one of them.
    */
-  SAME_OR_INTERCHANGEABLE
+  SAME_OR_MUTUALLY_INTELLIGIBLE
 }

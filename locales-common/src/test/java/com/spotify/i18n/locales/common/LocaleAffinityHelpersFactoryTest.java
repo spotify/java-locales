@@ -188,15 +188,15 @@ class LocaleAffinityHelpersFactoryTest {
       whenJoiningDatasetsUsingReferenceLocalesCalculator_joinsBasedOnExpectedRelatedReferenceLocale() {
     return Stream.of(
         // Chinese (Hong-Kong), Chinese (Traditional) -> Chinese (Taiwan)
-        Arguments.of("zh-HK", "zh-Hant", "zh-TW", LocaleAffinity.SAME_OR_INTERCHANGEABLE),
+        Arguments.of("zh-HK", "zh-Hant", "zh-TW", LocaleAffinity.SAME_OR_MUTUALLY_INTELLIGIBLE),
 
         // Chinese (Hong-Kong), Cantonese (Hong-Kong) -> Cantonese
         Arguments.of("zh-HK", "yue-HK", "yue", LocaleAffinity.HIGH),
 
         // Dutch (Belgium), Dutch (Netherlands) -> Dutch
-        Arguments.of("nl-BE", "nl-NL", "nl", LocaleAffinity.SAME_OR_INTERCHANGEABLE),
+        Arguments.of("nl-BE", "nl-NL", "nl", LocaleAffinity.SAME_OR_MUTUALLY_INTELLIGIBLE),
 
         // French (Switzerland), French (Canada) -> French
-        Arguments.of("fr-CH", "fr-CA", "fr-CA", LocaleAffinity.SAME_OR_INTERCHANGEABLE));
+        Arguments.of("fr-CH", "fr-CA", "fr-CA", LocaleAffinity.SAME_OR_MUTUALLY_INTELLIGIBLE));
   }
 }

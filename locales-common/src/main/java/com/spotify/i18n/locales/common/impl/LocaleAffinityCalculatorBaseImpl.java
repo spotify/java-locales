@@ -75,7 +75,7 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
   private static final double DISTANCE_THRESHOLD = 224.0;
 
   // Score to affinity thresholds
-  private static final int SCORE_THRESHOLD_SAME_OR_INTERCHANGEABLE = 65;
+  private static final int SCORE_THRESHOLD_SAME_OR_MUTUALLY_INTELLIGIBLE = 65;
   private static final int SCORE_THRESHOLD_HIGH = 30;
   private static final int SCORE_THRESHOLD_LOW = 0;
 
@@ -103,7 +103,7 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
       // We attempt to match based on corresponding spoken language first, and make use of the
       // score-based affinity calculation as fallback.
       if (hasSameSpokenLanguageAffinity(languageTag)) {
-        return LocaleAffinity.SAME_OR_INTERCHANGEABLE;
+        return LocaleAffinity.SAME_OR_MUTUALLY_INTELLIGIBLE;
       } else {
         return calculateScoreBasedAffinity(languageTag);
       }
@@ -155,8 +155,8 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
   }
 
   private LocaleAffinity convertScoreToLocaleAffinity(final int score) {
-    if (score > SCORE_THRESHOLD_SAME_OR_INTERCHANGEABLE) {
-      return LocaleAffinity.SAME_OR_INTERCHANGEABLE;
+    if (score > SCORE_THRESHOLD_SAME_OR_MUTUALLY_INTELLIGIBLE) {
+      return LocaleAffinity.SAME_OR_MUTUALLY_INTELLIGIBLE;
     } else if (score > SCORE_THRESHOLD_HIGH) {
       return LocaleAffinity.HIGH;
     } else if (score > SCORE_THRESHOLD_LOW) {

@@ -22,7 +22,7 @@ package com.spotify.i18n.locales.affinity.examples;
 
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.LOW;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.NONE;
-import static com.spotify.i18n.locales.common.model.LocaleAffinity.SAME_OR_INTERCHANGEABLE;
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.SAME_OR_MUTUALLY_INTELLIGIBLE;
 
 import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
@@ -120,18 +120,18 @@ public class AffinityCalculationExampleMain {
     map.put("en-US", NONE);
 
     // Spanish in Europe should ok
-    map.put("es-419", SAME_OR_INTERCHANGEABLE);
-    map.put("es-GB", SAME_OR_INTERCHANGEABLE);
-    map.put("es-US", SAME_OR_INTERCHANGEABLE);
+    map.put("es-419", SAME_OR_MUTUALLY_INTELLIGIBLE);
+    map.put("es-GB", SAME_OR_MUTUALLY_INTELLIGIBLE);
+    map.put("es-US", SAME_OR_MUTUALLY_INTELLIGIBLE);
 
     // Basque should be matched, since we support Spanish
     map.put("eu", LOW);
 
     // French
-    map.put("fr", SAME_OR_INTERCHANGEABLE);
-    map.put("fr-BE", SAME_OR_INTERCHANGEABLE);
-    map.put("fr-CA", SAME_OR_INTERCHANGEABLE);
-    map.put("fr-FR", SAME_OR_INTERCHANGEABLE);
+    map.put("fr", SAME_OR_MUTUALLY_INTELLIGIBLE);
+    map.put("fr-BE", SAME_OR_MUTUALLY_INTELLIGIBLE);
+    map.put("fr-CA", SAME_OR_MUTUALLY_INTELLIGIBLE);
+    map.put("fr-FR", SAME_OR_MUTUALLY_INTELLIGIBLE);
 
     // Galician should be matched, since we support Spanish
     map.put("gl", LOW);
@@ -140,23 +140,23 @@ public class AffinityCalculationExampleMain {
     map.put("hi", NONE);
 
     // Croatian should be nicely matched with Bosnian
-    map.put("hr-HR", SAME_OR_INTERCHANGEABLE);
+    map.put("hr-HR", SAME_OR_MUTUALLY_INTELLIGIBLE);
 
     // Serbian Cyrillic should be matched, although only Latin script is supported
-    map.put("sr", SAME_OR_INTERCHANGEABLE);
-    map.put("sr-Latn", SAME_OR_INTERCHANGEABLE);
-    map.put("sr-Cyrl-ME", SAME_OR_INTERCHANGEABLE);
+    map.put("sr", SAME_OR_MUTUALLY_INTELLIGIBLE);
+    map.put("sr-Latn", SAME_OR_MUTUALLY_INTELLIGIBLE);
+    map.put("sr-Cyrl-ME", SAME_OR_MUTUALLY_INTELLIGIBLE);
 
     // Portuguese
-    map.put("pt", SAME_OR_INTERCHANGEABLE);
-    map.put("pt-BR", SAME_OR_INTERCHANGEABLE);
-    map.put("pt-SE", SAME_OR_INTERCHANGEABLE);
-    map.put("pt-US", SAME_OR_INTERCHANGEABLE);
+    map.put("pt", SAME_OR_MUTUALLY_INTELLIGIBLE);
+    map.put("pt-BR", SAME_OR_MUTUALLY_INTELLIGIBLE);
+    map.put("pt-SE", SAME_OR_MUTUALLY_INTELLIGIBLE);
+    map.put("pt-US", SAME_OR_MUTUALLY_INTELLIGIBLE);
 
     // Only Traditional Chinese should be matched, not Simplified
     map.put("zh-CN", NONE);
-    map.put("zh-TW", SAME_OR_INTERCHANGEABLE);
-    map.put("zh-HK", SAME_OR_INTERCHANGEABLE);
+    map.put("zh-TW", SAME_OR_MUTUALLY_INTELLIGIBLE);
+    map.put("zh-HK", SAME_OR_MUTUALLY_INTELLIGIBLE);
     return map;
   }
 
@@ -164,17 +164,17 @@ public class AffinityCalculationExampleMain {
     final LocaleAffinityCalculator affinityCalculator = getLocaleAffinityCalculator();
 
     // Example 1: Filter the list of test language tags, and only retain the ones that result in a
-    // locale affinity at the level of SAME_OR_INTERCHANGEABLE, therefore guaranteeing that the
-    // associated
+    // locale affinity at the level of SAME_OR_MUTUALLY_INTELLIGIBLE
     System.out.println("========================================");
     System.out.println(
         String.format(
             "Example 1: List of language tags with calculated affinity = %s",
-            SAME_OR_INTERCHANGEABLE.name()));
+            SAME_OR_MUTUALLY_INTELLIGIBLE.name()));
     getLanguageTagToExpectedAffinityMap().keySet().stream()
         .filter(
             languageTag ->
-                affinityCalculator.calculate(languageTag).affinity() == SAME_OR_INTERCHANGEABLE)
+                affinityCalculator.calculate(languageTag).affinity()
+                    == SAME_OR_MUTUALLY_INTELLIGIBLE)
         .forEach(System.out::println);
 
     // Example 2: Check that calculated affinity for each language tag matches the expected value.
