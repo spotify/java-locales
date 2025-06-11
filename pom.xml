@@ -10,7 +10,7 @@
 
   <groupId>com.spotify.i18n</groupId>
   <artifactId>locales-oss-parent</artifactId>
-  <version>4.2.2-SNAPSHOT</version>
+  <version>5.0.0</version>
   <packaging>pom</packaging>
 
   <modules>
@@ -70,7 +70,7 @@
   <scm>
     <connection>scm:git:https@github.com:spotify/java-locales.git</connection>
     <developerConnection>scm:git:git@github.com:spotify/java-locales.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>v5.0.0</tag>
     <url>http://github.com/spotify/java-locales</url>
   </scm>
 
