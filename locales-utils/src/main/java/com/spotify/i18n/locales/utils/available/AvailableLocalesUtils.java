@@ -36,6 +36,23 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * A Utility class that supplies specific common sets of locales, namely:
+ *
+ * <ul>
+ *   <li>{@link #getCldrLocales()}: All available CLDR {@link ULocale}, without the ROOT and
+ *       en-US-POSIX.
+ *   <li>{@link #getWrittenLanguageLocales()}: All unambiguous written language locales available in
+ *       CLDR.
+ *   <li>{@link #getSpokenLanguageLocales()}: All unambiguous spoken language locales available in
+ *       CLDR.
+ *   <li>{@link #getReferenceLocales()}: All reference locales, which is a reduced set of the one
+ *       returned by {@link #getCldrLocales()}, where alias entries were removed. It only contains
+ *       minimized locales.
+ * </ul>
+ *
+ * @author Eric Fjøsne
+ */
 public class AvailableLocalesUtils {
 
   // Outlier locale we don't want to encounter
