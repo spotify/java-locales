@@ -45,6 +45,9 @@ public class LanguageUtils {
           .setNoDefaultLocale()
           .build();
 
+  // Locale for Croatian (necessary to go around a bug in icu4j)
+  public static final ULocale CROATIAN = ULocale.forLanguageTag("hr");
+
   /**
    * Returns the optional {@link ULocale} identifying the written language associated with the given
    * language tag. The returned locale will consist of a language code at the minimum, but will
@@ -55,7 +58,22 @@ public class LanguageUtils {
    * @return the optional locale identifying the written language
    */
   public static Optional<ULocale> getWrittenLanguageLocale(final String languageTag) {
-    return LanguageTagUtils.parse(languageTag).map(WRITTEN_LANGUAGE_LOCALE_MATCHER::getBestMatch);
+    return LanguageTagUtils.parse(languageTag)
+        .map(LanguageUtils::getWrittenLanguageLocaleForLocale);
+  }
+
+  private static ULocale getWrittenLanguageLocaleForLocale(final ULocale locale) {
+    // Croatian is Bosnia is matched with Bosnian (Latin script). This is likely a bug in icu4j. We
+    // created a workaround to ensure that we return Croatian when encountering this locale.
+    if (isCroatianBosnia(locale)) {
+      return CROATIAN;
+    } else {
+      return WRITTEN_LANGUAGE_LOCALE_MATCHER.getBestMatch(locale);
+    }
+  }
+
+  private static boolean isCroatianBosnia(ULocale locale) {
+    return locale.getLanguage().equals("hr") && locale.getCountry().equals("BA");
   }
 
   /**
@@ -69,8 +87,7 @@ public class LanguageUtils {
    * @return the optional locale identifying the written language
    */
   public static Optional<ULocale> getSpokenLanguageLocale(final String languageTag) {
-    return LanguageTagUtils.parse(languageTag)
-        .map(WRITTEN_LANGUAGE_LOCALE_MATCHER::getBestMatch)
+    return getWrittenLanguageLocale(languageTag)
         .map(LanguageUtils::getCorrespondingSpokenLanguageLocale);
   }
 

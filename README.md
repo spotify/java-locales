@@ -73,8 +73,9 @@ We define the affinity between two locales using a `LocaleAffinity` enum value:
 - `LOW`: Locales are somewhat related, meaning they either have low similarities from a linguistic
   perspective or co-exist in given geopolitical or cultural contexts.
 - `HIGH`: Locales are quite related, meaning they have similarities from a linguistic perspective.
-- `SAME_OR_MUTUALLY_INTELLIGIBLE`: Locales either identify the same language, or languages that are
-  similar to a point where a person should understand both if they understand one of them.
+- `MUTUALLY_INTELLIGIBLE`: Locales identify languages that are similar to a point where a person
+  should understand both if they understand one of them.
+- `SAME`: Locales identify the same language
 
 We offer two separate logics, each dedicated to separate use-cases:
 
