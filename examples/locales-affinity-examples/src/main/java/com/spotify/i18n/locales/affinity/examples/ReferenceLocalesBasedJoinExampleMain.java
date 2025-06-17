@@ -45,17 +45,15 @@ public class ReferenceLocalesBasedJoinExampleMain {
    * <p>Possible joins in the execution output are:
    *
    * <ul>
-   *   <li>(de, de-AT) on reference locale [de-AT] with SAME_OR_MUTUALLY_INTELLIGIBLE affinity
-   *   <li>(en-GB, en-JP) on reference locale [en-GB] with SAME_OR_MUTUALLY_INTELLIGIBLE affinity
-   *   <li>(en-GB, en-SE) on reference locale [en-SE] with SAME_OR_MUTUALLY_INTELLIGIBLE affinity
+   *   <li>(de, de-AT) on reference locale [de-AT] with SAME affinity
+   *   <li>(en-GB, en-JP) on reference locale [en-GB] with SAME affinity
+   *   <li>(en-GB, en-SE) on reference locale [en-SE] with SAME affinity
    *   <li>(es-BE, ca) on reference locale [ca] with LOW affinity
-   *   <li>(fr-SE, fr-BE-u-ca-gregorian) on reference locale [fr-BE] with
-   *       SAME_OR_MUTUALLY_INTELLIGIBLE affinity
-   *   <li>(fr-SE, fr-CA) on reference locale [fr-CA] with SAME_OR_MUTUALLY_INTELLIGIBLE affinity
-   *   <li>(ja-IT, ja@calendar=buddhist) on reference locale [ja] with SAME_OR_MUTUALLY_INTELLIGIBLE
-   *       affinity
-   *   <li>(nl-BE, nl-ZA) on reference locale [nl] with SAME_OR_MUTUALLY_INTELLIGIBLE affinity
-   *   <li>(zh-Hans-US, zh-CN) on reference locale [zh] with SAME_OR_MUTUALLY_INTELLIGIBLE affinity
+   *   <li>(fr-SE, fr-BE-u-ca-gregorian) on reference locale [fr-BE] with SAME affinity
+   *   <li>(fr-SE, fr-CA) on reference locale [fr-CA] with SAME affinity
+   *   <li>(ja-IT, ja@calendar=buddhist) on reference locale [ja] with SAME affinity
+   *   <li>(nl-BE, nl-ZA) on reference locale [nl] with SAME affinity
+   *   <li>(zh-Hans-US, zh-CN) on reference locale [zh] with SAME affinity
    * </ul>
    *
    * @param args

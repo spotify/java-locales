@@ -142,4 +142,65 @@ class LanguageUtilsTest {
             .filter(locale -> !fallbackIsNotSpokenLanguage.contains(locale.toLanguageTag()))
             .count());
   }
+
+  @Test
+  public void validateBosnianCroatian() {
+    ULocale bosnian = ULocale.forLanguageTag("bs");
+    ULocale bosnianLatin = ULocale.forLanguageTag("bs-Latn");
+    ULocale bosnianCyrillic = ULocale.forLanguageTag("bs-Cyrl");
+    ULocale croatian = ULocale.forLanguageTag("hr");
+
+    // Bosnian written
+    Set.of("bs", "bs-Latn", "bs-Latn-BA")
+        .forEach(
+            languageTag ->
+                assertEquals(
+                    bosnianLatin,
+                    LanguageUtils.getWrittenLanguageLocale(languageTag).get(),
+                    String.format(
+                        "Spoken language for language tag %s should be %s",
+                        languageTag, bosnianLatin.toLanguageTag())));
+    Set.of("bs-Cyrl", "bs-Cyrl-BA")
+        .forEach(
+            languageTag ->
+                assertEquals(
+                    bosnianCyrillic,
+                    LanguageUtils.getWrittenLanguageLocale(languageTag).get(),
+                    String.format(
+                        "Spoken language for language tag %s should be %s",
+                        languageTag, bosnianCyrillic.toLanguageTag())));
+
+    // Bosnian spoken
+    Set.of("bs", "bs-Cyrl", "bs-Cyrl-BA", "bs-Latn", "bs-Latn-BA")
+        .forEach(
+            languageTag ->
+                assertEquals(
+                    bosnian,
+                    LanguageUtils.getSpokenLanguageLocale(languageTag).get(),
+                    String.format(
+                        "Spoken language for language tag %s should be %s",
+                        languageTag, bosnian.toLanguageTag())));
+
+    // Croatian written
+    Set.of("hr", "hr-BA", "hr-HR")
+        .forEach(
+            languageTag ->
+                assertEquals(
+                    croatian,
+                    LanguageUtils.getWrittenLanguageLocale(languageTag).get(),
+                    String.format(
+                        "Written language for language tag %s should be %s",
+                        languageTag, croatian.toLanguageTag())));
+
+    // Croatian spoken
+    Set.of("hr", "hr-BA", "hr-HR")
+        .forEach(
+            languageTag ->
+                assertEquals(
+                    croatian,
+                    LanguageUtils.getSpokenLanguageLocale(languageTag).get(),
+                    String.format(
+                        "Spoken language for language tag %s should be %s",
+                        languageTag, croatian.toLanguageTag())));
+  }
 }

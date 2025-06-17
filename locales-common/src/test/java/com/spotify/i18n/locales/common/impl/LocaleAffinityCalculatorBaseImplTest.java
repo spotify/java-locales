@@ -21,8 +21,9 @@
 package com.spotify.i18n.locales.common.impl;
 
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.LOW;
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.MUTUALLY_INTELLIGIBLE;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.NONE;
-import static com.spotify.i18n.locales.common.model.LocaleAffinity.SAME_OR_MUTUALLY_INTELLIGIBLE;
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.SAME;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
@@ -112,18 +113,18 @@ class LocaleAffinityCalculatorBaseImplTest {
         Arguments.of("en-US", NONE),
 
         // Spanish in Europe should be ranked higher
-        Arguments.of("es-419", SAME_OR_MUTUALLY_INTELLIGIBLE),
-        Arguments.of("es-GB", SAME_OR_MUTUALLY_INTELLIGIBLE),
-        Arguments.of("es-US", SAME_OR_MUTUALLY_INTELLIGIBLE),
+        Arguments.of("es-419", SAME),
+        Arguments.of("es-GB", SAME),
+        Arguments.of("es-US", SAME),
 
         // Basque should be matched, since we support Spanish
         Arguments.of("eu", LOW),
 
         // French
-        Arguments.of("fr", SAME_OR_MUTUALLY_INTELLIGIBLE),
-        Arguments.of("fr-BE", SAME_OR_MUTUALLY_INTELLIGIBLE),
-        Arguments.of("fr-CA", SAME_OR_MUTUALLY_INTELLIGIBLE),
-        Arguments.of("fr-FR", SAME_OR_MUTUALLY_INTELLIGIBLE),
+        Arguments.of("fr", SAME),
+        Arguments.of("fr-BE", SAME),
+        Arguments.of("fr-CA", SAME),
+        Arguments.of("fr-FR", SAME),
 
         // Galician should be matched, since we support Spanish
         Arguments.of("gl", LOW),
@@ -132,23 +133,23 @@ class LocaleAffinityCalculatorBaseImplTest {
         Arguments.of("hi", NONE),
 
         // Croatian should be nicely matched with Bosnian
-        Arguments.of("hr-HR", SAME_OR_MUTUALLY_INTELLIGIBLE),
+        Arguments.of("hr-HR", MUTUALLY_INTELLIGIBLE),
 
         // Serbian Cyrillic should be matched, although only Latin script is supported
-        Arguments.of("sr", SAME_OR_MUTUALLY_INTELLIGIBLE),
-        Arguments.of("sr-Latn", SAME_OR_MUTUALLY_INTELLIGIBLE),
-        Arguments.of("sr-Cyrl-ME", SAME_OR_MUTUALLY_INTELLIGIBLE),
+        Arguments.of("sr", SAME),
+        Arguments.of("sr-Latn", SAME),
+        Arguments.of("sr-Cyrl-ME", SAME),
 
         // Portuguese
-        Arguments.of("pt", SAME_OR_MUTUALLY_INTELLIGIBLE),
-        Arguments.of("pt-BR", SAME_OR_MUTUALLY_INTELLIGIBLE),
-        Arguments.of("pt-SE", SAME_OR_MUTUALLY_INTELLIGIBLE),
-        Arguments.of("pt-US", SAME_OR_MUTUALLY_INTELLIGIBLE),
+        Arguments.of("pt", SAME),
+        Arguments.of("pt-BR", SAME),
+        Arguments.of("pt-SE", SAME),
+        Arguments.of("pt-US", SAME),
 
         // Only Traditional Chinese should be matched, not Simplified
         Arguments.of("zh-CN", NONE),
-        Arguments.of("zh-TW", SAME_OR_MUTUALLY_INTELLIGIBLE),
-        Arguments.of("zh-HK", SAME_OR_MUTUALLY_INTELLIGIBLE));
+        Arguments.of("zh-TW", SAME),
+        Arguments.of("zh-HK", SAME));
   }
 
   @Test
