@@ -94,11 +94,9 @@ public class AffinityBasedJoinExampleMain {
             "zh-CN" // Chinese (Mainland China)
             );
 
-    // Iterate through all possible combinations
+    // Iterate through all possible combinations, and calculate the affinity for each of them.
     for (String languageTagInOriginDataset : languageTagsInOriginDataset) {
       for (String languageTagInTargetDataset : languageTagsInTargetDataset) {
-        // Retrieve the optional related reference locale based on which a join operation can be
-        // performed, and display the outcome in the execution output.
         LocaleAffinityResult affinityResult =
             LOCALE_AFFINITY_BI_CALCULATOR.calculate(
                 languageTagInOriginDataset, languageTagInTargetDataset);
