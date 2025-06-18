@@ -63,8 +63,9 @@ public class LanguageUtils {
   }
 
   private static ULocale getWrittenLanguageLocaleForLocale(final ULocale locale) {
-    // Croatian is Bosnia is matched with Bosnian (Latin script). This is likely a bug in icu4j. We
-    // created a workaround to ensure that we return Croatian when encountering this locale.
+    // The written language locale matcher matches Croatian in Bosnia with Bosnian (Latin script).
+    // This is likely a bug in icu4j. We created a workaround to ensure that we return Croatian when
+    // encountering this locale.
     if (isCroatianBosnia(locale)) {
       return CROATIAN;
     } else {

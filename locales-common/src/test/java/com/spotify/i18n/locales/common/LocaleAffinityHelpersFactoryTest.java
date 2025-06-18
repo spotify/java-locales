@@ -157,6 +157,13 @@ class LocaleAffinityHelpersFactoryTest {
             instanceof ReferenceLocalesCalculator);
   }
 
+  @Test
+  void whenBuildingAffinityBiCalculator_returnsExpectedCalculator() {
+    assertTrue(
+        LocaleAffinityHelpersFactory.getDefaultInstance().buildAffinityBiCalculator()
+            instanceof LocaleAffinityBiCalculator);
+  }
+
   @ParameterizedTest
   @MethodSource
   void

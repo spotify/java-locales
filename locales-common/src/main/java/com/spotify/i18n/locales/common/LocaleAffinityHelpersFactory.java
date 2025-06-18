@@ -110,6 +110,10 @@ public class LocaleAffinityHelpersFactory {
             .collect(Collectors.toSet()));
   }
 
+  public LocaleAffinityBiCalculator buildAffinityBiCalculator() {
+    return ReferenceLocalesCalculatorBaseImpl.builder().buildLocaleAffinityBiCalculator();
+  }
+
   /**
    * Returns a pre-configured, ready-to-use instance of {@link ReferenceLocalesCalculator}.
    *
@@ -117,6 +121,6 @@ public class LocaleAffinityHelpersFactory {
    * @see ReferenceLocalesCalculator
    */
   public ReferenceLocalesCalculator buildRelatedReferenceLocalesCalculator() {
-    return ReferenceLocalesCalculatorBaseImpl.builder().build();
+    return ReferenceLocalesCalculatorBaseImpl.builder().buildReferenceLocalesCalculator();
   }
 }

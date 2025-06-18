@@ -31,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.ibm.icu.util.ULocale;
 import com.ibm.icu.util.ULocale.Builder;
+import com.spotify.i18n.locales.common.LocaleAffinityBiCalculator;
 import com.spotify.i18n.locales.common.ReferenceLocalesCalculator;
 import com.spotify.i18n.locales.common.model.LocaleAffinity;
 import com.spotify.i18n.locales.common.model.RelatedReferenceLocale;
@@ -39,6 +40,7 @@ import com.spotify.i18n.locales.utils.language.LanguageUtils;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -46,7 +48,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 class ReferenceLocalesCalculatorBaseImplTest {
 
   public static final ReferenceLocalesCalculator REFERENCE_LOCALES_CALCULATOR =
-      ReferenceLocalesCalculatorBaseImpl.builder().build();
+      ReferenceLocalesCalculatorBaseImpl.builder().buildReferenceLocalesCalculator();
+
+  public static final LocaleAffinityBiCalculator LOCALE_AFFINITY_BI_CALCULATOR =
+      ReferenceLocalesCalculatorBaseImpl.builder().buildLocaleAffinityBiCalculator();
 
   public static Stream<Arguments> validateLocaleAffinityScoreRanges() {
     return AvailableLocalesUtils.getCldrLocales().stream().map(Arguments::of);
@@ -129,34 +134,32 @@ class ReferenceLocalesCalculatorBaseImplTest {
     String reference = referenceLS.toLanguageTag();
 
     switch (input) {
-        // Bosnian and Croatian
+      // Bosnian and Croatian
       case "bs-Latn":
-        return reference.equals("hr-Latn");
-        // Bosnian and Croatian
       case "bs-Cyrl":
         return reference.equals("hr-Latn");
-        // Croatian and Bosnian
+      // Croatian and Bosnian
       case "hr-Latn":
         return reference.equals("bs-Latn") || reference.equals("bs-Cyrl");
-        // German and Luxembourgish or Swiss German
+      // German and Luxembourgish or Swiss German
       case "de-Latn":
         return reference.equals("lb-Latn") || reference.equals("gsw-Latn");
-        // Luxembourgish and German
+      // Luxembourgish and German
       case "lb-Latn":
         return reference.equals("de-Latn");
-        // Swiss German and German
+      // Swiss German and German
       case "gsw-Latn":
         return reference.equals("de-Latn");
-        // Bokmål and Norwegian
+      // Bokmål and Norwegian
       case "nb-Latn":
         return reference.equals("no-Latn");
-        // Norwegian and Bokmål
+      // Norwegian and Bokmål
       case "no-Latn":
         return reference.equals("nb-Latn");
-        // Serbian (Latin script) and Serbian (Cyrillic script)
+      // Serbian (Latin script) and Serbian (Cyrillic script)
       case "sr-Latn":
         return reference.equals("sr-Cyrl");
-        // Serbian (Cyrillic script) and Serbian (Latin script)
+      // Serbian (Cyrillic script) and Serbian (Latin script)
       case "sr-Cyrl":
         return reference.equals("sr-Latn");
       default:
@@ -500,5 +503,21 @@ class ReferenceLocalesCalculatorBaseImplTest {
 
   private static List<RelatedReferenceLocale> swedish() {
     return List.of(rrl("sv", SAME), rrl("sv-AX", SAME), rrl("sv-FI", SAME));
+  }
+
+  @Test
+  public void calculateBiAffinity() {
+    assertEquals(
+        MUTUALLY_INTELLIGIBLE,
+        LOCALE_AFFINITY_BI_CALCULATOR.calculate("bs-Latn", "hr-BA").affinity());
+    assertEquals(
+        MUTUALLY_INTELLIGIBLE,
+        LOCALE_AFFINITY_BI_CALCULATOR.calculate("bs-Cyrl", "hr-BA").affinity());
+    assertEquals(
+        MUTUALLY_INTELLIGIBLE,
+        LOCALE_AFFINITY_BI_CALCULATOR.calculate("bs", "hr-BA").affinity());
+    assertEquals(
+        MUTUALLY_INTELLIGIBLE,
+        LOCALE_AFFINITY_BI_CALCULATOR.calculate("bs-Latn", "hr").affinity());
   }
 }

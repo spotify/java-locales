@@ -20,12 +20,16 @@
 
 package com.spotify.i18n.locales.common.impl;
 
+import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isSameLocale;
+
 import com.google.auto.value.AutoValue;
 import com.ibm.icu.util.LocaleMatcher;
 import com.ibm.icu.util.ULocale;
+import com.spotify.i18n.locales.common.LocaleAffinityBiCalculator;
 import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
 import com.spotify.i18n.locales.common.ReferenceLocalesCalculator;
 import com.spotify.i18n.locales.common.model.LocaleAffinity;
+import com.spotify.i18n.locales.common.model.LocaleAffinityResult;
 import com.spotify.i18n.locales.common.model.RelatedReferenceLocale;
 import com.spotify.i18n.locales.utils.available.AvailableLocalesUtils;
 import com.spotify.i18n.locales.utils.languagetag.LanguageTagUtils;
@@ -48,7 +52,8 @@ import java.util.stream.Collectors;
  * @author Eric Fjøsne
  */
 @AutoValue
-public abstract class ReferenceLocalesCalculatorBaseImpl implements ReferenceLocalesCalculator {
+public abstract class ReferenceLocalesCalculatorBaseImpl
+    implements ReferenceLocalesCalculator, LocaleAffinityBiCalculator {
 
   /** Prepared {@link LocaleMatcher}, ready to find the best matching reference locale */
   private static final LocaleMatcher REFERENCE_LOCALE_MATCHER =
@@ -105,6 +110,23 @@ public abstract class ReferenceLocalesCalculatorBaseImpl implements ReferenceLoc
     return LanguageTagUtils.parse(languageTag).map(REFERENCE_LOCALE_MATCHER::getBestMatch);
   }
 
+  @Override
+  public LocaleAffinityResult calculate(
+      @Nullable final String languageTag1, @Nullable final String languageTag2) {
+    return LocaleAffinityResult.builder()
+        .affinity(
+            calculateBestMatchingReferenceLocale(languageTag2)
+                .map(
+                    referenceLocale ->
+                        calculateRelatedReferenceLocales(languageTag1).stream()
+                            .filter(rrl -> isSameLocale(rrl.referenceLocale(), referenceLocale))
+                            .findFirst()
+                            .map(RelatedReferenceLocale::affinity)
+                            .orElse(LocaleAffinity.NONE))
+                .orElse(LocaleAffinity.NONE))
+        .build();
+  }
+
   /**
    * Returns a {@link Builder} instance that will allow you to manually create a {@link
    * ReferenceLocalesCalculatorBaseImpl} instance.
@@ -123,7 +145,12 @@ public abstract class ReferenceLocalesCalculatorBaseImpl implements ReferenceLoc
     abstract ReferenceLocalesCalculatorBaseImpl autoBuild();
 
     /** Builds a {@link ReferenceLocalesCalculator} out of this builder. */
-    public final ReferenceLocalesCalculator build() {
+    public final ReferenceLocalesCalculator buildReferenceLocalesCalculator() {
+      return autoBuild();
+    }
+
+    /** Builds a {@link LocaleAffinityBiCalculator} out of this builder. */
+    public final LocaleAffinityBiCalculator buildLocaleAffinityBiCalculator() {
       return autoBuild();
     }
   }
