@@ -39,8 +39,8 @@ import java.util.stream.Collectors;
  * <ul>
  *   <li>{@link LocaleAffinityCalculator}: A helper that calculates the locale affinity for a given
  *       language tag, against a configured set of locales.
- *   <li>{@link LocaleAffinityBiCalculator}: A helper that calculates the locale affinity for two
- *       given language tags.
+ *   <li>{@link LocaleAffinityBiCalculator}: A helper that calculates the locale affinity between
+ *       two given language tags.
  *   <li>{@link ReferenceLocalesCalculator}: A helper that enables reference locale-based
  *       operations.
  * </ul>
