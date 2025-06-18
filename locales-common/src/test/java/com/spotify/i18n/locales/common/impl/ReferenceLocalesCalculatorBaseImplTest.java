@@ -23,6 +23,7 @@ package com.spotify.i18n.locales.common.impl;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.HIGH;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.LOW;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.MUTUALLY_INTELLIGIBLE;
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.NONE;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.SAME;
 import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isSameLocale;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -37,6 +38,7 @@ import com.spotify.i18n.locales.common.model.LocaleAffinity;
 import com.spotify.i18n.locales.common.model.RelatedReferenceLocale;
 import com.spotify.i18n.locales.utils.available.AvailableLocalesUtils;
 import com.spotify.i18n.locales.utils.language.LanguageUtils;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -506,6 +508,37 @@ class ReferenceLocalesCalculatorBaseImplTest {
   }
 
   @Test
+  public void whenCalculatingForOutlierValues_returnsExpected() {
+    assertEquals(NONE, LOCALE_AFFINITY_BI_CALCULATOR.calculate(null, null).affinity());
+    assertEquals(NONE, LOCALE_AFFINITY_BI_CALCULATOR.calculate("", "").affinity());
+    assertEquals(NONE, LOCALE_AFFINITY_BI_CALCULATOR.calculate(null, "").affinity());
+    assertEquals(NONE, LOCALE_AFFINITY_BI_CALCULATOR.calculate("", null).affinity());
+    assertEquals(NONE, LOCALE_AFFINITY_BI_CALCULATOR.calculate("  ", "    ").affinity());
+  }
+
+  @Test
+  public void whenCalculatingBestMatchingReferenceLocaleForOutlierValues_returnsExpected() {
+    assertEquals(
+        Optional.empty(), REFERENCE_LOCALES_CALCULATOR.calculateBestMatchingReferenceLocale(null));
+    assertEquals(
+        Optional.empty(), REFERENCE_LOCALES_CALCULATOR.calculateBestMatchingReferenceLocale(""));
+    assertEquals(
+        Optional.empty(), REFERENCE_LOCALES_CALCULATOR.calculateBestMatchingReferenceLocale("   "));
+  }
+
+  @Test
+  public void whenCalculatingRelatedReferenceLocalesForOutlierValues_returnsExpected() {
+    assertEquals(
+        Collections.emptyList(),
+        REFERENCE_LOCALES_CALCULATOR.calculateRelatedReferenceLocales(null));
+    assertEquals(
+        Collections.emptyList(), REFERENCE_LOCALES_CALCULATOR.calculateRelatedReferenceLocales(""));
+    assertEquals(
+        Collections.emptyList(),
+        REFERENCE_LOCALES_CALCULATOR.calculateRelatedReferenceLocales("   "));
+  }
+
+  @Test
   public void calculateBiAffinity() {
     assertEquals(
         MUTUALLY_INTELLIGIBLE,
@@ -514,10 +547,8 @@ class ReferenceLocalesCalculatorBaseImplTest {
         MUTUALLY_INTELLIGIBLE,
         LOCALE_AFFINITY_BI_CALCULATOR.calculate("bs-Cyrl", "hr-BA").affinity());
     assertEquals(
-        MUTUALLY_INTELLIGIBLE,
-        LOCALE_AFFINITY_BI_CALCULATOR.calculate("bs", "hr-BA").affinity());
+        MUTUALLY_INTELLIGIBLE, LOCALE_AFFINITY_BI_CALCULATOR.calculate("bs", "hr-BA").affinity());
     assertEquals(
-        MUTUALLY_INTELLIGIBLE,
-        LOCALE_AFFINITY_BI_CALCULATOR.calculate("bs-Latn", "hr").affinity());
+        MUTUALLY_INTELLIGIBLE, LOCALE_AFFINITY_BI_CALCULATOR.calculate("bs-Latn", "hr").affinity());
   }
 }
