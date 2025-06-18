@@ -136,32 +136,32 @@ class ReferenceLocalesCalculatorBaseImplTest {
     String reference = referenceLS.toLanguageTag();
 
     switch (input) {
-      // Bosnian and Croatian
+        // Bosnian and Croatian
       case "bs-Latn":
       case "bs-Cyrl":
         return reference.equals("hr-Latn");
-      // Croatian and Bosnian
+        // Croatian and Bosnian
       case "hr-Latn":
         return reference.equals("bs-Latn") || reference.equals("bs-Cyrl");
-      // German and Luxembourgish or Swiss German
+        // German and Luxembourgish or Swiss German
       case "de-Latn":
         return reference.equals("lb-Latn") || reference.equals("gsw-Latn");
-      // Luxembourgish and German
+        // Luxembourgish and German
       case "lb-Latn":
         return reference.equals("de-Latn");
-      // Swiss German and German
+        // Swiss German and German
       case "gsw-Latn":
         return reference.equals("de-Latn");
-      // Bokmål and Norwegian
+        // Bokmål and Norwegian
       case "nb-Latn":
         return reference.equals("no-Latn");
-      // Norwegian and Bokmål
+        // Norwegian and Bokmål
       case "no-Latn":
         return reference.equals("nb-Latn");
-      // Serbian (Latin script) and Serbian (Cyrillic script)
+        // Serbian (Latin script) and Serbian (Cyrillic script)
       case "sr-Latn":
         return reference.equals("sr-Cyrl");
-      // Serbian (Cyrillic script) and Serbian (Latin script)
+        // Serbian (Cyrillic script) and Serbian (Latin script)
       case "sr-Cyrl":
         return reference.equals("sr-Latn");
       default:
