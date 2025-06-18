@@ -43,6 +43,7 @@ public class AffinityBasedJoinExampleMain {
    *
    * <ul>
    *   <li>(bs-Cyrl-BA, bs-Latn) -> Join possible with SAME affinity.
+   *   <li>(bs-Cyrl-BA, hr-MK) -> Join possible with MUTUALLY_INTELLIGIBLE affinity.
    *   <li>(de, de-AT) -> Join possible with SAME affinity.
    *   <li>(da-SE, nb-FI) -> Join possible with HIGH affinity.
    *   <li>(en-GB, en-JP) -> Join possible with SAME affinity.
@@ -51,6 +52,7 @@ public class AffinityBasedJoinExampleMain {
    *   <li>(fr-SE, fr-BE-u-ca-gregorian) -> Join possible with SAME affinity.
    *   <li>(fr-SE, fr-CA) -> Join possible with SAME affinity.
    *   <li>(hr-BA, bs-Latn) -> Join possible with MUTUALLY_INTELLIGIBLE affinity.
+   *   <li>(hr-BA, hr-MK) -> Join possible with SAME affinity.
    *   <li>(ja-IT, ja@calendar=buddhist) -> Join possible with SAME affinity.
    *   <li>(nl-BE, nl-ZA) -> Join possible with SAME affinity.
    *   <li>(zh-Hans-US, zh-CN) -> Join possible with SAME affinity.
@@ -74,6 +76,7 @@ public class AffinityBasedJoinExampleMain {
             "zh-Hans-US", // Chinese (Simplified) (USA)
             "zh-HK" // Chinese (Hong-Kong)
             );
+
     final List<String> languageTagsInTargetDataset =
         List.of(
             "bs-Latn", // Bosnian (Latin)
@@ -83,6 +86,7 @@ public class AffinityBasedJoinExampleMain {
             "en-SE", // English (Sweden)
             "fr-BE-u-ca-gregorian", // French (Belgium), with gregorian calendar extension
             "fr-CA", // French (Canada)
+            "hr-MK", // Croatian (North Macedonia)
             "ja@calendar=buddhist", // Japanese, with buddhist calendar extension
             "nb-FI", // Norwegian Bokmål (Finland)
             "nl-ZA", // Dutch (South Africa)

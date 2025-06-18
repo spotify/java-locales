@@ -24,7 +24,7 @@ import com.spotify.i18n.locales.common.model.LocaleAffinityResult;
 import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
- * Represents an engine that calculates a locale affinity for two given language tags. All
+ * Represents an engine that calculates the locale affinity for two given language tags. All
  * implementations of this interface must return a non-null {@link LocaleAffinityResult}, even when
  * the given language tags are null or empty.
  *
