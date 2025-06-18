@@ -102,12 +102,10 @@ public class AffinityBasedJoinExampleMain {
                 languageTagInOriginDataset, languageTagInTargetDataset);
         switch (affinityResult.affinity()) {
           case NONE:
-            if (false) {
-              System.out.println(
-                  String.format(
-                      "(%s, %s) -> No join possible.",
-                      languageTagInOriginDataset, languageTagInTargetDataset));
-            }
+            System.out.println(
+                String.format(
+                    "(%s, %s) -> No join possible.",
+                    languageTagInOriginDataset, languageTagInTargetDataset));
             break;
           default:
             System.out.println(
