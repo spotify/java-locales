@@ -62,7 +62,7 @@ localization quality assurance testers only.
 You can see all these concepts in action
 in [our HTTP server example implementation](./examples/locales-http-examples).
 
-#### Calculate the affinity between two locales
+##### Calculate the affinity between locales
 
 This feature enables you to easily and programmatically reason around affinity between locales,
 without having to know anything about how they relate to each other.
@@ -77,18 +77,31 @@ We define the affinity between two locales using a `LocaleAffinity` enum value:
   should understand both if they understand one of them.
 - `SAME`: Locales identify the same language
 
-We offer two separate logics, each dedicated to separate use-cases:
+We offer separate affinity logics, each dedicated to separate use-cases:
 
-- **Locale affinity calculation**: To be used when we need visibility on the affinity of a given
-  locale against a set of locales.
-- **Reference locales calculation:** To be used when we need to join two datasets based on language
-  identifiers. It is indeed impossible to perform such a join operation out of the box, as language
-  identifiers can immensely differ even when they are syntactically valid and identify the very same
-  language. For Example: `zh-Hant`, `zh-HK`, `zh-MO`, `zh-Hant-TW`, `zh-Hant-FR`, `zh-US` all
-  identify Traditional Chinese, but `zh` and `zh-CN` identify Simplified Chinese.
+##### Calculate the affinity of a given locale against a set of locales
 
-You can see all these concepts in action
-in [our locales affinity example implementations](./examples/locales-affinity-examples).
+This should be used when we need visibility on the affinity of a given locale, against a set of
+pre-configured locales. This can, for instance, be used to verify whether some content language is a
+good match for a given user, based on the Accept-Language header value received in an incoming
+request.
+
+You can see this concept in action
+in [our example implementation](./examples/locales-affinity-examples/src/main/java/com/spotify/i18n/locales/affinity/examples/AffinityCalculationExampleMain.java).
+
+#### Calculate the affinity between 2 given locales
+
+This should be used when we need visibility on the affinity between two given locales. This can, for
+instance, be used to join two datasets based on language identifiers and how they related to each
+other in terms of affinity.
+
+It is indeed impossible to perform such a join operation out of the box, as language identifiers
+can immensely differ even when they are syntactically valid and identify the very same language. For
+example: `zh-Hant`, `zh-HK`, `zh-MO`, `zh-Hant-TW`, `zh-Hant-FR`, `zh-US` all
+identify Traditional Chinese, but `zh` and `zh-CN` identify Simplified Chinese.
+
+You can see this concept in action
+in [our example implementation](./examples/locales-affinity-examples/src/main/java/com/spotify/i18n/locales/affinity/examples/AffinityBasedJoinExampleMain.java).
 
 ### Utility helpers
 
