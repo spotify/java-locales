@@ -79,6 +79,10 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
   private static final int SCORE_THRESHOLD_HIGH = 30;
   private static final int SCORE_THRESHOLD_LOW = 0;
 
+  // Language codes for which we need some manual tweaks
+  private static final String LANGUAGE_CODE_CROATIAN = "hr";
+  private static final String LANGUAGE_CODE_BOSNIAN = "bs";
+
   /**
    * Returns the set of {@link ULocale} against which affinity is being calculated.
    *
@@ -167,6 +171,13 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
   }
 
   private int getDistanceBetweenInputAndSupported(final LSR maxParsed, final LSR maxSupported) {
+    // Croatian should be matched with Bosnian. This is the case for Bosnian written in Latin
+    // script, but not Cyrillic, because the ICU implementation enforces script matching. We
+    // created a workaround to ensure that we return a MUTUALLY_INTELLIGIBLE affinity when
+    // encountering this locale.
+    if (calculatingDistanceBetweenCroatianAndBosnian(maxParsed, maxSupported)) {
+      return 0;
+    }
     return LOCALE_DISTANCE_INSTANCE.getBestIndexAndDistance(
         maxParsed,
         new LSR[] {maxSupported},
@@ -174,6 +185,13 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
         LOCALE_DISTANCE_SHIFTED,
         LOCALE_DISTANCE_FAVOR_SUBTAG,
         LOCALE_DISTANCE_DIRECTION);
+  }
+
+  private boolean calculatingDistanceBetweenCroatianAndBosnian(final LSR lsr1, final LSR lsr2) {
+    return (lsr1.language.equals(LANGUAGE_CODE_CROATIAN)
+            && lsr2.language.equals(LANGUAGE_CODE_BOSNIAN))
+        || (lsr1.language.equals(LANGUAGE_CODE_BOSNIAN)
+            && lsr2.language.equals(LANGUAGE_CODE_CROATIAN));
   }
 
   private static LSR getMaximizedLanguageScriptRegion(final ULocale locale) {

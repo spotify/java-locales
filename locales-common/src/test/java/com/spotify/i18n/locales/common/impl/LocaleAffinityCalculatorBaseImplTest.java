@@ -49,7 +49,7 @@ class LocaleAffinityCalculatorBaseImplTest {
   public static final LocaleAffinityCalculator CALCULATOR_AGAINST_TEST_SET_OF_LOCALES =
       LocaleAffinityCalculatorBaseImpl.builder()
           .againstLocales(
-              Set.of("ar", "bs", "es", "fr", "ja", "pt", "sr-Latn", "zh-Hant").stream()
+              Set.of("ar", "bs-Cyrl", "es", "fr", "ja", "pt", "sr-Latn", "zh-Hant").stream()
                   .map(ULocale::forLanguageTag)
                   .collect(Collectors.toSet()))
           .build();
@@ -106,6 +106,14 @@ class LocaleAffinityCalculatorBaseImplTest {
         Arguments.of("ca", LOW),
         Arguments.of("ca-ES", LOW),
         Arguments.of("ca-AD", LOW),
+
+        // Bosnian should be matched for all scripts and regions, since we support Bosnian
+        Arguments.of("bs", SAME),
+        Arguments.of("bs-Latn", SAME),
+        Arguments.of("bs-Cyrl", SAME),
+        Arguments.of("bs-BA", SAME),
+        Arguments.of("bs-Latn-BA", SAME),
+        Arguments.of("bs-Cyrl-BA", SAME),
 
         // No english should be matched
         Arguments.of("en", NONE),
