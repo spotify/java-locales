@@ -62,7 +62,7 @@ localization quality assurance testers only.
 You can see all these concepts in action
 in [our HTTP server example implementation](./examples/locales-http-examples).
 
-##### Calculate the affinity between locales
+#### Calculate the affinity between locales
 
 This feature enables you to easily and programmatically reason around affinity between locales,
 without having to know anything about how they relate to each other.
@@ -89,7 +89,7 @@ request.
 You can see this concept in action
 in [our example implementation](./examples/locales-affinity-examples/src/main/java/com/spotify/i18n/locales/affinity/examples/AffinityCalculationExampleMain.java).
 
-#### Calculate the affinity between 2 given locales
+##### Calculate the affinity between 2 given locales
 
 This should be used when we need visibility on the affinity between two given locales. This can, for
 instance, be used to join two datasets based on language identifiers and how they related to each
