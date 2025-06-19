@@ -21,6 +21,7 @@
 package com.spotify.i18n.locales.affinity.examples;
 
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.LOW;
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.MUTUALLY_INTELLIGIBLE;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.NONE;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.SAME;
 
@@ -29,7 +30,7 @@ import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
 import com.spotify.i18n.locales.common.LocaleAffinityHelpersFactory;
 import com.spotify.i18n.locales.common.model.LocaleAffinity;
 import com.spotify.i18n.locales.common.model.LocaleAffinityResult;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -100,7 +101,7 @@ public class AffinityCalculationExampleMain {
    * which were all imported as static in this class.
    */
   private static Map<String, LocaleAffinity> getLanguageTagToExpectedAffinityMap() {
-    Map<String, LocaleAffinity> map = new HashMap<>();
+    Map<String, LocaleAffinity> map = new LinkedHashMap<>();
 
     // Edge cases
     map.put(" Invalid language tag ", NONE);
@@ -110,17 +111,25 @@ public class AffinityCalculationExampleMain {
     map.put(null, NONE);
 
     // Catalan should be matched, since we support Spanish
+    map.put("bs", SAME);
+    map.put("bs-Latn-MK", SAME);
+    map.put("bs-Cyrl", SAME);
+    map.put("bs-BA", SAME);
+
+    // Catalan should be matched, since we support Spanish
     map.put("ca", LOW);
-    map.put("ca-ES", LOW);
     map.put("ca-AD", LOW);
+    map.put("ca-ES", LOW);
 
     // No english should be matched
     map.put("en", NONE);
     map.put("en-GB", NONE);
+    map.put("en-SE", NONE);
     map.put("en-US", NONE);
 
-    // Spanish in Europe should ok
+    // Spanish in Europe or elsewhere should ok
     map.put("es-419", SAME);
+    map.put("es-BE", SAME);
     map.put("es-GB", SAME);
     map.put("es-US", SAME);
 
@@ -140,10 +149,11 @@ public class AffinityCalculationExampleMain {
     map.put("hi", NONE);
 
     // Croatian should be nicely matched with Bosnian
-    map.put("hr-HR", SAME);
+    map.put("hr-HR", MUTUALLY_INTELLIGIBLE);
+    map.put("hr-US", MUTUALLY_INTELLIGIBLE);
 
     // Serbian Cyrillic should be matched, although only Latin script is supported
-    map.put("sr", SAME);
+    map.put("sr-MK", SAME);
     map.put("sr-Latn", SAME);
     map.put("sr-Cyrl-ME", SAME);
 
@@ -155,8 +165,11 @@ public class AffinityCalculationExampleMain {
 
     // Only Traditional Chinese should be matched, not Simplified
     map.put("zh-CN", NONE);
+    map.put("zh-Hant-CN", SAME);
     map.put("zh-TW", SAME);
     map.put("zh-HK", SAME);
+    map.put("zh-US", SAME);
+
     return map;
   }
 
@@ -171,6 +184,7 @@ public class AffinityCalculationExampleMain {
             "Example 1: List of language tags with calculated affinity = %s", SAME.name()));
     getLanguageTagToExpectedAffinityMap().keySet().stream()
         .filter(languageTag -> affinityCalculator.calculate(languageTag).affinity() == SAME)
+        .sorted()
         .forEach(System.out::println);
 
     // Example 2: Check that calculated affinity for each language tag matches the expected value.
