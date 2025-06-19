@@ -45,6 +45,7 @@ public class AffinityBasedJoinExampleMain {
    *   <li>(bs-Cyrl-BA, bs-Latn) -> Join possible with SAME affinity.
    *   <li>(bs-Cyrl-BA, hr-MK) -> Join possible with MUTUALLY_INTELLIGIBLE affinity.
    *   <li>(de, de-AT) -> Join possible with SAME affinity.
+   *   <li>(de, gsw-CH) -> Join possible with MUTUALLY_INTELLIGIBLE affinity.
    *   <li>(da-SE, nb-FI) -> Join possible with HIGH affinity.
    *   <li>(en-GB, en-JP) -> Join possible with SAME affinity.
    *   <li>(en-GB, en-SE) -> Join possible with SAME affinity.
@@ -55,6 +56,8 @@ public class AffinityBasedJoinExampleMain {
    *   <li>(hr-BA, hr-MK) -> Join possible with SAME affinity.
    *   <li>(ja-IT, ja@calendar=buddhist) -> Join possible with SAME affinity.
    *   <li>(nl-BE, nl-ZA) -> Join possible with SAME affinity.
+   *   <li>(no-SE, nb-FI) -> Join possible with SAME affinity.
+   *   <li>(nn-DK, nb-FI) -> Join possible with SAME affinity.
    *   <li>(zh-Hans-US, zh-CN) -> Join possible with SAME affinity.
    * </ul>
    *
@@ -73,6 +76,8 @@ public class AffinityBasedJoinExampleMain {
             "it-CH", // Italian (Switzerland)
             "ja-IT", // Japanese (Italy)
             "nl-BE", // Dutch (Belgium)
+            "no-SE", // Norwegian (Sweden)
+            "nn-DK", // Norwegian Nynorsk (Danemark)
             "zh-Hans-US", // Chinese (Simplified) (USA)
             "zh-HK" // Chinese (Hong-Kong)
             );
@@ -86,6 +91,7 @@ public class AffinityBasedJoinExampleMain {
             "en-SE", // English (Sweden)
             "fr-BE-u-ca-gregorian", // French (Belgium), with gregorian calendar extension
             "fr-CA", // French (Canada)
+            "gsw-CH", // Swiss German (Switzerland)
             "hr-MK", // Croatian (North Macedonia)
             "ja@calendar=buddhist", // Japanese, with buddhist calendar extension
             "nb-FI", // Norwegian Bokmål (Finland)
@@ -102,10 +108,6 @@ public class AffinityBasedJoinExampleMain {
                 languageTagInOriginDataset, languageTagInTargetDataset);
         switch (affinityResult.affinity()) {
           case NONE:
-            System.out.println(
-                String.format(
-                    "(%s, %s) -> No join possible.",
-                    languageTagInOriginDataset, languageTagInTargetDataset));
             break;
           default:
             System.out.println(
