@@ -22,6 +22,7 @@ package com.spotify.i18n.locales.common;
 
 import com.google.common.base.Preconditions;
 import com.ibm.icu.util.ULocale;
+import com.spotify.i18n.locales.common.impl.LocaleAffinityBiCalculatorBaseImpl;
 import com.spotify.i18n.locales.common.impl.LocaleAffinityCalculatorBaseImpl;
 import com.spotify.i18n.locales.common.impl.ReferenceLocalesCalculatorBaseImpl;
 import com.spotify.i18n.locales.common.model.LocaleAffinity;
@@ -125,7 +126,7 @@ public class LocaleAffinityHelpersFactory {
    * @see LocaleAffinityBiCalculator
    */
   public LocaleAffinityBiCalculator buildAffinityBiCalculator() {
-    return ReferenceLocalesCalculatorBaseImpl.builder().buildLocaleAffinityBiCalculator();
+    return LocaleAffinityBiCalculatorBaseImpl.builder().build();
   }
 
   /**

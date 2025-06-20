@@ -28,6 +28,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.ibm.icu.impl.locale.LSR;
 import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
 import com.spotify.i18n.locales.common.model.LocaleAffinity;
@@ -60,7 +61,7 @@ class LocaleAffinityCalculatorBaseImplTest {
         assertThrows(
             IllegalStateException.class, () -> LocaleAffinityCalculatorBaseImpl.builder().build());
 
-    assertEquals(thrown.getMessage(), "Missing required properties: againstLocales");
+    assertEquals(thrown.getMessage(), "Property \"againstLocales\" has not been set");
   }
 
   @Test
@@ -76,6 +77,63 @@ class LocaleAffinityCalculatorBaseImplTest {
     assertEquals(
         thrown.getMessage(),
         "The locales against which affinity needs to be calculated cannot contain the root.");
+  }
+
+  @Test
+  void whenBuildingWithUnavailableLocale_buildSucceeds() {
+    LocaleAffinityCalculatorBaseImpl built =
+        (LocaleAffinityCalculatorBaseImpl)
+            LocaleAffinityCalculatorBaseImpl.builder()
+                .againstLocales(
+                    Set.of(ULocale.forLanguageTag("apples"), ULocale.forLanguageTag("English")))
+                .build();
+
+    assertTrue(built.againstLocales().isEmpty());
+    assertTrue(built.againstSpokenLocales().isEmpty());
+    assertTrue(built.againstMaximizedLSRs().isEmpty());
+  }
+
+  @Test
+  void whenBuildingForHappyPath_buildSucceedsAndStructuresArePrepared() {
+    final Set<ULocale> againstLocales =
+        Set.of(
+            ULocale.FRENCH,
+            ULocale.CANADA_FRENCH,
+            ULocale.ENGLISH,
+            ULocale.CHINESE,
+            ULocale.TRADITIONAL_CHINESE,
+            ULocale.GERMANY,
+            ULocale.forLanguageTag("de-AT"),
+            ULocale.forLanguageTag("de-CH"),
+            ULocale.JAPAN);
+
+    LocaleAffinityCalculatorBaseImpl built =
+        (LocaleAffinityCalculatorBaseImpl)
+            LocaleAffinityCalculatorBaseImpl.builder().againstLocales(againstLocales).build();
+
+    assertEquals(againstLocales, built.againstLocales());
+    assertEquals(
+        Set.of(
+            ULocale.forLanguageTag("de"),
+            ULocale.forLanguageTag("fr"),
+            ULocale.forLanguageTag("en"),
+            ULocale.forLanguageTag("ja"),
+            ULocale.forLanguageTag("zh-Hans"),
+            ULocale.forLanguageTag("zh-Hant")),
+        built.againstSpokenLocales());
+
+    assertEquals(
+        Set.of(
+            "de-Latn-AT",
+            "de-Latn-CH",
+            "de-Latn-DE",
+            "en-Latn-US",
+            "fr-Latn-CA",
+            "fr-Latn-FR",
+            "ja-Jpan-JP",
+            "zh-Hans-CN",
+            "zh-Hant-TW"),
+        built.againstMaximizedLSRs().stream().map(LSR::toString).collect(Collectors.toSet()));
   }
 
   @ParameterizedTest
