@@ -20,16 +20,16 @@
 
 package com.spotify.i18n.locales.common.impl;
 
+import static com.spotify.i18n.locales.common.impl.LocaleAffinityBiCalculatorBaseImpl.convertDistanceToAffinityScore;
+import static com.spotify.i18n.locales.common.impl.LocaleAffinityBiCalculatorBaseImpl.convertScoreToLocaleAffinity;
+import static com.spotify.i18n.locales.common.impl.LocaleAffinityBiCalculatorBaseImpl.getBestDistanceBetweenLSR;
+import static com.spotify.i18n.locales.common.impl.LocaleAffinityBiCalculatorBaseImpl.getMaximizedLanguageScriptRegion;
 import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isRootLocale;
 import static com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils.isSameLocale;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import com.ibm.icu.impl.locale.LSR;
-import com.ibm.icu.impl.locale.LikelySubtags;
-import com.ibm.icu.impl.locale.LocaleDistance;
-import com.ibm.icu.util.LocaleMatcher.Direction;
-import com.ibm.icu.util.LocaleMatcher.FavorSubtag;
 import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
 import com.spotify.i18n.locales.common.model.LocaleAffinity;
@@ -39,6 +39,7 @@ import com.spotify.i18n.locales.utils.languagetag.LanguageTagUtils;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Base implementation of {@link LocaleAffinityCalculator} that calculates the locale affinity for a
@@ -52,43 +53,27 @@ import java.util.Set;
 @AutoValue
 public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinityCalculator {
 
-  // LocaleDistance.INSTANCE is commented as VisibleForTesting, so not ideal ... but this is the
-  // only way to make use of this class, which provides the features we need here.
-  private static final LocaleDistance LOCALE_DISTANCE_INSTANCE = LocaleDistance.INSTANCE;
-
-  // LocaleDistance best distance method arguments, all assigned to their default as per icu
-  // implementation.
-  private static final int LOCALE_DISTANCE_SHIFTED =
-      LocaleDistance.shiftDistance(LOCALE_DISTANCE_INSTANCE.getDefaultScriptDistance());
-  private static final int LOCALE_DISTANCE_SUPPORTED_LSRS_LENGTH = 1;
-  private static final FavorSubtag LOCALE_DISTANCE_FAVOR_SUBTAG = FavorSubtag.LANGUAGE;
-  private static final Direction LOCALE_DISTANCE_DIRECTION = Direction.WITH_ONE_WAY;
-
-  // LikelySubtags.INSTANCE is commented as VisibleForTesting, so not ideal ... but this is the
-  // only way to make use of this class, which provides the features we need here.
-  private static final LikelySubtags LIKELY_SUBTAGS_INSTANCE = LikelySubtags.INSTANCE;
-
-  // LikelySubtags method arguments, all assigned to their default as per icu implementation.
-  private static final boolean LIKELY_SUBTAGS_RETURNS_INPUT_IF_UNMATCH = false;
-
-  // Distance threshold: Anything above this value will be scored 0.
-  private static final double DISTANCE_THRESHOLD = 224.0;
-
-  // Score to affinity thresholds
-  private static final int SCORE_THRESHOLD_MUTUALLY_INTELLIGIBLE = 65;
-  private static final int SCORE_THRESHOLD_HIGH = 30;
-  private static final int SCORE_THRESHOLD_LOW = 0;
-
-  // Language codes for which we need some manual tweaks
-  private static final String LANGUAGE_CODE_CROATIAN = "hr";
-  private static final String LANGUAGE_CODE_BOSNIAN = "bs";
-
   /**
    * Returns the set of {@link ULocale} against which affinity is being calculated.
    *
    * @return set of locales
    */
   public abstract Set<ULocale> againstLocales();
+
+  /**
+   * Returns the set of best matching spoken {@link ULocale} against which affinity is being
+   * calculated.
+   *
+   * @return set of locales
+   */
+  abstract Set<ULocale> againstSpokenLocales();
+
+  /**
+   * Returns the set of maximized {@link LSR} against which affinity is being calculated.
+   *
+   * @return set of locales
+   */
+  abstract Set<LSR> againstMaximizedLSRs();
 
   /**
    * Returns the calculated {@link LocaleAffinityResult} for the given language tag
@@ -118,10 +103,7 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
     return LanguageUtils.getSpokenLanguageLocale(languageTag)
         .map(
             spokenLanguageLocale ->
-                againstLocales().stream()
-                    .map(ULocale::toLanguageTag)
-                    .map(LanguageUtils::getSpokenLanguageLocale)
-                    .flatMap(Optional::stream)
+                againstSpokenLocales().stream()
                     .anyMatch(
                         againstSpokenLocale ->
                             isSameLocale(spokenLanguageLocale, againstSpokenLocale)))
@@ -136,67 +118,15 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
 
   private int getBestDistance(@Nullable final String languageTag) {
     return LanguageTagUtils.parse(languageTag)
-        .map(LocaleAffinityCalculatorBaseImpl::getMaximizedLanguageScriptRegion)
+        .filter(LocaleAffinityBiCalculatorBaseImpl::isAvailableLanguage)
+        .map(parsed -> getMaximizedLanguageScriptRegion(parsed))
         .map(
             maxParsed ->
-                againstLocales().stream()
-                    .map(LocaleAffinityCalculatorBaseImpl::getMaximizedLanguageScriptRegion)
-                    .map(
-                        maxSupported ->
-                            getDistanceBetweenInputAndSupported(maxParsed, maxSupported))
-                    .map(Math::abs)
+                againstMaximizedLSRs().stream()
+                    .map(maxAgainst -> getBestDistanceBetweenLSR(maxParsed, maxAgainst))
                     .min(Integer::compare)
                     .orElse(Integer.MAX_VALUE))
         .orElse(Integer.MAX_VALUE);
-  }
-
-  private int convertDistanceToAffinityScore(final int distance) {
-    if (distance > DISTANCE_THRESHOLD) {
-      return 0;
-    } else {
-      return (int) ((DISTANCE_THRESHOLD - distance) / DISTANCE_THRESHOLD * 100.0);
-    }
-  }
-
-  private LocaleAffinity convertScoreToLocaleAffinity(final int score) {
-    if (score > SCORE_THRESHOLD_MUTUALLY_INTELLIGIBLE) {
-      return LocaleAffinity.MUTUALLY_INTELLIGIBLE;
-    } else if (score > SCORE_THRESHOLD_HIGH) {
-      return LocaleAffinity.HIGH;
-    } else if (score > SCORE_THRESHOLD_LOW) {
-      return LocaleAffinity.LOW;
-    } else {
-      return LocaleAffinity.NONE;
-    }
-  }
-
-  private int getDistanceBetweenInputAndSupported(final LSR maxParsed, final LSR maxSupported) {
-    // Croatian should be matched with Bosnian. This is the case for Bosnian written in Latin
-    // script, but not Cyrillic, because the ICU implementation enforces script matching. We
-    // created a workaround to ensure that we return a MUTUALLY_INTELLIGIBLE affinity when
-    // encountering this locale.
-    if (calculatingDistanceBetweenCroatianAndBosnian(maxParsed, maxSupported)) {
-      return 0;
-    }
-    return LOCALE_DISTANCE_INSTANCE.getBestIndexAndDistance(
-        maxParsed,
-        new LSR[] {maxSupported},
-        LOCALE_DISTANCE_SUPPORTED_LSRS_LENGTH,
-        LOCALE_DISTANCE_SHIFTED,
-        LOCALE_DISTANCE_FAVOR_SUBTAG,
-        LOCALE_DISTANCE_DIRECTION);
-  }
-
-  private boolean calculatingDistanceBetweenCroatianAndBosnian(final LSR lsr1, final LSR lsr2) {
-    return (lsr1.language.equals(LANGUAGE_CODE_CROATIAN)
-            && lsr2.language.equals(LANGUAGE_CODE_BOSNIAN))
-        || (lsr1.language.equals(LANGUAGE_CODE_BOSNIAN)
-            && lsr2.language.equals(LANGUAGE_CODE_CROATIAN));
-  }
-
-  private static LSR getMaximizedLanguageScriptRegion(final ULocale locale) {
-    return LIKELY_SUBTAGS_INSTANCE.makeMaximizedLsrFrom(
-        locale, LIKELY_SUBTAGS_RETURNS_INPUT_IF_UNMATCH);
   }
 
   /**
@@ -222,17 +152,56 @@ public abstract class LocaleAffinityCalculatorBaseImpl implements LocaleAffinity
      */
     public abstract Builder againstLocales(final Set<ULocale> locales);
 
+    /**
+     * Configures the set of best matching spoken {@link ULocale} against which affinity will be
+     * calculated.
+     *
+     * @param locales spoken locales
+     * @return The {@link Builder} instance
+     */
+    abstract Builder againstSpokenLocales(final Set<ULocale> locales);
+
+    /**
+     * Configures the set of maximized {@link LSR} against which affinity will be calculated.
+     *
+     * @param maximizedLSR
+     * @return The {@link Builder} instance
+     */
+    abstract Builder againstMaximizedLSRs(final Set<LSR> maximizedLSR);
+
+    abstract Set<ULocale> againstLocales();
+
     abstract LocaleAffinityCalculatorBaseImpl autoBuild();
 
     /** Builds a {@link LocaleAffinityCalculator} out of this builder. */
     public final LocaleAffinityCalculator build() {
-      final LocaleAffinityCalculatorBaseImpl built = autoBuild();
-      for (ULocale locale : built.againstLocales()) {
+      for (ULocale locale : againstLocales()) {
         Preconditions.checkState(
             !isRootLocale(locale),
             "The locales against which affinity needs to be calculated cannot contain the root.");
       }
-      return built;
+
+      // Filter out locales with a language unavailable in CLDR
+      againstLocales(
+          againstLocales().stream()
+              .filter(LocaleAffinityBiCalculatorBaseImpl::isAvailableLanguage)
+              .collect(Collectors.toSet()));
+
+      // Prepare the best matching spoken locales set, for faster calculations
+      againstSpokenLocales(
+          againstLocales().stream()
+              .map(ULocale::toLanguageTag)
+              .map(LanguageUtils::getSpokenLanguageLocale)
+              .flatMap(Optional::stream)
+              .collect(Collectors.toSet()));
+
+      // Prepare the maximized LSR set, for faster calculations
+      againstMaximizedLSRs(
+          againstLocales().stream()
+              .map(LocaleAffinityBiCalculatorBaseImpl::getMaximizedLanguageScriptRegion)
+              .collect(Collectors.toSet()));
+
+      return autoBuild();
     }
   }
 }
