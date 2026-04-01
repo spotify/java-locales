@@ -10,7 +10,7 @@
 
   <groupId>com.spotify.i18n</groupId>
   <artifactId>locales-oss-parent</artifactId>
-  <version>6.2.1</version>
+  <version>6.2.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>locales-oss-parent</name>
