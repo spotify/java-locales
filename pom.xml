@@ -13,6 +13,8 @@
   <version>6.2.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <name>locales-oss-parent</name>
+
   <modules>
     <module>examples/locales-affinity-examples</module>
     <module>examples/locales-http-examples</module>

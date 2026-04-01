@@ -8,6 +8,7 @@
     <version>6.2.2-SNAPSHOT</version>
   </parent>
 
+  <name>locales-common</name>
   <artifactId>locales-common</artifactId>
 
   <dependencies>

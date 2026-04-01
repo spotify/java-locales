@@ -8,6 +8,7 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
+  <name>locales-http-examples</name>
   <artifactId>locales-http-examples</artifactId>
 
   <packaging>jar</packaging>
