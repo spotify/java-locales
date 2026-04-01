@@ -291,20 +291,22 @@ class ReferenceLocalesCalculatorBaseImplTest {
         rrl("en-DG", SAME),
         rrl("en-DK", SAME),
         rrl("en-DM", SAME),
+        rrl("en-EE", SAME),
         rrl("en-ER", SAME),
         rrl("en-ES", SAME),
         rrl("en-FI", SAME),
         rrl("en-FJ", SAME),
-        rrl("en-FR", SAME),
         rrl("en-FK", SAME),
         rrl("en-FM", SAME),
+        rrl("en-FR", SAME),
         rrl("en-GB", SAME),
-        rrl("en-GS", SAME),
         rrl("en-GD", SAME),
+        rrl("en-GE", SAME),
         rrl("en-GG", SAME),
         rrl("en-GH", SAME),
         rrl("en-GI", SAME),
         rrl("en-GM", SAME),
+        rrl("en-GS", SAME),
         rrl("en-GU", SAME),
         rrl("en-GY", SAME),
         rrl("en-HK", SAME),
@@ -318,6 +320,7 @@ class ReferenceLocalesCalculatorBaseImplTest {
         rrl("en-IT", SAME),
         rrl("en-JE", SAME),
         rrl("en-JM", SAME),
+        rrl("en-JP", SAME),
         rrl("en-KE", SAME),
         rrl("en-KI", SAME),
         rrl("en-KN", SAME),
@@ -325,6 +328,8 @@ class ReferenceLocalesCalculatorBaseImplTest {
         rrl("en-LC", SAME),
         rrl("en-LR", SAME),
         rrl("en-LS", SAME),
+        rrl("en-LT", SAME),
+        rrl("en-LV", SAME),
         rrl("en-MG", SAME),
         rrl("en-MH", SAME),
         rrl("en-MO", SAME),
@@ -371,6 +376,7 @@ class ReferenceLocalesCalculatorBaseImplTest {
         rrl("en-TT", SAME),
         rrl("en-TV", SAME),
         rrl("en-TZ", SAME),
+        rrl("en-UA", SAME),
         rrl("en-UG", SAME),
         rrl("en-UM", SAME),
         rrl("en-VC", SAME),
@@ -474,7 +480,15 @@ class ReferenceLocalesCalculatorBaseImplTest {
   }
 
   private static List<RelatedReferenceLocale> italian() {
-    return List.of(rrl("it", SAME), rrl("it-CH", SAME), rrl("it-SM", SAME), rrl("it-VA", SAME));
+    return List.of(
+        // Italian
+        rrl("it", SAME),
+        rrl("it-CH", SAME),
+        rrl("it-SM", SAME),
+        rrl("it-VA", SAME),
+
+        // Sicilian
+        rrl("scn", LOW));
   }
 
   private static List<RelatedReferenceLocale> norwegian() {

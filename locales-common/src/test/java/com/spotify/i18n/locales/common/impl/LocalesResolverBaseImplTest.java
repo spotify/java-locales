@@ -187,7 +187,7 @@ class LocalesResolverBaseImplTest {
         Arguments.of(
             "et-EE",
             supportedLocales,
-            ResolvedLocale.fromLanguageTags("en-GB", List.of("en"), "en-GB")),
+            ResolvedLocale.fromLanguageTags("en-GB", List.of("en"), "en-EE")),
         // Dutch (Netherlands)
         Arguments.of(
             "nl-NL",
