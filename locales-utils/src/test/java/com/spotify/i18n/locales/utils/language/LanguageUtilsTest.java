@@ -59,6 +59,7 @@ class LanguageUtilsTest {
       case "kk":
       case "kok":
       case "ks":
+      case "ku":
       case "kxv":
       case "mni":
       case "pa":
@@ -113,8 +114,10 @@ class LanguageUtilsTest {
             "az-Cyrl", // https://www.omniglot.com/writing/azeri.htm
             "bs-Cyrl", // https://www.omniglot.com/writing/bosnian.htm
             "ff-Adlm", // https://www.omniglot.com/writing/fula.htm
+            "kk-Arab", // https://www.omniglot.com/writing/kazakh.htm
             "kok-Latn", // https://www.omniglot.com/writing/konkani.htm
             "ks-Deva", // https://www.omniglot.com/writing/kashmiri.htm
+            "ku-Latn", // https://www.omniglot.com/writing/kurdish.htm
             "kxv-Deva", // https://www.businesswireindia.com/two-of-indias-endangered-languages-kuvi-and-kangri-get-a-lease-of-revival-as-motorola-and-lenovo-foundation-bring-alive-their-indigenous-languages-digital-inclusion-initiative-83131.html
             "kxv-Orya", // https://www.businesswireindia.com/two-of-indias-endangered-languages-kuvi-and-kangri-get-a-lease-of-revival-as-motorola-and-lenovo-foundation-bring-alive-their-indigenous-languages-digital-inclusion-initiative-83131.html
             "kxv-Telu", // https://www.businesswireindia.com/two-of-indias-endangered-languages-kuvi-and-kangri-get-a-lease-of-revival-as-motorola-and-lenovo-foundation-bring-alive-their-indigenous-languages-digital-inclusion-initiative-83131.html
