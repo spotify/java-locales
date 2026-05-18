@@ -20,11 +20,18 @@
 
 package com.spotify.i18n.locales.common.impl;
 
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.HIGH;
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.LOW;
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.MUTUALLY_INTELLIGIBLE;
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.SAME;
+
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.ibm.icu.util.LocaleMatcher;
 import com.ibm.icu.util.ULocale;
 import com.spotify.i18n.locales.common.LocalesResolver;
+import com.spotify.i18n.locales.common.model.LocaleAffinity;
 import com.spotify.i18n.locales.common.model.ResolvedLocale;
 import com.spotify.i18n.locales.common.model.SupportedLocale;
 import com.spotify.i18n.locales.utils.acceptlanguage.AcceptLanguageUtils;
@@ -32,6 +39,7 @@ import com.spotify.i18n.locales.utils.available.AvailableLocalesUtils;
 import com.spotify.i18n.locales.utils.hierarchy.LocalesHierarchyUtils;
 import com.spotify.i18n.locales.utils.languagetag.LanguageTagUtils;
 import java.util.List;
+import java.util.Locale;
 import java.util.Locale.LanguageRange;
 import java.util.Map;
 import java.util.Optional;
@@ -68,6 +76,9 @@ public abstract class LocalesResolverBaseImpl implements LocalesResolver {
           .map(ULocale::getLanguage)
           .collect(Collectors.toSet());
 
+  /** Default required locale affinity for resolved locale */
+  public static final LocaleAffinity DEFAULT_REQUIRED_LOCALE_AFFINITY = MUTUALLY_INTELLIGIBLE;
+
   /** Wildcard character for language ranges */
   private static final String LANGUAGE_RANGE_WILDCARD = "*";
 
@@ -75,11 +86,28 @@ public abstract class LocalesResolverBaseImpl implements LocalesResolver {
   private static final String ULOCALE_UNDEFINED_CODE = "Und";
 
   /**
+   * Affinity to distance threshold for {@link LocaleMatcher.Builder#setMaxDistance(Locale, Locale)}
+   */
+  private static final Map<LocaleAffinity, Integer> AFFINITY_TO_DISTANCE_THRESHOLD =
+      Map.of(
+          SAME, 6,
+          MUTUALLY_INTELLIGIBLE, 10,
+          HIGH, 20,
+          LOW, 100);
+
+  /**
    * Returns the set of {@link SupportedLocale} against which locale resolution will be performed.
    *
    * @return The set of {@link SupportedLocale}s
    */
   public abstract Set<SupportedLocale> supportedLocales();
+
+  /**
+   * Returns the required {@link LocaleAffinity} for the resolved locale
+   *
+   * @return The required {@link LocaleAffinity}
+   */
+  public abstract LocaleAffinity requiredLocaleAffinity();
 
   /**
    * Returns the default {@link ResolvedLocale} that will be used as final fallback for a given
@@ -442,6 +470,7 @@ public abstract class LocalesResolverBaseImpl implements LocalesResolver {
   private LocaleMatcher getLocaleMatcher(final Set<ULocale> supportedLocales) {
     return LocaleMatcher.builder()
         .setSupportedULocales(supportedLocales)
+        .internalSetThresholdDistance(AFFINITY_TO_DISTANCE_THRESHOLD.get(requiredLocaleAffinity()))
         .setNoDefaultLocale()
         .build();
   }
@@ -459,7 +488,9 @@ public abstract class LocalesResolverBaseImpl implements LocalesResolver {
   /** A builder for a {@link LocalesResolverBaseImpl}. */
   @AutoValue.Builder
   public abstract static class Builder {
-    Builder() {} // package private constructor
+    Builder() { // package private constructor
+      requiredLocaleAffinity(DEFAULT_REQUIRED_LOCALE_AFFINITY);
+    }
 
     /**
      * Configures the default {@link ResolvedLocale} that will be returned if locale resolution
@@ -479,11 +510,24 @@ public abstract class LocalesResolverBaseImpl implements LocalesResolver {
      */
     public abstract Builder supportedLocales(final Set<SupportedLocale> supportedLocales);
 
+    /**
+     * Configures the set of {@link LocaleAffinity} based on which locale resolution will be
+     * performed.
+     *
+     * @param requiredLocaleAffinity
+     * @return The {@link Builder}
+     */
+    public abstract Builder requiredLocaleAffinity(final LocaleAffinity requiredLocaleAffinity);
+
     abstract LocalesResolverBaseImpl autoBuild();
 
     /** Builds a {@link LocalesResolver} out of this builder. */
     public final LocalesResolver build() {
-      return autoBuild();
+      LocalesResolverBaseImpl built = autoBuild();
+      Preconditions.checkState(
+          built.requiredLocaleAffinity() != LocaleAffinity.NONE,
+          "Required locale affinity for resolved locale cannot be NONE.");
+      return built;
     }
   }
 }

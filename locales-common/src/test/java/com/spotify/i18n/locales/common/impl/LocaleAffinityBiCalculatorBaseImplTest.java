@@ -146,7 +146,10 @@ class LocaleAffinityBiCalculatorBaseImplTest {
         Arguments.of("zh-Hant", "zh", NONE),
         Arguments.of("zh-MK", "zh-CN", SAME),
         Arguments.of("zh-FR", "zh-CN", SAME),
-        Arguments.of("zh-TW", "zh-US", SAME));
+        Arguments.of("zh-TW", "zh-US", SAME),
+
+        // Malay
+        Arguments.of("ms", "id", HIGH));
   }
 
   @Test
