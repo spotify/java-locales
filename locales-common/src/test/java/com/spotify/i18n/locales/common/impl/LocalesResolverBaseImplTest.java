@@ -20,12 +20,16 @@
 
 package com.spotify.i18n.locales.common.impl;
 
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.NONE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.ibm.icu.util.ULocale;
+import com.spotify.i18n.locales.common.LocaleAffinityCalculator;
 import com.spotify.i18n.locales.common.LocalesResolver;
+import com.spotify.i18n.locales.common.model.LocaleAffinityResult;
 import com.spotify.i18n.locales.common.model.ResolvedLocale;
 import com.spotify.i18n.locales.common.model.SupportedLocale;
 import java.util.Collections;
@@ -347,6 +351,27 @@ class LocalesResolverBaseImplTest {
             // Only es should appear as fallback, not es-419
             List.of("es"),
             "es-419");
+    assertThat(resolver.resolve(localeToResolve), is(expectedResolvedLocale));
+  }
+
+  @Test
+  void whenResolvingMazandaraniAgainstFarsi_returnsDefault() {
+    LocalesResolver resolver =
+        LocalesResolverBaseImpl.builder()
+            .supportedLocales(
+                Set.of("en", "fa").stream()
+                    .map(SupportedLocale::fromLanguageTag)
+                    .collect(Collectors.toSet()))
+            .defaultResolvedLocale(DEFAULT_LOCALE)
+            .build();
+
+    String localeToResolve = "mzn";
+
+    ResolvedLocale expectedResolvedLocale =
+        ResolvedLocale.fromLanguageTags(
+            "en",
+            Collections.emptyList(),
+            "en");
     assertThat(resolver.resolve(localeToResolve), is(expectedResolvedLocale));
   }
 }

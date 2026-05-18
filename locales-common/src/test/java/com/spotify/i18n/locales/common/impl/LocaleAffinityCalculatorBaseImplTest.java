@@ -20,6 +20,7 @@
 
 package com.spotify.i18n.locales.common.impl;
 
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.HIGH;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.LOW;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.MUTUALLY_INTELLIGIBLE;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.NONE;
@@ -229,5 +230,18 @@ class LocaleAffinityCalculatorBaseImplTest {
             .build();
 
     assertThat(matcher.calculate("sv"), is(LocaleAffinityResult.builder().affinity(NONE).build()));
+  }
+
+  @Test
+  void whenCalculatingAffinityForMazandaraniAgainstFarsi_returnsNone() {
+    final LocaleAffinityCalculator matcher =
+        LocaleAffinityCalculatorBaseImpl.builder()
+            .againstLocales(
+                Set.of("fa").stream()
+                    .map(ULocale::forLanguageTag)
+                    .collect(Collectors.toSet()))
+            .build();
+
+    assertThat(matcher.calculate("mzn"), is(LocaleAffinityResult.builder().affinity(NONE).build()));
   }
 }
