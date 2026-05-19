@@ -23,6 +23,7 @@ package com.spotify.i18n.locales.common.impl;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.HIGH;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.LOW;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.MUTUALLY_INTELLIGIBLE;
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.NONE;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.SAME;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -58,6 +59,23 @@ class LocalesResolverBaseImplTest {
 
     assertEquals(
         thrown.getMessage(), "Missing required properties: supportedLocales defaultResolvedLocale");
+  }
+
+
+  @Test
+  void whenBuildingWithRequiredLocaleAffinityNONE_buildFails() {
+    IllegalStateException thrown =
+        assertThrows(IllegalStateException.class, () -> LocalesResolverBaseImpl.builder()
+            .supportedLocales(
+                Set.of("fr", "ar", "zh-Hant", "ja").stream()
+                    .map(SupportedLocale::fromLanguageTag)
+                    .collect(Collectors.toSet()))
+            .defaultResolvedLocale(DEFAULT_LOCALE)
+            .requiredLocaleAffinity(NONE)
+            .build());
+
+    assertEquals(
+        thrown.getMessage(), "Required locale affinity for resolved locale cannot be NONE.");
   }
 
   @Test
