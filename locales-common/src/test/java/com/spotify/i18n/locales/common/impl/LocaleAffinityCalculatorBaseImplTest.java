@@ -20,6 +20,7 @@
 
 package com.spotify.i18n.locales.common.impl;
 
+import static com.spotify.i18n.locales.common.model.LocaleAffinity.HIGH;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.LOW;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.MUTUALLY_INTELLIGIBLE;
 import static com.spotify.i18n.locales.common.model.LocaleAffinity.NONE;
@@ -50,7 +51,10 @@ class LocaleAffinityCalculatorBaseImplTest {
   public static final LocaleAffinityCalculator CALCULATOR_AGAINST_TEST_SET_OF_LOCALES =
       LocaleAffinityCalculatorBaseImpl.builder()
           .againstLocales(
-              Set.of("ar", "bs-Cyrl", "es", "fr", "ja", "pt", "sr-Latn", "zh-Hant").stream()
+              Set.of(
+                      "ar", "bs-Cyrl", "es", "fr", "id", "ja", "nb", "pt", "ru", "sr-Latn",
+                      "zh-Hant")
+                  .stream()
                   .map(ULocale::forLanguageTag)
                   .collect(Collectors.toSet()))
           .build();
@@ -186,6 +190,9 @@ class LocaleAffinityCalculatorBaseImplTest {
         // Basque should be matched, since we support Spanish
         Arguments.of("eu", LOW),
 
+        // Danish
+        Arguments.of("da", HIGH),
+
         // French
         Arguments.of("fr", SAME),
         Arguments.of("fr-BE", SAME),
@@ -205,6 +212,17 @@ class LocaleAffinityCalculatorBaseImplTest {
         Arguments.of("sr", SAME),
         Arguments.of("sr-Latn", SAME),
         Arguments.of("sr-Cyrl-ME", SAME),
+
+        // Kazakh should be matched with Russian
+        Arguments.of("kk", NONE),
+        Arguments.of("kk-KZ", NONE),
+
+        // Malay
+        Arguments.of("ms", HIGH),
+
+        // Mongolian should be matched with Russian
+        Arguments.of("mn", NONE),
+        Arguments.of("mn-MN", NONE),
 
         // Portuguese
         Arguments.of("pt", SAME),
